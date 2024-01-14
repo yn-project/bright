@@ -1,0 +1,216 @@
+pipeline {
+  agent any
+
+  stages {
+    // switch k8s env
+    stage('Switch to current cluster') {
+      when {
+        expression { TARGET != 'helm' }
+      }
+      steps {
+        sh 'cd /etc/kubeasz; ./ezctl checkout $TARGET_ENV'
+      }
+    }
+
+    // -------install tasks----------
+    stage('set cluster gateway') {
+      when {
+        expression { INSTALL   ==  'true' }
+        expression { UNINSTALL   ==  'false' }
+        expression { TARGET == 'set-gateway' }
+      }
+      steps {
+        sh 'ansible-playbook -i /etc/kubeasz/clusters/$TARGET_ENV/hosts -e "CLUSTER_GATEWAY=$GATEWAY_HOST" basement/00-set-gateway/gateway.yaml'
+      }
+    }
+
+    stage('install helm') {
+      when {
+        expression { INSTALL   ==  'true' }
+        expression { UNINSTALL   ==  'false' }
+        expression { TARGET == 'helm' }
+      }
+      steps {
+        sh 'bash basement/02-helm/install.sh'
+      }
+    }
+
+    stage('install traefik') {
+      when {
+        expression { INSTALL   ==  'true' }
+        anyOf {
+          expression { TARGET == 'traefik' }
+        }
+      }
+      steps {
+        sh 'bash basement/03-traefik/install.sh'
+      }
+    }
+
+    stage('install milvus') {
+      when {
+        expression { INSTALL   ==  'true' }
+        anyOf {
+            expression { TARGET   ==  'all' }
+            expression { TARGET == 'milvus' }
+        }
+      }
+      steps {
+        sh 'bash basement/04-milvus/install.sh'
+      }
+    }
+    
+    stage('install redis-cluster') {
+      when{
+        expression { INSTALL   ==  'true' }
+        anyOf {
+          expression { TARGET   ==  'all' }
+          expression { TARGET == 'redis-cluster' }
+        }
+      }
+      steps {
+        sh 'bash basement/05-redis-cluster/install.sh'
+      }
+    }
+
+    stage('install minio') {
+      when{
+        expression { INSTALL   ==  'true' }
+        anyOf {
+          expression { TARGET   ==  'all' }
+          expression { TARGET == 'minio' }
+        }
+      }
+      
+      steps {
+        sh 'bash basement/06-minio/install.sh'
+      }
+    }
+
+    stage('install mysql') {
+      when {
+        expression { INSTALL   ==  'true' }
+        anyOf {
+          expression { TARGET   ==  'all' }
+          expression { TARGET == 'mysql' }
+        }
+      }
+      steps {
+        sh 'bash basement/07-mysql/install.sh'
+      }
+    }
+
+    // -------uninstall tasks----------
+    stage('uninstall traefik') {
+      when {
+        expression { UNINSTALL   ==  'true' }
+        anyOf {
+          expression { TARGET == 'traefik' }
+        }
+      }
+      steps {
+        sh 'bash basement/03-traefik/uninstall.sh'
+      }
+    }
+
+    stage('uninstall milvus') {
+      when {
+        expression { UNINSTALL   ==  'true' }
+        anyOf {
+            expression { TARGET   ==  'all' }
+           expression { TARGET == 'milvus' }
+        }
+      }
+      steps {
+        sh 'bash basement/04-milvus/uninstall.sh'
+      }
+    }
+
+    stage('uninstall redis-cluster') {
+      when{
+        expression { UNINSTALL   ==  'true' }
+        anyOf {
+          expression { TARGET   ==  'all' }
+          expression { TARGET == 'redis-cluster' }
+        }
+      }
+      steps {
+        sh 'bash basement/05-redis-cluster/uninstall.sh'
+      }
+    }
+
+    stage('uninstall minio') {
+      when{
+        expression { UNINSTALL   ==  'true' }
+        anyOf {
+          expression { TARGET   ==  'all' }
+          expression { TARGET == 'minio' }
+        }
+      }
+      
+      steps {
+        sh 'bash basement/06-minio/uninstall.sh'
+      }
+    }
+
+    stage('uninstall mysql') {
+      when {
+        expression { UNINSTALL   ==  'true' }
+        anyOf {
+          expression { TARGET   ==  'all' }
+          expression { TARGET == 'mysql' }
+        }
+      }
+      steps {
+        sh 'bash basement/07-mysql/uninstall.sh'
+      }
+    }
+  }
+
+
+
+  post('Report') {
+    always {
+      echo "Anyway,finished the job."
+     }
+    // success {
+    //   script {
+    //     sh(script: 'bash $JENKINS_HOME/wechat-templates/send_wxmsg.sh successful')
+    //  }
+    //   script {
+    //     // env.ForEmailPlugin = env.WORKSPACE
+    //     emailext attachmentsPattern: 'TestResults\\*.trx',
+    //     body: '${FILE,path="$JENKINS_HOME/email-templates/success_email_tmp.html"}',
+    //     mimeType: 'text/html',
+    //     subject: currentBuild.currentResult + " : " + env.JOB_NAME,
+    //     to: '$DEFAULT_RECIPIENTS'
+    //   }
+    //  }
+    // failure {
+    //   script {
+    //     sh(script: 'bash $JENKINS_HOME/wechat-templates/send_wxmsg.sh failure')
+    //  }
+    //   script {
+    //     // env.ForEmailPlugin = env.WORKSPACE
+    //     emailext attachmentsPattern: 'TestResults\\*.trx',
+    //     body: '${FILE,path="$JENKINS_HOME/email-templates/fail_email_tmp.html"}',
+    //     mimeType: 'text/html',
+    //     subject: currentBuild.currentResult + " : " + env.JOB_NAME,
+    //     to: '$DEFAULT_RECIPIENTS'
+    //   }
+    //  }
+    // aborted {
+    //   script {
+    //     sh(script: 'bash $JENKINS_HOME/wechat-templates/send_wxmsg.sh aborted')
+    //  }
+    //   script {
+    //     // env.ForEmailPlugin = env.WORKSPACE
+    //     emailext attachmentsPattern: 'TestResults\\*.trx',
+    //     body: '${FILE,path="$JENKINS_HOME/email-templates/fail_email_tmp.html"}',
+    //     mimeType: 'text/html',
+    //     subject: currentBuild.currentResult + " : " + env.JOB_NAME,
+    //     to: '$DEFAULT_RECIPIENTS'
+    //   }
+    // }
+  }
+}

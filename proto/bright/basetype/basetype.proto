@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package basetype;
+
+option go_package = "yun.tea/block/bright/proto/bright/basetype";
+
+enum EndpointState {
+    EndpointDefault = 0;
+    EndpointAvaliable = 10;
+    EndpointParse = 20;
+    EndpointError = 40;
+}

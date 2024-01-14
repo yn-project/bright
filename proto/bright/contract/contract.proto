@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package nftmeta.v1.block;
+
+option go_package = "yun.tea/block/bright/proto/bright/nftmeta/v1/block";
+import "google/api/annotations.proto";
+
+
+service Manager {
+  rpc GetContractCode(GetContractCodeRequest) returns (GetContractCodeResponse) {
+    option (google.api.http) = {
+      post:"/v1/get/contract/code"
+      body:"*"
+    };
+  }
+
+  rpc CompileContractCode(CompileContractCodeRequest) returns (CompileContractCodeResponse) {
+    option (google.api.http) = {
+      post:"/v1/compile/contract/code"
+      body:"*"
+    };
+  }
+}
+
+message ContractCode {
+  string Data = 10;
+  string AimContractName = 20;
+  string Pkg = 30;
+  string Remark = 40;
+}
+
+message GetContractCodeRequest { }
+message GetContractCodeResponse { ContractCode Info = 10; }
+
+message ContractGEN {
+  string ABI = 10;
+  string BIN = 20;
+  string API = 30;
+}
+
+message CompileContractCodeRequest {
+  string Code = 10;
+  string Pkg = 20;
+  string AimContractName = 30;
+}
+
+message CompileContractCodeResponse { ContractGEN Info = 10; }

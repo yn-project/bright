@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package bright;
+
+option go_package = "yun.tea/block/bright/proto/bright";
+
+enum ERR {
+  OK = 0;
+
+  START = 10000;
+}

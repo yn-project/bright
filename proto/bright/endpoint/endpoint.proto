@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+package bright.endpoint;
+
+option go_package = "yun.tea/block/bright/proto/bright/endpoint";
+import "bright/bright.proto";
+import "bright/basetype/basetype.proto";
+import "google/api/annotations.proto";
+
+service Manager {
+  rpc CreateEndpoint(CreateEndpointRequest) returns (CreateEndpointResponse) {
+    option (google.api.http) = {
+      post:"/create/endpoint"
+      body:"*"
+    };
+  }
+  rpc CreateEndpoints(CreateEndpointsRequest) returns (CreateEndpointsResponse) {
+    option (google.api.http) = {
+      post:"/create/endpoints"
+      body:"*"
+    };
+  }
+  rpc UpdateEndpoint(UpdateEndpointRequest) returns (UpdateEndpointResponse) {
+    option (google.api.http) = {
+      post:"/update/endpoint"
+      body:"*"
+    };
+  }
+  rpc UpdateEndpoints(UpdateEndpointsRequest) returns (UpdateEndpointsResponse) {
+    option (google.api.http) = {
+      post:"/update/endpoints"
+      body:"*"
+    };
+  }
+  rpc GetEndpoint(GetEndpointRequest) returns (GetEndpointResponse) {
+    option (google.api.http) = {
+      post:"/get/endpoint"
+      body:"*"
+    };
+  }
+  rpc GetEndpoints(GetEndpointsRequest) returns (GetEndpointsResponse) {
+    option (google.api.http) = {
+      post:"/get/endpoints"
+      body:"*"
+    };
+  }
+  rpc DeleteEndpoint(DeleteEndpointRequest) returns (DeleteEndpointResponse) {
+    option (google.api.http) = {
+      post:"/delete/endpoint"
+      body:"*"
+    };
+  }
+}
+
+message EndpointReq {
+  optional string ID = 10;
+  optional string Address = 20;
+  optional basetype.EndpointState State = 30;
+  optional string Remark = 40;
+}
+
+message Endpoint {
+  string ID = 10;
+  string Address = 20;
+  basetype.EndpointState State = 30;
+  string Remark = 40;
+  uint64 CreatedAt = 50;
+  uint64 UpdatedAt = 60;
+}
+
+message Conds {
+  bright.StringVal ID = 10;
+  bright.StringVal Address = 20;
+  bright.StringVal State = 30;
+  bright.StringSliceVal IDs = 100;
+}
+
+message CreateEndpointRequest { EndpointReq Info = 10; }
+message CreateEndpointResponse { Endpoint Info = 10; }
+
+message CreateEndpointsRequest { repeated EndpointReq Infos = 10; }
+message CreateEndpointsResponse { repeated Endpoint Infos = 10; }
+
+message GetEndpointRequest { string ID = 10; }
+message GetEndpointResponse { Endpoint Info = 10; }
+
+message GetEndpointsRequest {
+  Conds Conds = 10;
+  int32 Offset = 20;
+  int32 Limit = 30;
+}
+
+message GetEndpointsResponse {
+  repeated Endpoint Infos = 10;
+  uint32 Total = 20;
+}
+
+message FailedInfo {
+  string ID  = 10;
+  string MSG  = 20;
+}
+
+message UpdateEndpointRequest { EndpointReq Info = 10; }
+message UpdateEndpointResponse { Endpoint Info = 10; }
+
+message UpdateEndpointsRequest { repeated EndpointReq Infos = 10; }
+message UpdateEndpointsResponse { repeated FailedInfo Infos = 10; }
+
+message DeleteEndpointRequest { string ID = 10; }
+message DeleteEndpointResponse { Endpoint Info = 10; }
