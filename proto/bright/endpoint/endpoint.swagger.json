@@ -277,6 +277,18 @@
         }
       }
     },
+    "brightUint32Val": {
+      "type": "object",
+      "properties": {
+        "Op": {
+          "type": "string"
+        },
+        "Value": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
     "endpointConds": {
       "type": "object",
       "properties": {
@@ -288,6 +300,9 @@
         },
         "State": {
           "$ref": "#/definitions/brightStringVal"
+        },
+        "RPS": {
+          "$ref": "#/definitions/brightUint32Val"
         },
         "IDs": {
           "$ref": "#/definitions/brightStringSliceVal"
@@ -362,6 +377,10 @@
         "State": {
           "$ref": "#/definitions/basetypeEndpointState"
         },
+        "RPS": {
+          "type": "integer",
+          "format": "int64"
+        },
         "Remark": {
           "type": "string"
         },
@@ -386,6 +405,10 @@
         },
         "State": {
           "$ref": "#/definitions/basetypeEndpointState"
+        },
+        "RPS": {
+          "type": "integer",
+          "format": "int64"
         },
         "Remark": {
           "type": "string"

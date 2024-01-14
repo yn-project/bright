@@ -56,22 +56,25 @@ message EndpointReq {
   optional string ID = 10;
   optional string Address = 20;
   optional basetype.EndpointState State = 30;
-  optional string Remark = 40;
+  optional uint32 RPS = 40;
+  optional string Remark = 50;
 }
 
 message Endpoint {
   string ID = 10;
   string Address = 20;
   basetype.EndpointState State = 30;
-  string Remark = 40;
-  uint64 CreatedAt = 50;
-  uint64 UpdatedAt = 60;
+  uint32 RPS = 40;
+  string Remark = 50;
+  uint64 CreatedAt = 60;
+  uint64 UpdatedAt = 70;
 }
 
 message Conds {
   bright.StringVal ID = 10;
   bright.StringVal Address = 20;
   bright.StringVal State = 30;
+  bright.Uint32Val RPS = 40;
   bright.StringSliceVal IDs = 100;
 }
 

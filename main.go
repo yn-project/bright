@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"math/big"
@@ -10,10 +9,8 @@ import (
 
 	"github.com/Vigo-Tea/go-ethereum-ant/accounts/abi/bind"
 	"github.com/Vigo-Tea/go-ethereum-ant/common"
-	"github.com/Vigo-Tea/go-ethereum-ant/core/types"
 	"github.com/Vigo-Tea/go-ethereum-ant/crypto"
 	"github.com/Vigo-Tea/go-ethereum-ant/ethclient"
-	"github.com/Vigo-Tea/go-ethereum-ant/rlp"
 	data_fin "yun.tea/block/bright/common/chains/eth/datafin"
 	"yun.tea/block/bright/common/utils"
 )
@@ -43,67 +40,13 @@ func main() {
 	// }
 	// fmt.Println(addr)
 
-	// GenContractAddr(cli)
+	// GetContractAddr(cli)
 
 	// fmt.Println(common.HexToAddress("2b55ecfbf6150b82c3b6889f426e277fc9f7f2cd").Hex())
 
 	// GetAdminInfos(common.HexToAddress("0xE77E96548B2900767771403489eEe7EB8a9409d6"), cli)
 
 	// AddAdmin(privateKeyStr, cli)
-}
-
-func DeployContract(backend *ethclient.Client, priKey, bytecode string) (common.Address, error) {
-	ctx := context.Background()
-	var contractAddr common.Address
-
-	privateKey, err := crypto.HexToECDSA(priKey)
-	if err != nil {
-		return contractAddr, fmt.Errorf("parse key err: %v", err)
-	}
-
-	_from := privateKey.PublicKey
-	from := crypto.PubkeyToAddress(_from)
-
-	chainID, err := backend.ChainID(context.Background())
-	if err != nil {
-		return contractAddr, fmt.Errorf("get eth chainID err: %v", err)
-	}
-	fmt.Println("chainID:%v", chainID)
-
-	nonce, err := backend.PendingNonceAt(ctx, from)
-	if err != nil {
-		return contractAddr, err
-	}
-	fmt.Println("nonce:%v", nonce)
-
-	gasPrice, err := backend.SuggestGasPrice(ctx)
-	if err != nil {
-		return contractAddr, err
-	}
-	fmt.Println("gasPrice:%v", gasPrice)
-
-	rawTx := types.NewContractCreation(nonce, common.Big0, 700000, gasPrice, common.FromHex(bytecode))
-
-	signedTx, err := types.SignTx(rawTx, types.NewEIP155Signer(chainID), privateKey)
-	signedTxBuf := bytes.Buffer{}
-	err = signedTx.EncodeRLP(&signedTxBuf)
-
-	tx := new(types.Transaction)
-	err = rlp.Decode(bytes.NewReader(signedTxBuf.Bytes()), tx)
-
-	// data, err := tx.MarshalBinary()
-	// txDD := hexutil.Encode(data)
-	// fmt.Println(txDD)
-
-	err = backend.SendTransaction(ctx, tx)
-	fmt.Println(tx.Hash())
-	fmt.Println(err)
-	time.Sleep(20 * time.Second)
-	// use json-grpc
-	rec, err := backend.TransactionReceipt(ctx, tx.Hash())
-	fmt.Println(err)
-	fmt.Println(utils.PrettyStruct(rec))
-	return crypto.CreateAddress(from, nonce), nil
 }
 
 func DeployContract2(backend *ethclient.Client, priKey string) (common.Address, error) {
@@ -134,7 +77,7 @@ func DeployContract2(backend *ethclient.Client, priKey string) (common.Address, 
 	return recp.ContractAddress, nil
 }
 
-func GenContractAddr(backend *ethclient.Client) {
+func GetContractAddr(backend *ethclient.Client) {
 
 	fmt.Println(common.HexToHash("0x2102f8637f5dbaff62bbf0382929f8134aeb9ccc0abdd584f928fce7f6ce3632"))
 	rec, err := backend.TransactionReceipt(context.Background(), common.HexToHash("0x2102f8637f5dbaff62bbf0382929f8134aeb9ccc0abdd584f928fce7f6ce3632"))

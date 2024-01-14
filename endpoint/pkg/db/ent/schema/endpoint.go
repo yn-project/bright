@@ -25,6 +25,7 @@ func (Endpoint) Fields() []ent.Field {
 			Unique(),
 		field.String("address"),
 		field.String("state").Optional(),
+		field.Uint32("rps").Default(10),
 		field.String("remark").Optional(),
 	}
 }
