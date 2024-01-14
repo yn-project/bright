@@ -12,10 +12,10 @@ func Ent2Grpc(row *ent.Endpoint) *proto.Endpoint {
 	}
 
 	return &proto.Endpoint{
-		ID: row.ID.String(),
-
+		ID:      row.ID.String(),
 		Address: row.Address,
 		State:   basetype.EndpointState(basetype.EndpointState_value[row.State]),
+		RPS:     row.Rps,
 		Remark:  row.Remark,
 	}
 }

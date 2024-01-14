@@ -43,6 +43,9 @@ func CreateSet(c *ent.EndpointCreate, in *proto.EndpointReq) *ent.EndpointCreate
 	if in.State != nil {
 		c.SetState(in.GetState().String())
 	}
+	if in.RPS != nil {
+		c.SetRps(in.GetRPS())
+	}
 	if in.Remark != nil {
 		c.SetRemark(in.GetRemark())
 	}

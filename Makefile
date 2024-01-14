@@ -41,7 +41,6 @@ verify-shellcheck: ## Runs shellcheck
 gen-ent:
 	go install entgo.io/ent/cmd/ent@v0.11.2
 	go get entgo.io/ent/cmd/ent@v0.11.2
-	go run entgo.io/ent/cmd/ent generate --feature entql,sql/lock,sql/execquery,sql/upsert,privacy,schema/snapshot,sql/modifier ./nft-meta/pkg/db/ent/schema
 	go run entgo.io/ent/cmd/ent generate --feature entql,sql/lock,sql/execquery,sql/upsert,privacy,schema/snapshot,sql/modifier ./endpoint/pkg/db/ent/schema
 
 ifdef AIMPROJECT
@@ -62,20 +61,6 @@ endif
 
 .PHONY: build build-docker release-docker deploy-to-k8s-cluster
 
-./dealer/output/linux/amd64/lotus:
-	mkdir -p dealer/output/linux/amd64/
-	curl -sL https://github.com/filecoin-project/lotus/releases/download/v1.23.1-rc2/lotus_v1.23.1-rc2_linux_amd64.tar.gz -o dealer/output/linux/amd64/lotus_v1.23.1-rc2_linux_amd64.tar.gz
-	tar xvvf dealer/output/linux/amd64/lotus_v1.23.1-rc2_linux_amd64.tar.gz -C dealer/output/linux/amd64/
-	mv dealer/output/linux/amd64/lotus_v1.23.1-rc2_linux_amd64/lotus dealer/output/linux/amd64
-
-./dealer/output/linux/amd64/ipfs:
-	mkdir -p dealer/output/linux/amd64/
-	curl -sL https://dist.ipfs.tech/kubo/v0.20.0/kubo_v0.20.0_linux-amd64.tar.gz -o dealer/output/linux/amd64/kubo_v0.20.0_linux-amd64.tar.gz
-	tar -xvzf dealer/output/linux/amd64/kubo_v0.20.0_linux-amd64.tar.gz -C dealer/output/linux/amd64/
-	cp dealer/output/linux/amd64/kubo/ipfs dealer/output/linux/amd64/
-
-
-dealer: ./dealer/output/linux/amd64/lotus ./dealer/output/linux/amd64/ipfs
 
 build:  ## Build project
 	@for x in $(PROJECTS); do \

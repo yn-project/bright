@@ -16,6 +16,7 @@ var (
 		{Name: "deleted_at", Type: field.TypeUint32},
 		{Name: "address", Type: field.TypeString},
 		{Name: "state", Type: field.TypeString, Nullable: true},
+		{Name: "rps", Type: field.TypeUint32, Default: 10},
 		{Name: "remark", Type: field.TypeString, Nullable: true},
 	}
 	// EndpointsTable holds the schema information for the "endpoints" table.
