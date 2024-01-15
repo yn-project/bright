@@ -1,5 +1,6 @@
 
 "链上合约：
+内置维护密码
 Ownerable合约初始化功能
 Ownerable合约验证器
 Ownerable合约设置Root帐号

@@ -27,15 +27,16 @@ type EndpointInterval struct {
 var _eIMGR *endpointIntervalMGR
 
 const (
-	keyExpireTime        = time.Minute * 5
 	lockEndpointWaitTime = time.Millisecond * 100
 	eIMGRPrefix          = "eIMGR"
-	goaheadLockTime      = time.Minute
+	endpointsListKey     = "endpoint-list"
+	endpointsListExpire  = time.Hour * 24
+	goaheadLockTime      = time.Second * 30
 )
 
 func GetEndpintIntervalMGR() *endpointIntervalMGR {
 	if _eIMGR == nil {
-		_eIMGR = &endpointIntervalMGR{RedisExpireTime: keyExpireTime}
+		_eIMGR = &endpointIntervalMGR{RedisExpireTime: endpointsListExpire}
 	}
 	return _eIMGR
 }
@@ -48,6 +49,19 @@ func (eIMGR *endpointIntervalMGR) putEndpoint(item *EndpointInterval, autoResetB
 	}
 
 	return ctredis.Set(eIMGR.getKey(item.Address), item, eIMGR.RedisExpireTime)
+}
+
+func (eIMGR *endpointIntervalMGR) SetEndpoinsList(infos []string) error {
+	return ctredis.Set(endpointsListKey, infos, endpointsListExpire)
+}
+
+func (eIMGR *endpointIntervalMGR) GetEndpoinsList() ([]string, error) {
+	infos := []string{}
+	err := ctredis.Get(endpointsListKey, infos)
+	if err != nil {
+		return nil, err
+	}
+	return infos, err
 }
 
 func (eIMGR *endpointIntervalMGR) GoAheadEndpoint(item *EndpointInterval) error {
