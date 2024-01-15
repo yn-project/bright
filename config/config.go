@@ -17,6 +17,7 @@ type Config struct {
 	Version  string   `toml:"version" env:"version"`
 	Contract Contract `toml:"contract" env:"contract"`
 	Endpoint Endpoint `toml:"endpoint" env:"endpoint"`
+	Account  Account  `toml:"account" env:"account"`
 	MySQL    MySQL    `toml:"mysql" env:"mysql"`
 	Pulsar   Pulsar   `toml:"pulsar" env:"pulsar"`
 	Redis    Redis    `toml:"redis" env:"redis"`
@@ -31,6 +32,13 @@ type Contract struct {
 }
 
 type Endpoint struct {
+	Domain   string `toml:"domain" env:"domain"`
+	HTTPPort int    `toml:"http-port" env:"http_port"`
+	GrpcPort int    `toml:"grpc-port" env:"grpc_port"`
+	LogFile  string `toml:"log-file" env:"log_file"`
+}
+
+type Account struct {
 	Domain   string `toml:"domain" env:"domain"`
 	HTTPPort int    `toml:"http-port" env:"http_port"`
 	GrpcPort int    `toml:"grpc-port" env:"grpc_port"`

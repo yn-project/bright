@@ -14,16 +14,15 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	cli "github.com/urfave/cli/v2"
 	"yun.tea/block/bright/config"
-	"yun.tea/block/bright/endpoint/pkg/db"
-	"yun.tea/block/bright/endpoint/pkg/mgr"
+	"yun.tea/block/bright/account/pkg/db"
 
 	"yun.tea/block/bright/common/logger"
-	api "yun.tea/block/bright/endpoint/api"
+	api "yun.tea/block/bright/account/api"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
-	"yun.tea/block/bright/endpoint/pkg/servicename"
+	"yun.tea/block/bright/account/pkg/servicename"
 )
 
 func init() {
@@ -42,12 +41,11 @@ var runCmd = &cli.Command{
 		if err != nil {
 			return err
 		}
-		return logger.Init(logger.DebugLevel, config.GetConfig().Endpoint.LogFile)
+		return logger.Init(logger.DebugLevel, config.GetConfig().Account.LogFile)
 	},
 	Action: func(c *cli.Context) error {
-		go mgr.Maintain(c.Context)
-		go runGRPCServer(config.GetConfig().Endpoint.GrpcPort)
-		go runHTTPServer(config.GetConfig().Endpoint.HTTPPort, config.GetConfig().Endpoint.GrpcPort)
+		go runGRPCServer(config.GetConfig().Account.GrpcPort)
+		go runHTTPServer(config.GetConfig().Account.HTTPPort, config.GetConfig().Account.GrpcPort)
 		sigchan := make(chan os.Signal, 1)
 		signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 
@@ -58,8 +56,8 @@ var runCmd = &cli.Command{
 }
 
 func runGRPCServer(grpcPort int) {
-	endpoint := fmt.Sprintf(":%v", grpcPort)
-	lis, err := net.Listen("tcp", endpoint)
+	account := fmt.Sprintf(":%v", grpcPort)
+	lis, err := net.Listen("tcp", account)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
@@ -73,17 +71,17 @@ func runGRPCServer(grpcPort int) {
 }
 
 func runHTTPServer(httpPort, grpcPort int) {
-	httpEndpoint := fmt.Sprintf(":%v", httpPort)
-	grpcEndpoint := fmt.Sprintf(":%v", grpcPort)
+	httpAccount := fmt.Sprintf(":%v", httpPort)
+	grpcAccount := fmt.Sprintf(":%v", grpcPort)
 
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	err := api.RegisterGateway(mux, grpcEndpoint, opts)
+	err := api.RegisterGateway(mux, grpcAccount, opts)
 	if err != nil {
-		log.Fatalf("Fail to register gRPC gateway service endpoint: %v", err)
+		log.Fatalf("Fail to register gRPC gateway service account: %v", err)
 	}
 
-	err = http.ListenAndServe(httpEndpoint, mux)
+	err = http.ListenAndServe(httpAccount, mux)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}

@@ -12,6 +12,12 @@ http-port=30120
 grpc-port=30121
 log-file="/var/log/endpoint.log"
 
+[account]
+domain="account"
+http-port=30130
+grpc-port=30131
+log-file="/var/log/account.log"
+
 [mysql]
 domain="127.0.0.1"
 port=3306

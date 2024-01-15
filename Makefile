@@ -42,6 +42,7 @@ gen-ent:
 	go install entgo.io/ent/cmd/ent@v0.11.2
 	go get entgo.io/ent/cmd/ent@v0.11.2
 	go run entgo.io/ent/cmd/ent generate --feature entql,sql/lock,sql/execquery,sql/upsert,privacy,schema/snapshot,sql/modifier ./endpoint/pkg/db/ent/schema
+	go run entgo.io/ent/cmd/ent generate --feature entql,sql/lock,sql/execquery,sql/upsert,privacy,schema/snapshot,sql/modifier ./account/pkg/db/ent/schema
 
 ifdef AIMPROJECT
 PROJECTS= $(AIMPROJECT)

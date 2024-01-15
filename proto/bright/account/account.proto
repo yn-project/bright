@@ -1,0 +1,115 @@
+syntax = "proto3";
+
+package bright.account;
+
+option go_package = "yun.tea/block/bright/proto/bright/account";
+import "bright/bright.proto";
+import "bright/basetype/basetype.proto";
+import "google/api/annotations.proto";
+
+service Manager {
+  rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse) {
+    option (google.api.http) = {
+      post:"/create/account"
+      body:"*"
+    };
+  }
+  rpc CreateAccounts(CreateAccountsRequest) returns (CreateAccountsResponse) {
+    option (google.api.http) = {
+      post:"/create/accounts"
+      body:"*"
+    };
+  }
+  rpc UpdateAccount(UpdateAccountRequest) returns (UpdateAccountResponse) {
+    option (google.api.http) = {
+      post:"/update/account"
+      body:"*"
+    };
+  }
+  rpc UpdateAccounts(UpdateAccountsRequest) returns (UpdateAccountsResponse) {
+    option (google.api.http) = {
+      post:"/update/accounts"
+      body:"*"
+    };
+  }
+  rpc GetAccount(GetAccountRequest) returns (GetAccountResponse) {
+    option (google.api.http) = {
+      post:"/get/account"
+      body:"*"
+    };
+  }
+  rpc GetAccounts(GetAccountsRequest) returns (GetAccountsResponse) {
+    option (google.api.http) = {
+      post:"/get/accounts"
+      body:"*"
+    };
+  }
+  rpc DeleteAccount(DeleteAccountRequest) returns (DeleteAccountResponse) {
+    option (google.api.http) = {
+      post:"/delete/account"
+      body:"*"
+    };
+  }
+}
+
+message AccountReq {
+  optional string ID = 10;
+  optional string Address = 20;
+  optional string Balance = 30;
+  optional bool Enable = 40;
+  optional bool IsRoot = 50;
+  optional string Remark = 60;
+}
+
+message Account {
+  string ID = 10;
+  string Address = 20;
+  string Balance = 30;
+  bool Enable = 40;
+  bool IsRoot = 50;
+  string Remark = 60;
+}
+
+message Conds {
+  bright.StringVal ID = 10;
+  bright.StringVal Address = 20;
+  bright.StringVal Balance = 30;
+  bright.BoolVal Enable = 40;
+  bright.BoolVal IsRoot = 50;
+  bright.StringVal Remark = 60;
+  bright.StringSliceVal IDs = 100;
+}
+
+message CreateAccountRequest { AccountReq Info = 10; }
+message CreateAccountResponse { Account Info = 10; }
+
+message CreateAccountsRequest { repeated AccountReq Infos = 10; }
+message CreateAccountsResponse { repeated Account Infos = 10; }
+
+message GetAccountRequest { string ID = 10; }
+message GetAccountResponse { Account Info = 10; }
+
+message GetAccountsRequest {
+  Conds Conds = 10;
+  int32 Offset = 20;
+  int32 Limit = 30;
+}
+
+message GetAccountsResponse {
+  repeated Account Infos = 10;
+  uint32 Total = 20;
+}
+
+message FailedInfo {
+  string ID  = 10;
+  string MSG  = 20;
+}
+
+message UpdateAccountRequest { AccountReq Info = 10; }
+message UpdateAccountResponse { Account Info = 10; }
+
+message UpdateAccountsRequest { repeated AccountReq Infos = 10; }
+message UpdateAccountsResponse { repeated FailedInfo Infos = 10; }
+
+message DeleteAccountRequest { string ID = 10; }
+message DeleteAccountResponse { Account Info = 10; }
