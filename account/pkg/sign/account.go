@@ -2,6 +2,7 @@ package sign
 
 import (
 	"crypto/ecdsa"
+	"encoding/base64"
 	"encoding/hex"
 	"errors"
 
@@ -65,4 +66,32 @@ func GetPubKey(hexPri string) (pub string, err error) {
 
 	pubKey := crypto.PubkeyToAddress(*publicKeyECDSA).Hex() // Hex String
 	return pubKey, nil
+}
+
+func FuzzStr(srcStr, fuzzStr string) string {
+	fuzzStr = hex.EncodeToString([]byte(fuzzStr))
+	src := []byte(srcStr + fuzzStr)
+
+	for i := 0; i < len(src)/3; i++ {
+		src[i], src[i+len(src)/3], src[i+len(src)/3*2] = src[i+len(src)/3], src[i+len(src)/3*2], src[i]
+	}
+	dst1Len := base64.RawStdEncoding.EncodedLen(len(src))
+	dst1 := make([]byte, dst1Len)
+	base64.RawStdEncoding.Encode(dst1, src)
+
+	return string(dst1)
+}
+
+func DefuzzStr(srcStr, fuzzStr string) (string, error) {
+	fuzzStr = hex.EncodeToString([]byte(fuzzStr))
+	src, err := base64.RawStdEncoding.DecodeString(string(srcStr))
+	if err != nil {
+		return "", err
+	}
+
+	for i := 0; i < len(src)/3; i++ {
+		src[i+len(src)/3], src[i+len(src)/3*2], src[i] = src[i], src[i+len(src)/3], src[i+len(src)/3*2]
+	}
+	srcStr = string(src[:len(src)-len(fuzzStr)])
+	return srcStr, nil
 }

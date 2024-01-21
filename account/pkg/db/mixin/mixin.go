@@ -2,8 +2,8 @@ package mixin
 
 import (
 	"entgo.io/ent"
-	"yun.tea/block/bright/endpoint/pkg/db/ent/privacy"
-	"yun.tea/block/bright/endpoint/pkg/db/rule"
+	"yun.tea/block/bright/account/pkg/db/ent/privacy"
+	"yun.tea/block/bright/account/pkg/db/rule"
 )
 
 func (TimeMixin) Mixin() []ent.Mixin {

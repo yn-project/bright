@@ -23,10 +23,9 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ManagerClient interface {
 	CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*CreateAccountResponse, error)
-	CreateAccounts(ctx context.Context, in *CreateAccountsRequest, opts ...grpc.CallOption) (*CreateAccountsResponse, error)
-	UpdateAccount(ctx context.Context, in *UpdateAccountRequest, opts ...grpc.CallOption) (*UpdateAccountResponse, error)
-	UpdateAccounts(ctx context.Context, in *UpdateAccountsRequest, opts ...grpc.CallOption) (*UpdateAccountsResponse, error)
+	ImportAccount(ctx context.Context, in *ImportAccountRequest, opts ...grpc.CallOption) (*ImportAccountResponse, error)
 	GetAccount(ctx context.Context, in *GetAccountRequest, opts ...grpc.CallOption) (*GetAccountResponse, error)
+	GetAccountPriKey(ctx context.Context, in *GetAccountPriKeyRequest, opts ...grpc.CallOption) (*GetAccountPriKeyResponse, error)
 	GetAccounts(ctx context.Context, in *GetAccountsRequest, opts ...grpc.CallOption) (*GetAccountsResponse, error)
 	DeleteAccount(ctx context.Context, in *DeleteAccountRequest, opts ...grpc.CallOption) (*DeleteAccountResponse, error)
 }
@@ -48,27 +47,9 @@ func (c *managerClient) CreateAccount(ctx context.Context, in *CreateAccountRequ
 	return out, nil
 }
 
-func (c *managerClient) CreateAccounts(ctx context.Context, in *CreateAccountsRequest, opts ...grpc.CallOption) (*CreateAccountsResponse, error) {
-	out := new(CreateAccountsResponse)
-	err := c.cc.Invoke(ctx, "/bright.account.Manager/CreateAccounts", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *managerClient) UpdateAccount(ctx context.Context, in *UpdateAccountRequest, opts ...grpc.CallOption) (*UpdateAccountResponse, error) {
-	out := new(UpdateAccountResponse)
-	err := c.cc.Invoke(ctx, "/bright.account.Manager/UpdateAccount", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *managerClient) UpdateAccounts(ctx context.Context, in *UpdateAccountsRequest, opts ...grpc.CallOption) (*UpdateAccountsResponse, error) {
-	out := new(UpdateAccountsResponse)
-	err := c.cc.Invoke(ctx, "/bright.account.Manager/UpdateAccounts", in, out, opts...)
+func (c *managerClient) ImportAccount(ctx context.Context, in *ImportAccountRequest, opts ...grpc.CallOption) (*ImportAccountResponse, error) {
+	out := new(ImportAccountResponse)
+	err := c.cc.Invoke(ctx, "/bright.account.Manager/ImportAccount", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -78,6 +59,15 @@ func (c *managerClient) UpdateAccounts(ctx context.Context, in *UpdateAccountsRe
 func (c *managerClient) GetAccount(ctx context.Context, in *GetAccountRequest, opts ...grpc.CallOption) (*GetAccountResponse, error) {
 	out := new(GetAccountResponse)
 	err := c.cc.Invoke(ctx, "/bright.account.Manager/GetAccount", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *managerClient) GetAccountPriKey(ctx context.Context, in *GetAccountPriKeyRequest, opts ...grpc.CallOption) (*GetAccountPriKeyResponse, error) {
+	out := new(GetAccountPriKeyResponse)
+	err := c.cc.Invoke(ctx, "/bright.account.Manager/GetAccountPriKey", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -107,10 +97,9 @@ func (c *managerClient) DeleteAccount(ctx context.Context, in *DeleteAccountRequ
 // for forward compatibility
 type ManagerServer interface {
 	CreateAccount(context.Context, *CreateAccountRequest) (*CreateAccountResponse, error)
-	CreateAccounts(context.Context, *CreateAccountsRequest) (*CreateAccountsResponse, error)
-	UpdateAccount(context.Context, *UpdateAccountRequest) (*UpdateAccountResponse, error)
-	UpdateAccounts(context.Context, *UpdateAccountsRequest) (*UpdateAccountsResponse, error)
+	ImportAccount(context.Context, *ImportAccountRequest) (*ImportAccountResponse, error)
 	GetAccount(context.Context, *GetAccountRequest) (*GetAccountResponse, error)
+	GetAccountPriKey(context.Context, *GetAccountPriKeyRequest) (*GetAccountPriKeyResponse, error)
 	GetAccounts(context.Context, *GetAccountsRequest) (*GetAccountsResponse, error)
 	DeleteAccount(context.Context, *DeleteAccountRequest) (*DeleteAccountResponse, error)
 	mustEmbedUnimplementedManagerServer()
@@ -123,17 +112,14 @@ type UnimplementedManagerServer struct {
 func (UnimplementedManagerServer) CreateAccount(context.Context, *CreateAccountRequest) (*CreateAccountResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateAccount not implemented")
 }
-func (UnimplementedManagerServer) CreateAccounts(context.Context, *CreateAccountsRequest) (*CreateAccountsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateAccounts not implemented")
-}
-func (UnimplementedManagerServer) UpdateAccount(context.Context, *UpdateAccountRequest) (*UpdateAccountResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateAccount not implemented")
-}
-func (UnimplementedManagerServer) UpdateAccounts(context.Context, *UpdateAccountsRequest) (*UpdateAccountsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateAccounts not implemented")
+func (UnimplementedManagerServer) ImportAccount(context.Context, *ImportAccountRequest) (*ImportAccountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ImportAccount not implemented")
 }
 func (UnimplementedManagerServer) GetAccount(context.Context, *GetAccountRequest) (*GetAccountResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAccount not implemented")
+}
+func (UnimplementedManagerServer) GetAccountPriKey(context.Context, *GetAccountPriKeyRequest) (*GetAccountPriKeyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAccountPriKey not implemented")
 }
 func (UnimplementedManagerServer) GetAccounts(context.Context, *GetAccountsRequest) (*GetAccountsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAccounts not implemented")
@@ -172,56 +158,20 @@ func _Manager_CreateAccount_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Manager_CreateAccounts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateAccountsRequest)
+func _Manager_ImportAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ImportAccountRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ManagerServer).CreateAccounts(ctx, in)
+		return srv.(ManagerServer).ImportAccount(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/bright.account.Manager/CreateAccounts",
+		FullMethod: "/bright.account.Manager/ImportAccount",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ManagerServer).CreateAccounts(ctx, req.(*CreateAccountsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Manager_UpdateAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateAccountRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ManagerServer).UpdateAccount(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/bright.account.Manager/UpdateAccount",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ManagerServer).UpdateAccount(ctx, req.(*UpdateAccountRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Manager_UpdateAccounts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateAccountsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ManagerServer).UpdateAccounts(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/bright.account.Manager/UpdateAccounts",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ManagerServer).UpdateAccounts(ctx, req.(*UpdateAccountsRequest))
+		return srv.(ManagerServer).ImportAccount(ctx, req.(*ImportAccountRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -240,6 +190,24 @@ func _Manager_GetAccount_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ManagerServer).GetAccount(ctx, req.(*GetAccountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Manager_GetAccountPriKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAccountPriKeyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagerServer).GetAccountPriKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/bright.account.Manager/GetAccountPriKey",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagerServer).GetAccountPriKey(ctx, req.(*GetAccountPriKeyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -292,20 +260,16 @@ var Manager_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Manager_CreateAccount_Handler,
 		},
 		{
-			MethodName: "CreateAccounts",
-			Handler:    _Manager_CreateAccounts_Handler,
-		},
-		{
-			MethodName: "UpdateAccount",
-			Handler:    _Manager_UpdateAccount_Handler,
-		},
-		{
-			MethodName: "UpdateAccounts",
-			Handler:    _Manager_UpdateAccounts_Handler,
+			MethodName: "ImportAccount",
+			Handler:    _Manager_ImportAccount_Handler,
 		},
 		{
 			MethodName: "GetAccount",
 			Handler:    _Manager_GetAccount_Handler,
+		},
+		{
+			MethodName: "GetAccountPriKey",
+			Handler:    _Manager_GetAccountPriKey_Handler,
 		},
 		{
 			MethodName: "GetAccounts",

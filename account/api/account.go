@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"yun.tea/block/bright/common/logger"
+	"yun.tea/block/bright/common/utils"
 	proto "yun.tea/block/bright/proto/bright/account"
 
 	"github.com/google/uuid"
@@ -18,83 +19,49 @@ import (
 
 func (s *Server) CreateAccount(ctx context.Context, in *proto.CreateAccountRequest) (*proto.CreateAccountResponse, error) {
 	var err error
+	address := ""
 	isRoot := false
 	enable := false
 	balance := "0"
-	in.GetInfo().Balance = &balance
-	in.GetInfo().IsRoot = &isRoot
-	in.GetInfo().Enable = &enable
-	info, err := crud.Create(ctx, in.GetInfo())
+	info := &proto.AccountReq{
+		Address: &address,
+		Balance: &balance,
+		IsRoot:  &isRoot,
+		Enable:  &enable,
+		Remark:  &in.Remark,
+	}
+	crudInfo, err := crud.Create(ctx, info)
 	if err != nil {
 		logger.Sugar().Errorw("CreateAccount", "error", err)
 		return &proto.CreateAccountResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
 	return &proto.CreateAccountResponse{
-		Info: converter.Ent2Grpc(info),
+		Info: converter.Ent2Grpc(crudInfo),
 	}, nil
 }
 
-func (s *Server) CreateAccounts(ctx context.Context, in *proto.CreateAccountsRequest) (*proto.CreateAccountsResponse, error) {
+func (s *Server) ImportAccount(ctx context.Context, in *proto.ImportAccountRequest) (*proto.ImportAccountResponse, error) {
 	var err error
-
-	if len(in.GetInfos()) == 0 {
-		logger.Sugar().Errorw("CreateAccounts", "error", "Infos is empty")
-		return &proto.CreateAccountsResponse{}, status.Error(codes.InvalidArgument, "Infos is empty")
+	address := ""
+	isRoot := false
+	enable := false
+	balance := "0"
+	info := &proto.AccountReq{
+		Address: &address,
+		Balance: &balance,
+		IsRoot:  &isRoot,
+		Enable:  &enable,
+		Remark:  &in.Remark,
 	}
-
-	rows, err := crud.CreateBulk(ctx, in.GetInfos())
+	crudInfo, err := crud.Create(ctx, info)
 	if err != nil {
-		logger.Sugar().Errorw("CreateAccounts", "error", err)
-		return &proto.CreateAccountsResponse{}, status.Error(codes.Internal, err.Error())
+		logger.Sugar().Errorw("CreateAccount", "error", err)
+		return &proto.ImportAccountResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
-	return &proto.CreateAccountsResponse{
-		Infos: converter.Ent2GrpcMany(rows),
-	}, nil
-}
-
-func (s *Server) UpdateAccount(ctx context.Context, in *proto.UpdateAccountRequest) (*proto.UpdateAccountResponse, error) {
-	var err error
-
-	if _, err := uuid.Parse(in.GetInfo().GetID()); err != nil {
-		logger.Sugar().Errorw("UpdateAccount", "ID", in.GetInfo().GetID(), "error", err)
-		return &proto.UpdateAccountResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-
-	info, err := crud.Update(ctx, in.GetInfo())
-	if err != nil {
-		logger.Sugar().Errorw("UpdateAccount", "ID", in.GetInfo().GetID(), "error", err)
-		return &proto.UpdateAccountResponse{}, status.Error(codes.Internal, err.Error())
-	}
-
-	return &proto.UpdateAccountResponse{
-		Info: converter.Ent2Grpc(info),
-	}, nil
-}
-
-func (s *Server) UpdateAccounts(ctx context.Context, in *proto.UpdateAccountsRequest) (*proto.UpdateAccountsResponse, error) {
-	failedInfos := []*proto.FailedInfo{}
-	for _, v := range in.GetInfos() {
-		if _, err := uuid.Parse(v.GetID()); err != nil {
-			failedInfos = append(failedInfos, &proto.FailedInfo{
-				ID:  *v.ID,
-				MSG: err.Error(),
-			})
-			continue
-		}
-
-		_, err := crud.Update(ctx, v)
-		if err != nil {
-			failedInfos = append(failedInfos, &proto.FailedInfo{
-				ID:  *v.ID,
-				MSG: err.Error(),
-			})
-		}
-	}
-
-	return &proto.UpdateAccountsResponse{
-		Infos: failedInfos,
+	return &proto.ImportAccountResponse{
+		Info: converter.Ent2Grpc(crudInfo),
 	}, nil
 }
 
@@ -115,6 +82,26 @@ func (s *Server) GetAccount(ctx context.Context, in *proto.GetAccountRequest) (*
 
 	return &proto.GetAccountResponse{
 		Info: converter.Ent2Grpc(info),
+	}, nil
+}
+
+func (s *Server) GetAccountPriKey(ctx context.Context, in *proto.GetAccountPriKeyRequest) (*proto.GetAccountPriKeyResponse, error) {
+	var err error
+
+	id, err := uuid.Parse(in.GetID())
+	if err != nil {
+		logger.Sugar().Errorw("GetAccount", "ID", in.GetID(), "error", err)
+		return &proto.GetAccountPriKeyResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	info, err := crud.Row(ctx, id)
+	if err != nil {
+		logger.Sugar().Errorw("GetAccount", "ID", in.GetID(), "error", err)
+		return &proto.GetAccountPriKeyResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &proto.GetAccountPriKeyResponse{
+		PriKey: utils.PrettyStruct(info) + "prikey",
 	}, nil
 }
 

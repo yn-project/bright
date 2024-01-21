@@ -157,3 +157,9 @@
 工具：
 
 地址转换（ant-chain addr to address）
+
+
+docker run --rm -dit --name mysql-dev -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 -e MYSQL_ROOT_HOST=% mysql:5.6
+mycli -uroot -hlocalhost
+grant all privileges on *.* to 'root'@'%' identified by '123456' with grant option;
+flush privileges;

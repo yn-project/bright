@@ -48,38 +48,6 @@
         ]
       }
     },
-    "/create/accounts": {
-      "post": {
-        "operationId": "Manager_CreateAccounts",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/accountCreateAccountsResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/accountCreateAccountsRequest"
-            }
-          }
-        ],
-        "tags": [
-          "Manager"
-        ]
-      }
-    },
     "/delete/account": {
       "post": {
         "operationId": "Manager_DeleteAccount",
@@ -144,6 +112,38 @@
         ]
       }
     },
+    "/get/account/prikey": {
+      "post": {
+        "operationId": "Manager_GetAccountPriKey",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/accountGetAccountPriKeyResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/accountGetAccountPriKeyRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Manager"
+        ]
+      }
+    },
     "/get/accounts": {
       "post": {
         "operationId": "Manager_GetAccounts",
@@ -176,14 +176,14 @@
         ]
       }
     },
-    "/update/account": {
+    "/import/account": {
       "post": {
-        "operationId": "Manager_UpdateAccount",
+        "operationId": "Manager_ImportAccount",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/accountUpdateAccountResponse"
+              "$ref": "#/definitions/accountImportAccountResponse"
             }
           },
           "default": {
@@ -199,39 +199,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/accountUpdateAccountRequest"
-            }
-          }
-        ],
-        "tags": [
-          "Manager"
-        ]
-      }
-    },
-    "/update/accounts": {
-      "post": {
-        "operationId": "Manager_UpdateAccounts",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/accountUpdateAccountsResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/accountUpdateAccountsRequest"
+              "$ref": "#/definitions/accountImportAccountRequest"
             }
           }
         ],
@@ -243,29 +211,6 @@
   },
   "definitions": {
     "accountAccount": {
-      "type": "object",
-      "properties": {
-        "ID": {
-          "type": "string"
-        },
-        "Address": {
-          "type": "string"
-        },
-        "Balance": {
-          "type": "string"
-        },
-        "Enable": {
-          "type": "boolean"
-        },
-        "IsRoot": {
-          "type": "boolean"
-        },
-        "Remark": {
-          "type": "string"
-        }
-      }
-    },
-    "accountAccountReq": {
       "type": "object",
       "properties": {
         "ID": {
@@ -317,8 +262,8 @@
     "accountCreateAccountRequest": {
       "type": "object",
       "properties": {
-        "Info": {
-          "$ref": "#/definitions/accountAccountReq"
+        "Remark": {
+          "type": "string"
         }
       }
     },
@@ -327,30 +272,6 @@
       "properties": {
         "Info": {
           "$ref": "#/definitions/accountAccount"
-        }
-      }
-    },
-    "accountCreateAccountsRequest": {
-      "type": "object",
-      "properties": {
-        "Infos": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/accountAccountReq"
-          }
-        }
-      }
-    },
-    "accountCreateAccountsResponse": {
-      "type": "object",
-      "properties": {
-        "Infos": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/accountAccount"
-          }
         }
       }
     },
@@ -370,13 +291,18 @@
         }
       }
     },
-    "accountFailedInfo": {
+    "accountGetAccountPriKeyRequest": {
       "type": "object",
       "properties": {
         "ID": {
           "type": "string"
-        },
-        "MSG": {
+        }
+      }
+    },
+    "accountGetAccountPriKeyResponse": {
+      "type": "object",
+      "properties": {
+        "PriKey": {
           "type": "string"
         }
       }
@@ -429,43 +355,22 @@
         }
       }
     },
-    "accountUpdateAccountRequest": {
+    "accountImportAccountRequest": {
       "type": "object",
       "properties": {
-        "Info": {
-          "$ref": "#/definitions/accountAccountReq"
+        "PriStr": {
+          "type": "string"
+        },
+        "Remark": {
+          "type": "string"
         }
       }
     },
-    "accountUpdateAccountResponse": {
+    "accountImportAccountResponse": {
       "type": "object",
       "properties": {
         "Info": {
           "$ref": "#/definitions/accountAccount"
-        }
-      }
-    },
-    "accountUpdateAccountsRequest": {
-      "type": "object",
-      "properties": {
-        "Infos": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/accountAccountReq"
-          }
-        }
-      }
-    },
-    "accountUpdateAccountsResponse": {
-      "type": "object",
-      "properties": {
-        "Infos": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/accountFailedInfo"
-          }
         }
       }
     },

@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"entgo.io/ent/entql"
-	"yun.tea/block/bright/endpoint/pkg/db/ent/privacy"
+	"yun.tea/block/bright/account/pkg/db/ent/privacy"
 )
 
 func FilterTimeRule() privacy.QueryMutationRule {

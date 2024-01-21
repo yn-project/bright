@@ -14,27 +14,22 @@ service Manager {
       body:"*"
     };
   }
-  rpc CreateAccounts(CreateAccountsRequest) returns (CreateAccountsResponse) {
+  rpc ImportAccount(ImportAccountRequest) returns (ImportAccountResponse) {
     option (google.api.http) = {
-      post:"/create/accounts"
+      post:"/import/account"
       body:"*"
     };
   }
-  rpc UpdateAccount(UpdateAccountRequest) returns (UpdateAccountResponse) {
-    option (google.api.http) = {
-      post:"/update/account"
-      body:"*"
-    };
-  }
-  rpc UpdateAccounts(UpdateAccountsRequest) returns (UpdateAccountsResponse) {
-    option (google.api.http) = {
-      post:"/update/accounts"
-      body:"*"
-    };
-  }
+ 
   rpc GetAccount(GetAccountRequest) returns (GetAccountResponse) {
     option (google.api.http) = {
       post:"/get/account"
+      body:"*"
+    };
+  }
+  rpc GetAccountPriKey(GetAccountPriKeyRequest) returns (GetAccountPriKeyResponse) {
+    option (google.api.http) = {
+      post:"/get/account/prikey"
       body:"*"
     };
   }
@@ -80,14 +75,20 @@ message Conds {
   bright.StringSliceVal IDs = 100;
 }
 
-message CreateAccountRequest { AccountReq Info = 10; }
+message CreateAccountRequest {string Remark = 10; }
 message CreateAccountResponse { Account Info = 10; }
 
-message CreateAccountsRequest { repeated AccountReq Infos = 10; }
-message CreateAccountsResponse { repeated Account Infos = 10; }
+message ImportAccountRequest {
+  string PriStr = 10;
+  string Remark = 20;
+}
+message ImportAccountResponse { Account Info = 10; }
 
 message GetAccountRequest { string ID = 10; }
 message GetAccountResponse { Account Info = 10; }
+
+message GetAccountPriKeyRequest { string ID = 10; }
+message GetAccountPriKeyResponse { string PriKey = 10; }
 
 message GetAccountsRequest {
   Conds Conds = 10;
@@ -99,17 +100,6 @@ message GetAccountsResponse {
   repeated Account Infos = 10;
   uint32 Total = 20;
 }
-
-message FailedInfo {
-  string ID  = 10;
-  string MSG  = 20;
-}
-
-message UpdateAccountRequest { AccountReq Info = 10; }
-message UpdateAccountResponse { Account Info = 10; }
-
-message UpdateAccountsRequest { repeated AccountReq Infos = 10; }
-message UpdateAccountsResponse { repeated FailedInfo Infos = 10; }
 
 message DeleteAccountRequest { string ID = 10; }
 message DeleteAccountResponse { Account Info = 10; }

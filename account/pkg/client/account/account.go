@@ -44,25 +44,9 @@ func CreateAccount(ctx context.Context, in *proto.CreateAccountRequest) (resp *p
 	return resp, err
 }
 
-func CreateAccounts(ctx context.Context, in *proto.CreateAccountsRequest) (resp *proto.CreateAccountsResponse, err error) {
+func ImportAccount(ctx context.Context, in *proto.ImportAccountRequest) (resp *proto.ImportAccountResponse, err error) {
 	_, err = withCRUD(ctx, func(_ctx context.Context, cli proto.ManagerClient) (cruder.Any, error) {
-		resp, err = cli.CreateAccounts(ctx, in)
-		return resp, err
-	})
-	return resp, err
-}
-
-func UpdateAccount(ctx context.Context, in *proto.UpdateAccountRequest) (resp *proto.UpdateAccountResponse, err error) {
-	_, err = withCRUD(ctx, func(_ctx context.Context, cli proto.ManagerClient) (cruder.Any, error) {
-		resp, err = cli.UpdateAccount(ctx, in)
-		return resp, err
-	})
-	return resp, err
-}
-
-func UpdateAccounts(ctx context.Context, in *proto.UpdateAccountsRequest) (resp *proto.UpdateAccountsResponse, err error) {
-	_, err = withCRUD(ctx, func(_ctx context.Context, cli proto.ManagerClient) (cruder.Any, error) {
-		resp, err = cli.UpdateAccounts(ctx, in)
+		resp, err = cli.ImportAccount(ctx, in)
 		return resp, err
 	})
 	return resp, err
