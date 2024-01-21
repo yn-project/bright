@@ -48,38 +48,6 @@
         ]
       }
     },
-    "/create/endpoints": {
-      "post": {
-        "operationId": "Manager_CreateEndpoints",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/endpointCreateEndpointsResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/endpointCreateEndpointsRequest"
-            }
-          }
-        ],
-        "tags": [
-          "Manager"
-        ]
-      }
-    },
     "/delete/endpoint": {
       "post": {
         "operationId": "Manager_DeleteEndpoint",
@@ -175,70 +143,6 @@
           "Manager"
         ]
       }
-    },
-    "/update/endpoint": {
-      "post": {
-        "operationId": "Manager_UpdateEndpoint",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/endpointUpdateEndpointResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/endpointUpdateEndpointRequest"
-            }
-          }
-        ],
-        "tags": [
-          "Manager"
-        ]
-      }
-    },
-    "/update/endpoints": {
-      "post": {
-        "operationId": "Manager_UpdateEndpoints",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/endpointUpdateEndpointsResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/endpointUpdateEndpointsRequest"
-            }
-          }
-        ],
-        "tags": [
-          "Manager"
-        ]
-      }
     }
   },
   "definitions": {
@@ -295,6 +199,9 @@
         "ID": {
           "$ref": "#/definitions/brightStringVal"
         },
+        "Name": {
+          "$ref": "#/definitions/brightStringVal"
+        },
         "Address": {
           "$ref": "#/definitions/brightStringVal"
         },
@@ -325,30 +232,6 @@
         }
       }
     },
-    "endpointCreateEndpointsRequest": {
-      "type": "object",
-      "properties": {
-        "Infos": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/endpointEndpointReq"
-          }
-        }
-      }
-    },
-    "endpointCreateEndpointsResponse": {
-      "type": "object",
-      "properties": {
-        "Infos": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/endpointEndpoint"
-          }
-        }
-      }
-    },
     "endpointDeleteEndpointRequest": {
       "type": "object",
       "properties": {
@@ -369,6 +252,9 @@
       "type": "object",
       "properties": {
         "ID": {
+          "type": "string"
+        },
+        "Name": {
           "type": "string"
         },
         "Address": {
@@ -400,6 +286,9 @@
         "ID": {
           "type": "string"
         },
+        "Name": {
+          "type": "string"
+        },
         "Address": {
           "type": "string"
         },
@@ -411,17 +300,6 @@
           "format": "int64"
         },
         "Remark": {
-          "type": "string"
-        }
-      }
-    },
-    "endpointFailedInfo": {
-      "type": "object",
-      "properties": {
-        "ID": {
-          "type": "string"
-        },
-        "MSG": {
           "type": "string"
         }
       }
@@ -471,46 +349,6 @@
         "Total": {
           "type": "integer",
           "format": "int64"
-        }
-      }
-    },
-    "endpointUpdateEndpointRequest": {
-      "type": "object",
-      "properties": {
-        "Info": {
-          "$ref": "#/definitions/endpointEndpointReq"
-        }
-      }
-    },
-    "endpointUpdateEndpointResponse": {
-      "type": "object",
-      "properties": {
-        "Info": {
-          "$ref": "#/definitions/endpointEndpoint"
-        }
-      }
-    },
-    "endpointUpdateEndpointsRequest": {
-      "type": "object",
-      "properties": {
-        "Infos": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/endpointEndpointReq"
-          }
-        }
-      }
-    },
-    "endpointUpdateEndpointsResponse": {
-      "type": "object",
-      "properties": {
-        "Infos": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/endpointFailedInfo"
-          }
         }
       }
     },

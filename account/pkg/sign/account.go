@@ -33,6 +33,11 @@ import (
 // 	return json.Marshal(signedData)
 // }
 
+const (
+	// rand string
+	defaultFuzzStr = "sdfda213esadf43grs"
+)
+
 func GenAccount() (pri, pub string, err error) {
 	privateKey, err := crypto.GenerateKey()
 	if err != nil {
@@ -68,6 +73,12 @@ func GetPubKey(hexPri string) (pub string, err error) {
 	return pubKey, nil
 }
 
+func DefaultFuzzStr(srcStr string) string {
+	return FuzzStr(srcStr, defaultFuzzStr)
+}
+func DefaultDefuzzStr(srcStr string) (string, error) {
+	return DefuzzStr(srcStr, defaultFuzzStr)
+}
 func FuzzStr(srcStr, fuzzStr string) string {
 	fuzzStr = hex.EncodeToString([]byte(fuzzStr))
 	src := []byte(srcStr + fuzzStr)

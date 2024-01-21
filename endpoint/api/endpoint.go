@@ -6,6 +6,7 @@ import (
 
 	converter "yun.tea/block/bright/endpoint/pkg/converter/endpoint"
 	crud "yun.tea/block/bright/endpoint/pkg/crud/endpoint"
+	"yun.tea/block/bright/endpoint/pkg/mgr"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -26,71 +27,13 @@ func (s *Server) CreateEndpoint(ctx context.Context, in *proto.CreateEndpointReq
 		return &proto.CreateEndpointResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
+	info, err = mgr.CheckAndUpdateEndpoint(ctx, info)
+	if err != nil {
+		logger.Sugar().Warnw("CreateEndpoint", "warning", err)
+	}
+
 	return &proto.CreateEndpointResponse{
 		Info: converter.Ent2Grpc(info),
-	}, nil
-}
-
-func (s *Server) CreateEndpoints(ctx context.Context, in *proto.CreateEndpointsRequest) (*proto.CreateEndpointsResponse, error) {
-	var err error
-
-	if len(in.GetInfos()) == 0 {
-		logger.Sugar().Errorw("CreateEndpoints", "error", "Infos is empty")
-		return &proto.CreateEndpointsResponse{}, status.Error(codes.InvalidArgument, "Infos is empty")
-	}
-
-	rows, err := crud.CreateBulk(ctx, in.GetInfos())
-	if err != nil {
-		logger.Sugar().Errorw("CreateEndpoints", "error", err)
-		return &proto.CreateEndpointsResponse{}, status.Error(codes.Internal, err.Error())
-	}
-
-	return &proto.CreateEndpointsResponse{
-		Infos: converter.Ent2GrpcMany(rows),
-	}, nil
-}
-
-func (s *Server) UpdateEndpoint(ctx context.Context, in *proto.UpdateEndpointRequest) (*proto.UpdateEndpointResponse, error) {
-	var err error
-
-	if _, err := uuid.Parse(in.GetInfo().GetID()); err != nil {
-		logger.Sugar().Errorw("UpdateEndpoint", "ID", in.GetInfo().GetID(), "error", err)
-		return &proto.UpdateEndpointResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-
-	info, err := crud.Update(ctx, in.GetInfo())
-	if err != nil {
-		logger.Sugar().Errorw("UpdateEndpoint", "ID", in.GetInfo().GetID(), "error", err)
-		return &proto.UpdateEndpointResponse{}, status.Error(codes.Internal, err.Error())
-	}
-
-	return &proto.UpdateEndpointResponse{
-		Info: converter.Ent2Grpc(info),
-	}, nil
-}
-
-func (s *Server) UpdateEndpoints(ctx context.Context, in *proto.UpdateEndpointsRequest) (*proto.UpdateEndpointsResponse, error) {
-	failedInfos := []*proto.FailedInfo{}
-	for _, v := range in.GetInfos() {
-		if _, err := uuid.Parse(v.GetID()); err != nil {
-			failedInfos = append(failedInfos, &proto.FailedInfo{
-				ID:  *v.ID,
-				MSG: err.Error(),
-			})
-			continue
-		}
-
-		_, err := crud.Update(ctx, v)
-		if err != nil {
-			failedInfos = append(failedInfos, &proto.FailedInfo{
-				ID:  *v.ID,
-				MSG: err.Error(),
-			})
-		}
-	}
-
-	return &proto.UpdateEndpointsResponse{
-		Infos: failedInfos,
 	}, nil
 }
 

@@ -14,6 +14,7 @@ var (
 		{Name: "created_at", Type: field.TypeUint32},
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "name", Type: field.TypeString},
 		{Name: "address", Type: field.TypeString},
 		{Name: "state", Type: field.TypeString, Nullable: true},
 		{Name: "rps", Type: field.TypeUint32, Default: 10},

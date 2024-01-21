@@ -26,8 +26,8 @@ password="123456"
 database="bright"
 
 [redis]
-address="redis-cluster-headless:6379"
-password="default"
+address="127.0.0.1:6379"
+password=""
 
 [pulsar]
 domain="milvus-pulsar-proxy"

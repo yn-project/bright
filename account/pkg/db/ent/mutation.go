@@ -40,6 +40,7 @@ type AccountMutation struct {
 	deleted_at    *uint32
 	adddeleted_at *int32
 	address       *string
+	pri_key       *string
 	balance       *string
 	enable        *bool
 	is_root       *bool
@@ -358,6 +359,42 @@ func (m *AccountMutation) ResetAddress() {
 	m.address = nil
 }
 
+// SetPriKey sets the "pri_key" field.
+func (m *AccountMutation) SetPriKey(s string) {
+	m.pri_key = &s
+}
+
+// PriKey returns the value of the "pri_key" field in the mutation.
+func (m *AccountMutation) PriKey() (r string, exists bool) {
+	v := m.pri_key
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPriKey returns the old "pri_key" field's value of the Account entity.
+// If the Account object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AccountMutation) OldPriKey(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPriKey is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPriKey requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPriKey: %w", err)
+	}
+	return oldValue.PriKey, nil
+}
+
+// ResetPriKey resets all changes to the "pri_key" field.
+func (m *AccountMutation) ResetPriKey() {
+	m.pri_key = nil
+}
+
 // SetBalance sets the "balance" field.
 func (m *AccountMutation) SetBalance(s string) {
 	m.balance = &s
@@ -547,7 +584,7 @@ func (m *AccountMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AccountMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.created_at != nil {
 		fields = append(fields, account.FieldCreatedAt)
 	}
@@ -559,6 +596,9 @@ func (m *AccountMutation) Fields() []string {
 	}
 	if m.address != nil {
 		fields = append(fields, account.FieldAddress)
+	}
+	if m.pri_key != nil {
+		fields = append(fields, account.FieldPriKey)
 	}
 	if m.balance != nil {
 		fields = append(fields, account.FieldBalance)
@@ -588,6 +628,8 @@ func (m *AccountMutation) Field(name string) (ent.Value, bool) {
 		return m.DeletedAt()
 	case account.FieldAddress:
 		return m.Address()
+	case account.FieldPriKey:
+		return m.PriKey()
 	case account.FieldBalance:
 		return m.Balance()
 	case account.FieldEnable:
@@ -613,6 +655,8 @@ func (m *AccountMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldDeletedAt(ctx)
 	case account.FieldAddress:
 		return m.OldAddress(ctx)
+	case account.FieldPriKey:
+		return m.OldPriKey(ctx)
 	case account.FieldBalance:
 		return m.OldBalance(ctx)
 	case account.FieldEnable:
@@ -657,6 +701,13 @@ func (m *AccountMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAddress(v)
+		return nil
+	case account.FieldPriKey:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPriKey(v)
 		return nil
 	case account.FieldBalance:
 		v, ok := value.(string)
@@ -800,6 +851,9 @@ func (m *AccountMutation) ResetField(name string) error {
 		return nil
 	case account.FieldAddress:
 		m.ResetAddress()
+		return nil
+	case account.FieldPriKey:
+		m.ResetPriKey()
 		return nil
 	case account.FieldBalance:
 		m.ResetBalance()

@@ -44,30 +44,6 @@ func CreateEndpoint(ctx context.Context, in *proto.CreateEndpointRequest) (resp 
 	return resp, err
 }
 
-func CreateEndpoints(ctx context.Context, in *proto.CreateEndpointsRequest) (resp *proto.CreateEndpointsResponse, err error) {
-	_, err = withCRUD(ctx, func(_ctx context.Context, cli proto.ManagerClient) (cruder.Any, error) {
-		resp, err = cli.CreateEndpoints(ctx, in)
-		return resp, err
-	})
-	return resp, err
-}
-
-func UpdateEndpoint(ctx context.Context, in *proto.UpdateEndpointRequest) (resp *proto.UpdateEndpointResponse, err error) {
-	_, err = withCRUD(ctx, func(_ctx context.Context, cli proto.ManagerClient) (cruder.Any, error) {
-		resp, err = cli.UpdateEndpoint(ctx, in)
-		return resp, err
-	})
-	return resp, err
-}
-
-func UpdateEndpoints(ctx context.Context, in *proto.UpdateEndpointsRequest) (resp *proto.UpdateEndpointsResponse, err error) {
-	_, err = withCRUD(ctx, func(_ctx context.Context, cli proto.ManagerClient) (cruder.Any, error) {
-		resp, err = cli.UpdateEndpoints(ctx, in)
-		return resp, err
-	})
-	return resp, err
-}
-
 func GetEndpoint(ctx context.Context, in *proto.GetEndpointRequest) (resp *proto.GetEndpointResponse, err error) {
 	_, err = withCRUD(ctx, func(_ctx context.Context, cli proto.ManagerClient) (cruder.Any, error) {
 		resp, err = cli.GetEndpoint(ctx, in)

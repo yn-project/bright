@@ -89,6 +89,12 @@ func (au *AccountUpdate) SetAddress(s string) *AccountUpdate {
 	return au
 }
 
+// SetPriKey sets the "pri_key" field.
+func (au *AccountUpdate) SetPriKey(s string) *AccountUpdate {
+	au.mutation.SetPriKey(s)
+	return au
+}
+
 // SetBalance sets the "balance" field.
 func (au *AccountUpdate) SetBalance(s string) *AccountUpdate {
 	au.mutation.SetBalance(s)
@@ -304,6 +310,13 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: account.FieldAddress,
 		})
 	}
+	if value, ok := au.mutation.PriKey(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: account.FieldPriKey,
+		})
+	}
 	if value, ok := au.mutation.Balance(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -423,6 +436,12 @@ func (auo *AccountUpdateOne) AddDeletedAt(u int32) *AccountUpdateOne {
 // SetAddress sets the "address" field.
 func (auo *AccountUpdateOne) SetAddress(s string) *AccountUpdateOne {
 	auo.mutation.SetAddress(s)
+	return auo
+}
+
+// SetPriKey sets the "pri_key" field.
+func (auo *AccountUpdateOne) SetPriKey(s string) *AccountUpdateOne {
+	auo.mutation.SetPriKey(s)
 	return auo
 }
 
@@ -669,6 +688,13 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Type:   field.TypeString,
 			Value:  value,
 			Column: account.FieldAddress,
+		})
+	}
+	if value, ok := auo.mutation.PriKey(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: account.FieldPriKey,
 		})
 	}
 	if value, ok := auo.mutation.Balance(); ok {

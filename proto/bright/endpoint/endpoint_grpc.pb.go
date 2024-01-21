@@ -23,9 +23,6 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ManagerClient interface {
 	CreateEndpoint(ctx context.Context, in *CreateEndpointRequest, opts ...grpc.CallOption) (*CreateEndpointResponse, error)
-	CreateEndpoints(ctx context.Context, in *CreateEndpointsRequest, opts ...grpc.CallOption) (*CreateEndpointsResponse, error)
-	UpdateEndpoint(ctx context.Context, in *UpdateEndpointRequest, opts ...grpc.CallOption) (*UpdateEndpointResponse, error)
-	UpdateEndpoints(ctx context.Context, in *UpdateEndpointsRequest, opts ...grpc.CallOption) (*UpdateEndpointsResponse, error)
 	GetEndpoint(ctx context.Context, in *GetEndpointRequest, opts ...grpc.CallOption) (*GetEndpointResponse, error)
 	GetEndpoints(ctx context.Context, in *GetEndpointsRequest, opts ...grpc.CallOption) (*GetEndpointsResponse, error)
 	DeleteEndpoint(ctx context.Context, in *DeleteEndpointRequest, opts ...grpc.CallOption) (*DeleteEndpointResponse, error)
@@ -42,33 +39,6 @@ func NewManagerClient(cc grpc.ClientConnInterface) ManagerClient {
 func (c *managerClient) CreateEndpoint(ctx context.Context, in *CreateEndpointRequest, opts ...grpc.CallOption) (*CreateEndpointResponse, error) {
 	out := new(CreateEndpointResponse)
 	err := c.cc.Invoke(ctx, "/bright.endpoint.Manager/CreateEndpoint", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *managerClient) CreateEndpoints(ctx context.Context, in *CreateEndpointsRequest, opts ...grpc.CallOption) (*CreateEndpointsResponse, error) {
-	out := new(CreateEndpointsResponse)
-	err := c.cc.Invoke(ctx, "/bright.endpoint.Manager/CreateEndpoints", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *managerClient) UpdateEndpoint(ctx context.Context, in *UpdateEndpointRequest, opts ...grpc.CallOption) (*UpdateEndpointResponse, error) {
-	out := new(UpdateEndpointResponse)
-	err := c.cc.Invoke(ctx, "/bright.endpoint.Manager/UpdateEndpoint", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *managerClient) UpdateEndpoints(ctx context.Context, in *UpdateEndpointsRequest, opts ...grpc.CallOption) (*UpdateEndpointsResponse, error) {
-	out := new(UpdateEndpointsResponse)
-	err := c.cc.Invoke(ctx, "/bright.endpoint.Manager/UpdateEndpoints", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -107,9 +77,6 @@ func (c *managerClient) DeleteEndpoint(ctx context.Context, in *DeleteEndpointRe
 // for forward compatibility
 type ManagerServer interface {
 	CreateEndpoint(context.Context, *CreateEndpointRequest) (*CreateEndpointResponse, error)
-	CreateEndpoints(context.Context, *CreateEndpointsRequest) (*CreateEndpointsResponse, error)
-	UpdateEndpoint(context.Context, *UpdateEndpointRequest) (*UpdateEndpointResponse, error)
-	UpdateEndpoints(context.Context, *UpdateEndpointsRequest) (*UpdateEndpointsResponse, error)
 	GetEndpoint(context.Context, *GetEndpointRequest) (*GetEndpointResponse, error)
 	GetEndpoints(context.Context, *GetEndpointsRequest) (*GetEndpointsResponse, error)
 	DeleteEndpoint(context.Context, *DeleteEndpointRequest) (*DeleteEndpointResponse, error)
@@ -122,15 +89,6 @@ type UnimplementedManagerServer struct {
 
 func (UnimplementedManagerServer) CreateEndpoint(context.Context, *CreateEndpointRequest) (*CreateEndpointResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateEndpoint not implemented")
-}
-func (UnimplementedManagerServer) CreateEndpoints(context.Context, *CreateEndpointsRequest) (*CreateEndpointsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateEndpoints not implemented")
-}
-func (UnimplementedManagerServer) UpdateEndpoint(context.Context, *UpdateEndpointRequest) (*UpdateEndpointResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateEndpoint not implemented")
-}
-func (UnimplementedManagerServer) UpdateEndpoints(context.Context, *UpdateEndpointsRequest) (*UpdateEndpointsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateEndpoints not implemented")
 }
 func (UnimplementedManagerServer) GetEndpoint(context.Context, *GetEndpointRequest) (*GetEndpointResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetEndpoint not implemented")
@@ -168,60 +126,6 @@ func _Manager_CreateEndpoint_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ManagerServer).CreateEndpoint(ctx, req.(*CreateEndpointRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Manager_CreateEndpoints_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateEndpointsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ManagerServer).CreateEndpoints(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/bright.endpoint.Manager/CreateEndpoints",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ManagerServer).CreateEndpoints(ctx, req.(*CreateEndpointsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Manager_UpdateEndpoint_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateEndpointRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ManagerServer).UpdateEndpoint(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/bright.endpoint.Manager/UpdateEndpoint",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ManagerServer).UpdateEndpoint(ctx, req.(*UpdateEndpointRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Manager_UpdateEndpoints_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateEndpointsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ManagerServer).UpdateEndpoints(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/bright.endpoint.Manager/UpdateEndpoints",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ManagerServer).UpdateEndpoints(ctx, req.(*UpdateEndpointsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -290,18 +194,6 @@ var Manager_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateEndpoint",
 			Handler:    _Manager_CreateEndpoint_Handler,
-		},
-		{
-			MethodName: "CreateEndpoints",
-			Handler:    _Manager_CreateEndpoints_Handler,
-		},
-		{
-			MethodName: "UpdateEndpoint",
-			Handler:    _Manager_UpdateEndpoint_Handler,
-		},
-		{
-			MethodName: "UpdateEndpoints",
-			Handler:    _Manager_UpdateEndpoints_Handler,
 		},
 		{
 			MethodName: "GetEndpoint",

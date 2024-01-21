@@ -64,34 +64,6 @@ func create(t *testing.T) {
 	}
 }
 
-func createBulk(t *testing.T) {
-	entAccount := []ent.Account{
-		{
-			ID:      uuid.New(),
-			Address: "1155",
-		},
-		{
-			ID:      uuid.New(),
-			Address: "1155",
-		},
-	}
-
-	accounts := []*proto.AccountReq{}
-	for key := range entAccount {
-		id := entAccount[key].ID.String()
-		accounts = append(accounts, &proto.AccountReq{
-			ID:      &id,
-			Address: &entAccount[key].Address,
-		})
-	}
-	infos, err := CreateBulk(context.Background(), accounts)
-	if assert.Nil(t, err) {
-		assert.Equal(t, len(infos), 2)
-		assert.NotEqual(t, infos[0].ID, uuid.UUID{}.String())
-		assert.NotEqual(t, infos[1].ID, uuid.UUID{}.String())
-	}
-}
-
 func update(t *testing.T) {
 	var err error
 	info, err = Update(context.Background(), &accountInfo)
@@ -153,7 +125,6 @@ func TestMainOrder(t *testing.T) {
 	}
 	prepareData()
 	t.Run("create", create)
-	t.Run("createBulk", createBulk)
 	t.Run("row", row)
 	t.Run("rows", rows)
 	t.Run("update", update)

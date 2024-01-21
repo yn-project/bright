@@ -22,6 +22,8 @@ type Endpoint struct {
 	UpdatedAt uint32 `json:"updated_at,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
 	DeletedAt uint32 `json:"deleted_at,omitempty"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
 	// Address holds the value of the "address" field.
 	Address string `json:"address,omitempty"`
 	// State holds the value of the "state" field.
@@ -39,7 +41,7 @@ func (*Endpoint) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case endpoint.FieldCreatedAt, endpoint.FieldUpdatedAt, endpoint.FieldDeletedAt, endpoint.FieldRps:
 			values[i] = new(sql.NullInt64)
-		case endpoint.FieldAddress, endpoint.FieldState, endpoint.FieldRemark:
+		case endpoint.FieldName, endpoint.FieldAddress, endpoint.FieldState, endpoint.FieldRemark:
 			values[i] = new(sql.NullString)
 		case endpoint.FieldID:
 			values[i] = new(uuid.UUID)
@@ -81,6 +83,12 @@ func (e *Endpoint) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
 			} else if value.Valid {
 				e.DeletedAt = uint32(value.Int64)
+			}
+		case endpoint.FieldName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name", values[i])
+			} else if value.Valid {
+				e.Name = value.String
 			}
 		case endpoint.FieldAddress:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -142,6 +150,9 @@ func (e *Endpoint) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("deleted_at=")
 	builder.WriteString(fmt.Sprintf("%v", e.DeletedAt))
+	builder.WriteString(", ")
+	builder.WriteString("name=")
+	builder.WriteString(e.Name)
 	builder.WriteString(", ")
 	builder.WriteString("address=")
 	builder.WriteString(e.Address)

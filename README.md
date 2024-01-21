@@ -163,3 +163,5 @@ docker run --rm -dit --name mysql-dev -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456
 mycli -uroot -hlocalhost
 grant all privileges on *.* to 'root'@'%' identified by '123456' with grant option;
 flush privileges;
+
+ docker run -itd --name redis-test -p 6379:6379 redis

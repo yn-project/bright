@@ -24,6 +24,7 @@ func (Account) Fields() []ent.Field {
 			Default(uuid.New).
 			Unique(),
 		field.String("address"),
+		field.String("pri_key").Unique(),
 		field.String("balance").Optional(),
 		field.Bool("enable").Default(false),
 		field.Bool("is_root").Default(false),

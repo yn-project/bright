@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"yun.tea/block/bright/account/pkg/db/ent/account"
+	"yun.tea/block/bright/account/pkg/sign"
 
 	"github.com/google/uuid"
 	"yun.tea/block/bright/account/pkg/db"
@@ -40,6 +41,10 @@ func CreateSet(c *ent.AccountCreate, in *proto.AccountReq) *ent.AccountCreate {
 	if in.Address != nil {
 		c.SetAddress(in.GetAddress())
 	}
+	if in.PriKey != nil {
+		fuzzedKey := sign.DefaultFuzzStr(in.GetPriKey())
+		c.SetPriKey(fuzzedKey)
+	}
 	if in.Balance != nil {
 		c.SetBalance(in.GetBalance())
 	}
@@ -53,25 +58,6 @@ func CreateSet(c *ent.AccountCreate, in *proto.AccountReq) *ent.AccountCreate {
 		c.SetRemark(in.GetRemark())
 	}
 	return c
-}
-
-func CreateBulk(ctx context.Context, in []*proto.AccountReq) ([]*ent.Account, error) {
-	var err error
-	rows := []*ent.Account{}
-
-	err = db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
-		bulk := make([]*ent.AccountCreate, len(in))
-		for i, info := range in {
-			bulk[i] = CreateSet(tx.Account.Create(), info)
-		}
-		rows, err = tx.Account.CreateBulk(bulk...).Save(_ctx)
-		return err
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return rows, nil
 }
 
 func Update(ctx context.Context, in *proto.AccountReq) (*ent.Account, error) {
@@ -95,9 +81,6 @@ func Update(ctx context.Context, in *proto.AccountReq) (*ent.Account, error) {
 }
 
 func UpdateSet(u *ent.AccountUpdateOne, in *proto.AccountReq) *ent.AccountUpdateOne {
-	if in.Address != nil {
-		u.SetAddress(in.GetAddress())
-	}
 	if in.Balance != nil {
 		u.SetBalance(in.GetBalance())
 	}
@@ -121,6 +104,11 @@ func Row(ctx context.Context, id uuid.UUID) (*ent.Account, error) {
 		info, err = cli.Account.Query().Where(account.ID(id)).Only(_ctx)
 		return err
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	info.PriKey, err = sign.DefaultDefuzzStr(info.PriKey)
 	if err != nil {
 		return nil, err
 	}
@@ -220,6 +208,12 @@ func Rows(ctx context.Context, conds *proto.Conds, offset, limit int) ([]*ent.Ac
 		return nil, 0, err
 	}
 
+	for _, v := range rows {
+		v.PriKey, err = sign.DefaultDefuzzStr(v.PriKey)
+		if err != nil {
+			v.PriKey = ""
+		}
+	}
 	return rows, total, nil
 }
 

@@ -37,6 +37,9 @@ func CreateSet(c *ent.EndpointCreate, in *proto.EndpointReq) *ent.EndpointCreate
 	if in.ID != nil {
 		c.SetID(uuid.New())
 	}
+	if in.Name != nil {
+		c.SetName(in.GetName())
+	}
 	if in.Address != nil {
 		c.SetAddress(in.GetAddress())
 	}
@@ -92,6 +95,9 @@ func Update(ctx context.Context, in *proto.EndpointReq) (*ent.Endpoint, error) {
 }
 
 func UpdateSet(u *ent.EndpointUpdateOne, in *proto.EndpointReq) *ent.EndpointUpdateOne {
+	if in.Name != nil {
+		u.SetName(in.GetName())
+	}
 	if in.Address != nil {
 		u.SetAddress(in.GetAddress())
 	}
@@ -153,6 +159,14 @@ func setQueryConds(conds *proto.Conds, cli *ent.Client) (*ent.EndpointQuery, err
 			stm.Where(endpoint.Address(conds.GetAddress().GetValue()))
 		default:
 			return nil, fmt.Errorf("invalid endpoint address field")
+		}
+	}
+	if conds.Name != nil {
+		switch conds.GetName().GetOp() {
+		case cruder.EQ:
+			stm.Where(endpoint.Name(conds.GetName().GetValue()))
+		default:
+			return nil, fmt.Errorf("invalid endpoint name field")
 		}
 	}
 	if conds.State != nil {

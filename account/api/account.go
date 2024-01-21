@@ -6,30 +6,55 @@ import (
 
 	converter "yun.tea/block/bright/account/pkg/converter/account"
 	crud "yun.tea/block/bright/account/pkg/crud/account"
+	"yun.tea/block/bright/account/pkg/mgr"
+	"yun.tea/block/bright/account/pkg/sign"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"yun.tea/block/bright/common/logger"
-	"yun.tea/block/bright/common/utils"
 	proto "yun.tea/block/bright/proto/bright/account"
 
 	"github.com/google/uuid"
 )
 
+const (
+	maxAccountNum = 1000
+)
+
 func (s *Server) CreateAccount(ctx context.Context, in *proto.CreateAccountRequest) (*proto.CreateAccountResponse, error) {
-	var err error
-	address := ""
+	priKey, pubKey, err := sign.GenAccount()
+	if err != nil {
+		logger.Sugar().Errorw("CreateAccount", "error", err)
+		return &proto.CreateAccountResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	_, total, err := crud.Rows(ctx, nil, 0, maxAccountNum)
+	if err != nil {
+		logger.Sugar().Errorw("CreateAccount", "error", err)
+		return &proto.CreateAccountResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
 	isRoot := false
+	if total > 0 {
+		isRoot = true
+	}
+
 	enable := false
-	balance := "0"
+	balance, err := mgr.CheckStateAndBalance(ctx, pubKey)
+	if err == nil {
+		enable = true
+	}
+
 	info := &proto.AccountReq{
-		Address: &address,
+		Address: &pubKey,
+		PriKey:  &priKey,
 		Balance: &balance,
 		IsRoot:  &isRoot,
 		Enable:  &enable,
 		Remark:  &in.Remark,
 	}
+
 	crudInfo, err := crud.Create(ctx, info)
 	if err != nil {
 		logger.Sugar().Errorw("CreateAccount", "error", err)
@@ -42,13 +67,27 @@ func (s *Server) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 }
 
 func (s *Server) ImportAccount(ctx context.Context, in *proto.ImportAccountRequest) (*proto.ImportAccountResponse, error) {
-	var err error
-	address := ""
+	pubKey, err := sign.GetPubKey(in.PriStr)
+	if err != nil {
+		logger.Sugar().Errorw("ImportAccount", "error", err)
+		return &proto.ImportAccountResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	_, total, err := crud.Rows(ctx, nil, 0, maxAccountNum)
+	if err != nil {
+		logger.Sugar().Errorw("ImportAccount", "error", err)
+		return &proto.ImportAccountResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
 	isRoot := false
+	if total > 0 {
+		isRoot = true
+	}
 	enable := false
 	balance := "0"
+
 	info := &proto.AccountReq{
-		Address: &address,
+		Address: &pubKey,
+		PriKey:  &in.PriStr,
 		Balance: &balance,
 		IsRoot:  &isRoot,
 		Enable:  &enable,
@@ -56,7 +95,7 @@ func (s *Server) ImportAccount(ctx context.Context, in *proto.ImportAccountReque
 	}
 	crudInfo, err := crud.Create(ctx, info)
 	if err != nil {
-		logger.Sugar().Errorw("CreateAccount", "error", err)
+		logger.Sugar().Errorw("ImportAccount", "error", err)
 		return &proto.ImportAccountResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
@@ -101,7 +140,7 @@ func (s *Server) GetAccountPriKey(ctx context.Context, in *proto.GetAccountPriKe
 	}
 
 	return &proto.GetAccountPriKeyResponse{
-		PriKey: utils.PrettyStruct(info) + "prikey",
+		PriKey: info.PriKey,
 	}, nil
 }
 

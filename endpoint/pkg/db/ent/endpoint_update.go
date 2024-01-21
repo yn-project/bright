@@ -83,6 +83,12 @@ func (eu *EndpointUpdate) AddDeletedAt(u int32) *EndpointUpdate {
 	return eu
 }
 
+// SetName sets the "name" field.
+func (eu *EndpointUpdate) SetName(s string) *EndpointUpdate {
+	eu.mutation.SetName(s)
+	return eu
+}
+
 // SetAddress sets the "address" field.
 func (eu *EndpointUpdate) SetAddress(s string) *EndpointUpdate {
 	eu.mutation.SetAddress(s)
@@ -290,6 +296,13 @@ func (eu *EndpointUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: endpoint.FieldDeletedAt,
 		})
 	}
+	if value, ok := eu.mutation.Name(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: endpoint.FieldName,
+		})
+	}
 	if value, ok := eu.mutation.Address(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -410,6 +423,12 @@ func (euo *EndpointUpdateOne) SetNillableDeletedAt(u *uint32) *EndpointUpdateOne
 // AddDeletedAt adds u to the "deleted_at" field.
 func (euo *EndpointUpdateOne) AddDeletedAt(u int32) *EndpointUpdateOne {
 	euo.mutation.AddDeletedAt(u)
+	return euo
+}
+
+// SetName sets the "name" field.
+func (euo *EndpointUpdateOne) SetName(s string) *EndpointUpdateOne {
+	euo.mutation.SetName(s)
 	return euo
 }
 
@@ -648,6 +667,13 @@ func (euo *EndpointUpdateOne) sqlSave(ctx context.Context) (_node *Endpoint, err
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: endpoint.FieldDeletedAt,
+		})
+	}
+	if value, ok := euo.mutation.Name(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: endpoint.FieldName,
 		})
 	}
 	if value, ok := euo.mutation.Address(); ok {

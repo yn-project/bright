@@ -15,6 +15,7 @@ var (
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
 		{Name: "address", Type: field.TypeString},
+		{Name: "pri_key", Type: field.TypeString, Unique: true},
 		{Name: "balance", Type: field.TypeString, Nullable: true},
 		{Name: "enable", Type: field.TypeBool, Default: false},
 		{Name: "is_root", Type: field.TypeBool, Default: false},

@@ -71,6 +71,12 @@ func (ac *AccountCreate) SetAddress(s string) *AccountCreate {
 	return ac
 }
 
+// SetPriKey sets the "pri_key" field.
+func (ac *AccountCreate) SetPriKey(s string) *AccountCreate {
+	ac.mutation.SetPriKey(s)
+	return ac
+}
+
 // SetBalance sets the "balance" field.
 func (ac *AccountCreate) SetBalance(s string) *AccountCreate {
 	ac.mutation.SetBalance(s)
@@ -273,6 +279,9 @@ func (ac *AccountCreate) check() error {
 	if _, ok := ac.mutation.Address(); !ok {
 		return &ValidationError{Name: "address", err: errors.New(`ent: missing required field "Account.address"`)}
 	}
+	if _, ok := ac.mutation.PriKey(); !ok {
+		return &ValidationError{Name: "pri_key", err: errors.New(`ent: missing required field "Account.pri_key"`)}
+	}
 	if _, ok := ac.mutation.Enable(); !ok {
 		return &ValidationError{Name: "enable", err: errors.New(`ent: missing required field "Account.enable"`)}
 	}
@@ -347,6 +356,14 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Column: account.FieldAddress,
 		})
 		_node.Address = value
+	}
+	if value, ok := ac.mutation.PriKey(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: account.FieldPriKey,
+		})
+		_node.PriKey = value
 	}
 	if value, ok := ac.mutation.Balance(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -495,6 +512,18 @@ func (u *AccountUpsert) SetAddress(v string) *AccountUpsert {
 // UpdateAddress sets the "address" field to the value that was provided on create.
 func (u *AccountUpsert) UpdateAddress() *AccountUpsert {
 	u.SetExcluded(account.FieldAddress)
+	return u
+}
+
+// SetPriKey sets the "pri_key" field.
+func (u *AccountUpsert) SetPriKey(v string) *AccountUpsert {
+	u.Set(account.FieldPriKey, v)
+	return u
+}
+
+// UpdatePriKey sets the "pri_key" field to the value that was provided on create.
+func (u *AccountUpsert) UpdatePriKey() *AccountUpsert {
+	u.SetExcluded(account.FieldPriKey)
 	return u
 }
 
@@ -680,6 +709,20 @@ func (u *AccountUpsertOne) SetAddress(v string) *AccountUpsertOne {
 func (u *AccountUpsertOne) UpdateAddress() *AccountUpsertOne {
 	return u.Update(func(s *AccountUpsert) {
 		s.UpdateAddress()
+	})
+}
+
+// SetPriKey sets the "pri_key" field.
+func (u *AccountUpsertOne) SetPriKey(v string) *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetPriKey(v)
+	})
+}
+
+// UpdatePriKey sets the "pri_key" field to the value that was provided on create.
+func (u *AccountUpsertOne) UpdatePriKey() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdatePriKey()
 	})
 }
 
@@ -1039,6 +1082,20 @@ func (u *AccountUpsertBulk) SetAddress(v string) *AccountUpsertBulk {
 func (u *AccountUpsertBulk) UpdateAddress() *AccountUpsertBulk {
 	return u.Update(func(s *AccountUpsert) {
 		s.UpdateAddress()
+	})
+}
+
+// SetPriKey sets the "pri_key" field.
+func (u *AccountUpsertBulk) SetPriKey(v string) *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetPriKey(v)
+	})
+}
+
+// UpdatePriKey sets the "pri_key" field to the value that was provided on create.
+func (u *AccountUpsertBulk) UpdatePriKey() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdatePriKey()
 	})
 }
 

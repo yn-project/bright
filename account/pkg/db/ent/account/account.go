@@ -20,6 +20,8 @@ const (
 	FieldDeletedAt = "deleted_at"
 	// FieldAddress holds the string denoting the address field in the database.
 	FieldAddress = "address"
+	// FieldPriKey holds the string denoting the pri_key field in the database.
+	FieldPriKey = "pri_key"
 	// FieldBalance holds the string denoting the balance field in the database.
 	FieldBalance = "balance"
 	// FieldEnable holds the string denoting the enable field in the database.
@@ -39,6 +41,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldDeletedAt,
 	FieldAddress,
+	FieldPriKey,
 	FieldBalance,
 	FieldEnable,
 	FieldIsRoot,

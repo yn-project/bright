@@ -50,6 +50,7 @@ service Manager {
 message AccountReq {
   optional string ID = 10;
   optional string Address = 20;
+  optional string PriKey = 21;
   optional string Balance = 30;
   optional bool Enable = 40;
   optional bool IsRoot = 50;

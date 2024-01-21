@@ -39,6 +39,7 @@ type EndpointMutation struct {
 	addupdated_at *int32
 	deleted_at    *uint32
 	adddeleted_at *int32
+	name          *string
 	address       *string
 	state         *string
 	rps           *uint32
@@ -322,6 +323,42 @@ func (m *EndpointMutation) ResetDeletedAt() {
 	m.adddeleted_at = nil
 }
 
+// SetName sets the "name" field.
+func (m *EndpointMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *EndpointMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Endpoint entity.
+// If the Endpoint object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EndpointMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *EndpointMutation) ResetName() {
+	m.name = nil
+}
+
 // SetAddress sets the "address" field.
 func (m *EndpointMutation) SetAddress(s string) {
 	m.address = &s
@@ -531,7 +568,7 @@ func (m *EndpointMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *EndpointMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.created_at != nil {
 		fields = append(fields, endpoint.FieldCreatedAt)
 	}
@@ -540,6 +577,9 @@ func (m *EndpointMutation) Fields() []string {
 	}
 	if m.deleted_at != nil {
 		fields = append(fields, endpoint.FieldDeletedAt)
+	}
+	if m.name != nil {
+		fields = append(fields, endpoint.FieldName)
 	}
 	if m.address != nil {
 		fields = append(fields, endpoint.FieldAddress)
@@ -567,6 +607,8 @@ func (m *EndpointMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case endpoint.FieldDeletedAt:
 		return m.DeletedAt()
+	case endpoint.FieldName:
+		return m.Name()
 	case endpoint.FieldAddress:
 		return m.Address()
 	case endpoint.FieldState:
@@ -590,6 +632,8 @@ func (m *EndpointMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldUpdatedAt(ctx)
 	case endpoint.FieldDeletedAt:
 		return m.OldDeletedAt(ctx)
+	case endpoint.FieldName:
+		return m.OldName(ctx)
 	case endpoint.FieldAddress:
 		return m.OldAddress(ctx)
 	case endpoint.FieldState:
@@ -627,6 +671,13 @@ func (m *EndpointMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDeletedAt(v)
+		return nil
+	case endpoint.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
 		return nil
 	case endpoint.FieldAddress:
 		v, ok := value.(string)
@@ -779,6 +830,9 @@ func (m *EndpointMutation) ResetField(name string) error {
 		return nil
 	case endpoint.FieldDeletedAt:
 		m.ResetDeletedAt()
+		return nil
+	case endpoint.FieldName:
+		m.ResetName()
 		return nil
 	case endpoint.FieldAddress:
 		m.ResetAddress()

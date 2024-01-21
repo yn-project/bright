@@ -46,7 +46,7 @@ func init() {
 	// endpoint.DefaultDeletedAt holds the default value on creation for the deleted_at field.
 	endpoint.DefaultDeletedAt = endpointDescDeletedAt.Default.(func() uint32)
 	// endpointDescRps is the schema descriptor for rps field.
-	endpointDescRps := endpointFields[3].Descriptor()
+	endpointDescRps := endpointFields[4].Descriptor()
 	// endpoint.DefaultRps holds the default value on creation for the rps field.
 	endpoint.DefaultRps = endpointDescRps.Default.(uint32)
 	// endpointDescID is the schema descriptor for id field.

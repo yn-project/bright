@@ -65,6 +65,12 @@ func (ec *EndpointCreate) SetNillableDeletedAt(u *uint32) *EndpointCreate {
 	return ec
 }
 
+// SetName sets the "name" field.
+func (ec *EndpointCreate) SetName(s string) *EndpointCreate {
+	ec.mutation.SetName(s)
+	return ec
+}
+
 // SetAddress sets the "address" field.
 func (ec *EndpointCreate) SetAddress(s string) *EndpointCreate {
 	ec.mutation.SetAddress(s)
@@ -252,6 +258,9 @@ func (ec *EndpointCreate) check() error {
 	if _, ok := ec.mutation.DeletedAt(); !ok {
 		return &ValidationError{Name: "deleted_at", err: errors.New(`ent: missing required field "Endpoint.deleted_at"`)}
 	}
+	if _, ok := ec.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Endpoint.name"`)}
+	}
 	if _, ok := ec.mutation.Address(); !ok {
 		return &ValidationError{Name: "address", err: errors.New(`ent: missing required field "Endpoint.address"`)}
 	}
@@ -318,6 +327,14 @@ func (ec *EndpointCreate) createSpec() (*Endpoint, *sqlgraph.CreateSpec) {
 			Column: endpoint.FieldDeletedAt,
 		})
 		_node.DeletedAt = value
+	}
+	if value, ok := ec.mutation.Name(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: endpoint.FieldName,
+		})
+		_node.Name = value
 	}
 	if value, ok := ec.mutation.Address(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -454,6 +471,18 @@ func (u *EndpointUpsert) UpdateDeletedAt() *EndpointUpsert {
 // AddDeletedAt adds v to the "deleted_at" field.
 func (u *EndpointUpsert) AddDeletedAt(v uint32) *EndpointUpsert {
 	u.Add(endpoint.FieldDeletedAt, v)
+	return u
+}
+
+// SetName sets the "name" field.
+func (u *EndpointUpsert) SetName(v string) *EndpointUpsert {
+	u.Set(endpoint.FieldName, v)
+	return u
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *EndpointUpsert) UpdateName() *EndpointUpsert {
+	u.SetExcluded(endpoint.FieldName)
 	return u
 }
 
@@ -631,6 +660,20 @@ func (u *EndpointUpsertOne) AddDeletedAt(v uint32) *EndpointUpsertOne {
 func (u *EndpointUpsertOne) UpdateDeletedAt() *EndpointUpsertOne {
 	return u.Update(func(s *EndpointUpsert) {
 		s.UpdateDeletedAt()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *EndpointUpsertOne) SetName(v string) *EndpointUpsertOne {
+	return u.Update(func(s *EndpointUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *EndpointUpsertOne) UpdateName() *EndpointUpsertOne {
+	return u.Update(func(s *EndpointUpsert) {
+		s.UpdateName()
 	})
 }
 
@@ -983,6 +1026,20 @@ func (u *EndpointUpsertBulk) AddDeletedAt(v uint32) *EndpointUpsertBulk {
 func (u *EndpointUpsertBulk) UpdateDeletedAt() *EndpointUpsertBulk {
 	return u.Update(func(s *EndpointUpsert) {
 		s.UpdateDeletedAt()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *EndpointUpsertBulk) SetName(v string) *EndpointUpsertBulk {
+	return u.Update(func(s *EndpointUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *EndpointUpsertBulk) UpdateName() *EndpointUpsertBulk {
+	return u.Update(func(s *EndpointUpsert) {
+		s.UpdateName()
 	})
 }
 

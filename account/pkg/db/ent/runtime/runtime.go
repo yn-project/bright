@@ -46,11 +46,11 @@ func init() {
 	// account.DefaultDeletedAt holds the default value on creation for the deleted_at field.
 	account.DefaultDeletedAt = accountDescDeletedAt.Default.(func() uint32)
 	// accountDescEnable is the schema descriptor for enable field.
-	accountDescEnable := accountFields[3].Descriptor()
+	accountDescEnable := accountFields[4].Descriptor()
 	// account.DefaultEnable holds the default value on creation for the enable field.
 	account.DefaultEnable = accountDescEnable.Default.(bool)
 	// accountDescIsRoot is the schema descriptor for is_root field.
-	accountDescIsRoot := accountFields[4].Descriptor()
+	accountDescIsRoot := accountFields[5].Descriptor()
 	// account.DefaultIsRoot holds the default value on creation for the is_root field.
 	account.DefaultIsRoot = accountDescIsRoot.Default.(bool)
 	// accountDescID is the schema descriptor for id field.

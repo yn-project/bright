@@ -24,6 +24,8 @@ type Account struct {
 	DeletedAt uint32 `json:"deleted_at,omitempty"`
 	// Address holds the value of the "address" field.
 	Address string `json:"address,omitempty"`
+	// PriKey holds the value of the "pri_key" field.
+	PriKey string `json:"pri_key,omitempty"`
 	// Balance holds the value of the "balance" field.
 	Balance string `json:"balance,omitempty"`
 	// Enable holds the value of the "enable" field.
@@ -43,7 +45,7 @@ func (*Account) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullBool)
 		case account.FieldCreatedAt, account.FieldUpdatedAt, account.FieldDeletedAt:
 			values[i] = new(sql.NullInt64)
-		case account.FieldAddress, account.FieldBalance, account.FieldRemark:
+		case account.FieldAddress, account.FieldPriKey, account.FieldBalance, account.FieldRemark:
 			values[i] = new(sql.NullString)
 		case account.FieldID:
 			values[i] = new(uuid.UUID)
@@ -91,6 +93,12 @@ func (a *Account) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field address", values[i])
 			} else if value.Valid {
 				a.Address = value.String
+			}
+		case account.FieldPriKey:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field pri_key", values[i])
+			} else if value.Valid {
+				a.PriKey = value.String
 			}
 		case account.FieldBalance:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -155,6 +163,9 @@ func (a *Account) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("address=")
 	builder.WriteString(a.Address)
+	builder.WriteString(", ")
+	builder.WriteString("pri_key=")
+	builder.WriteString(a.PriKey)
 	builder.WriteString(", ")
 	builder.WriteString("balance=")
 	builder.WriteString(a.Balance)

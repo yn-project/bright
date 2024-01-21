@@ -107,6 +107,13 @@ func Address(v string) predicate.Account {
 	})
 }
 
+// PriKey applies equality check predicate on the "pri_key" field. It's identical to PriKeyEQ.
+func PriKey(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldPriKey), v))
+	})
+}
+
 // Balance applies equality check predicate on the "balance" field. It's identical to BalanceEQ.
 func Balance(v string) predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {
@@ -423,6 +430,105 @@ func AddressEqualFold(v string) predicate.Account {
 func AddressContainsFold(v string) predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldAddress), v))
+	})
+}
+
+// PriKeyEQ applies the EQ predicate on the "pri_key" field.
+func PriKeyEQ(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldPriKey), v))
+	})
+}
+
+// PriKeyNEQ applies the NEQ predicate on the "pri_key" field.
+func PriKeyNEQ(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldPriKey), v))
+	})
+}
+
+// PriKeyIn applies the In predicate on the "pri_key" field.
+func PriKeyIn(vs ...string) predicate.Account {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.In(s.C(FieldPriKey), v...))
+	})
+}
+
+// PriKeyNotIn applies the NotIn predicate on the "pri_key" field.
+func PriKeyNotIn(vs ...string) predicate.Account {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.NotIn(s.C(FieldPriKey), v...))
+	})
+}
+
+// PriKeyGT applies the GT predicate on the "pri_key" field.
+func PriKeyGT(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldPriKey), v))
+	})
+}
+
+// PriKeyGTE applies the GTE predicate on the "pri_key" field.
+func PriKeyGTE(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldPriKey), v))
+	})
+}
+
+// PriKeyLT applies the LT predicate on the "pri_key" field.
+func PriKeyLT(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldPriKey), v))
+	})
+}
+
+// PriKeyLTE applies the LTE predicate on the "pri_key" field.
+func PriKeyLTE(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldPriKey), v))
+	})
+}
+
+// PriKeyContains applies the Contains predicate on the "pri_key" field.
+func PriKeyContains(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldPriKey), v))
+	})
+}
+
+// PriKeyHasPrefix applies the HasPrefix predicate on the "pri_key" field.
+func PriKeyHasPrefix(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldPriKey), v))
+	})
+}
+
+// PriKeyHasSuffix applies the HasSuffix predicate on the "pri_key" field.
+func PriKeyHasSuffix(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldPriKey), v))
+	})
+}
+
+// PriKeyEqualFold applies the EqualFold predicate on the "pri_key" field.
+func PriKeyEqualFold(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldPriKey), v))
+	})
+}
+
+// PriKeyContainsFold applies the ContainsFold predicate on the "pri_key" field.
+func PriKeyContainsFold(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldPriKey), v))
 	})
 }
 

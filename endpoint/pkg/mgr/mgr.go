@@ -9,6 +9,7 @@ import (
 	"math/big"
 	"time"
 
+	"github.com/Vigo-Tea/go-ethereum-ant/ethclient"
 	"yun.tea/block/bright/common/ctredis"
 )
 
@@ -48,7 +49,7 @@ func (eIMGR *endpointIntervalMGR) putEndpoint(item *EndpointInterval, autoResetB
 		item.MaxBackoffIndex = int(_maxBackoffIndex)
 	}
 
-	return ctredis.Set(eIMGR.getKey(item.Address), item, eIMGR.RedisExpireTime)
+	return ctredis.Set(eIMGR.getInfoKey(item.Address), item, eIMGR.RedisExpireTime)
 }
 
 func (eIMGR *endpointIntervalMGR) SetEndpoinsList(infos []string) error {
@@ -65,13 +66,13 @@ func (eIMGR *endpointIntervalMGR) GetEndpoinsList() ([]string, error) {
 }
 
 func (eIMGR *endpointIntervalMGR) GoAheadEndpoint(item *EndpointInterval) error {
-	locked, err := ctredis.TryPubLock(eIMGR.getLockKey(item.Address), goaheadLockTime)
+	locked, err := ctredis.TryPubLock(eIMGR.getUpdateLockKey(item.Address), goaheadLockTime)
 	if !locked || err != nil {
 		return nil
 	}
 
 	_item := &EndpointInterval{}
-	err = ctredis.Get(eIMGR.getKey(item.Address), _item)
+	err = ctredis.Get(eIMGR.getInfoKey(item.Address), _item)
 	if err != nil {
 		return eIMGR.putEndpoint(item, true)
 	}
@@ -85,7 +86,7 @@ func (eIMGR *endpointIntervalMGR) GoAheadEndpoint(item *EndpointInterval) error 
 
 func (eIMGR *endpointIntervalMGR) BackoffEndpoint(address string) error {
 	item := &EndpointInterval{}
-	err := ctredis.Get(eIMGR.getKey(address), item)
+	err := ctredis.Get(eIMGR.getInfoKey(address), item)
 	if err != nil {
 		return err
 	}
@@ -99,7 +100,7 @@ func (eIMGR *endpointIntervalMGR) BackoffEndpoint(address string) error {
 
 func (eIMGR *endpointIntervalMGR) getEndpointInterval(address string) (time.Duration, error) {
 	item := &EndpointInterval{}
-	err := ctredis.Get(eIMGR.getKey(address), item)
+	err := ctredis.Get(eIMGR.getInfoKey(address), item)
 	if err != nil {
 		return 0, err
 	}
@@ -110,11 +111,11 @@ func (eIMGR *endpointIntervalMGR) getEndpointInterval(address string) (time.Dura
 	return interval, nil
 }
 
-func (eIMGR *endpointIntervalMGR) getKey(address string) string {
+func (eIMGR *endpointIntervalMGR) getInfoKey(address string) string {
 	return fmt.Sprintf("%v-%v", eIMGRPrefix, address)
 }
 
-func (eIMGR *endpointIntervalMGR) getLockKey(address string) string {
+func (eIMGR *endpointIntervalMGR) getUpdateLockKey(address string) string {
 	return fmt.Sprintf("%v-lock-%v", eIMGRPrefix, address)
 }
 
@@ -127,40 +128,63 @@ func (e *EndpointInterval) UnmarshalBinary(data []byte) error {
 	return json.Unmarshal(data, e)
 }
 
-func LockEndpoint(ctx context.Context, endpoints []string, lockTimes uint16) (endpoint string, err error) {
+func WithClient(ctx context.Context, handle func(ctx context.Context, cli *ethclient.Client) error) (err error) {
+	eIMGR := GetEndpintIntervalMGR()
 	for {
 		select {
 		case <-time.NewTicker(lockEndpointWaitTime).C:
+			endpoints, err := eIMGR.GetEndpoinsList()
+			if err != nil {
+				return err
+			}
+
 			if len(endpoints) == 0 {
-				return "", fmt.Errorf("have no available endpoints")
+				return fmt.Errorf("have no available endpoints")
 			}
 
 			_randIndex, err := rand.Int(rand.Reader, big.NewInt(int64(len(endpoints))))
 			if err != nil {
-				return "", err
+				return err
 			}
 
 			randIndex := int(_randIndex.Int64())
 			var interval time.Duration
-			okEndpoints := []string{}
-
+			endpoint := ""
 			for j := 0; j < len(endpoints); j++ {
-				endpoint := endpoints[(randIndex+j)%len(endpoints)]
-				interval, err = GetEndpintIntervalMGR().getEndpointInterval(endpoint)
+				endpoint = endpoints[(randIndex+j)%len(endpoints)]
+				interval, err = eIMGR.getEndpointInterval(endpoint)
 				if err != nil {
 					continue
 				}
 
-				okEndpoints = append(okEndpoints, endpoint)
-
-				locked, _ := ctredis.TryPubLock(endpoint, interval*time.Duration(lockTimes))
-				if locked {
-					return endpoint, err
+				locked, err := ctredis.TryPubLock(endpoint, interval)
+				if err != nil || !locked {
+					continue
 				}
+
+				break
 			}
-			endpoints = okEndpoints
+
+			if endpoint == "" {
+				continue
+			}
+
+			cli, err := ethclient.DialContext(ctx, endpoint)
+			if err != nil {
+				_ = eIMGR.BackoffEndpoint(endpoint)
+				return err
+			}
+
+			err = handle(ctx, cli)
+			if err != nil {
+				checkErr := CheckStateAndChainID(ctx, endpoint)
+				if checkErr != nil {
+					_ = eIMGR.BackoffEndpoint(endpoint)
+				}
+				return err
+			}
 		case <-ctx.Done():
-			return endpoint, err
+			return ctx.Err()
 		}
 	}
 }

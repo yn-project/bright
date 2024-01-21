@@ -6,6 +6,7 @@ import (
 
 	"yun.tea/block/bright/common/logger"
 	crud "yun.tea/block/bright/endpoint/pkg/crud/endpoint"
+	"yun.tea/block/bright/endpoint/pkg/db/ent"
 
 	"yun.tea/block/bright/proto/bright/basetype"
 	proto "yun.tea/block/bright/proto/bright/endpoint"
@@ -33,24 +34,18 @@ func Maintain(ctx context.Context) {
 
 			okEndpoints := []string{}
 			for _, info := range infos {
-				err = CheckStateAndChainID(ctx, info.Address)
-				if err != nil {
-					info.State = basetype.EndpointState_EndpointError.String()
-					info.Remark = err.Error()
-					logger.Sugar().Warnf("endpoint:%v is not available,err: %v", info.Address, err)
-				} else {
-					okEndpoints = append(okEndpoints, info.Address)
-					info.State = basetype.EndpointState_EndpointAvaliable.String()
-					info.Remark = ""
-				}
+				_, _ = CheckAndUpdateEndpoint(ctx, info)
 
-				id := info.ID.String()
-				state := basetype.EndpointState(basetype.EndpointState_value[info.State])
-				crud.Update(ctx, &proto.EndpointReq{
-					ID:     &id,
-					State:  &state,
-					Remark: &info.Remark,
-				})
+				err = CheckStateAndChainID(ctx, info.Address)
+
+				if err == nil {
+					GetEndpintIntervalMGR().GoAheadEndpoint(&EndpointInterval{
+						Address:     info.Address,
+						MinInterval: time.Second / time.Duration(info.Rps),
+						MaxInterval: time.Minute,
+					})
+					okEndpoints = append(okEndpoints, info.Address)
+				}
 			}
 
 			err = GetEndpintIntervalMGR().SetEndpoinsList(okEndpoints)
@@ -63,4 +58,24 @@ func Maintain(ctx context.Context) {
 			return
 		}
 	}
+}
+
+func CheckAndUpdateEndpoint(ctx context.Context, info *ent.Endpoint) (*ent.Endpoint, error) {
+	err := CheckStateAndChainID(ctx, info.Address)
+	if err != nil {
+		info.State = basetype.EndpointState_EndpointError.String()
+		info.Remark = err.Error()
+		logger.Sugar().Warnf("endpoint:%v is not available,err: %v", info.Address, err)
+	} else {
+		info.State = basetype.EndpointState_EndpointAvaliable.String()
+		info.Remark = ""
+	}
+
+	id := info.ID.String()
+	state := basetype.EndpointState(basetype.EndpointState_value[info.State])
+	return crud.Update(ctx, &proto.EndpointReq{
+		ID:     &id,
+		State:  &state,
+		Remark: &info.Remark,
+	})
 }

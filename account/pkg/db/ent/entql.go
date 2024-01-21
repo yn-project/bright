@@ -29,6 +29,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			account.FieldUpdatedAt: {Type: field.TypeUint32, Column: account.FieldUpdatedAt},
 			account.FieldDeletedAt: {Type: field.TypeUint32, Column: account.FieldDeletedAt},
 			account.FieldAddress:   {Type: field.TypeString, Column: account.FieldAddress},
+			account.FieldPriKey:    {Type: field.TypeString, Column: account.FieldPriKey},
 			account.FieldBalance:   {Type: field.TypeString, Column: account.FieldBalance},
 			account.FieldEnable:    {Type: field.TypeBool, Column: account.FieldEnable},
 			account.FieldIsRoot:    {Type: field.TypeBool, Column: account.FieldIsRoot},
@@ -102,6 +103,11 @@ func (f *AccountFilter) WhereDeletedAt(p entql.Uint32P) {
 // WhereAddress applies the entql string predicate on the address field.
 func (f *AccountFilter) WhereAddress(p entql.StringP) {
 	f.Where(p.Field(account.FieldAddress))
+}
+
+// WherePriKey applies the entql string predicate on the pri_key field.
+func (f *AccountFilter) WherePriKey(p entql.StringP) {
+	f.Where(p.Field(account.FieldPriKey))
 }
 
 // WhereBalance applies the entql string predicate on the balance field.

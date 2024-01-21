@@ -23,6 +23,7 @@ func (Endpoint) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).
 			Unique(),
+		field.String("name"),
 		field.String("address"),
 		field.String("state").Optional(),
 		field.Uint32("rps").Default(10),

@@ -14,24 +14,6 @@ service Manager {
       body:"*"
     };
   }
-  rpc CreateEndpoints(CreateEndpointsRequest) returns (CreateEndpointsResponse) {
-    option (google.api.http) = {
-      post:"/create/endpoints"
-      body:"*"
-    };
-  }
-  rpc UpdateEndpoint(UpdateEndpointRequest) returns (UpdateEndpointResponse) {
-    option (google.api.http) = {
-      post:"/update/endpoint"
-      body:"*"
-    };
-  }
-  rpc UpdateEndpoints(UpdateEndpointsRequest) returns (UpdateEndpointsResponse) {
-    option (google.api.http) = {
-      post:"/update/endpoints"
-      body:"*"
-    };
-  }
   rpc GetEndpoint(GetEndpointRequest) returns (GetEndpointResponse) {
     option (google.api.http) = {
       post:"/get/endpoint"
@@ -54,6 +36,7 @@ service Manager {
 
 message EndpointReq {
   optional string ID = 10;
+  optional string Name = 11;
   optional string Address = 20;
   optional basetype.EndpointState State = 30;
   optional uint32 RPS = 40;
@@ -62,6 +45,7 @@ message EndpointReq {
 
 message Endpoint {
   string ID = 10;
+  string Name = 11;
   string Address = 20;
   basetype.EndpointState State = 30;
   uint32 RPS = 40;
@@ -72,6 +56,7 @@ message Endpoint {
 
 message Conds {
   bright.StringVal ID = 10;
+  bright.StringVal Name = 11;
   bright.StringVal Address = 20;
   bright.StringVal State = 30;
   bright.Uint32Val RPS = 40;
@@ -80,9 +65,6 @@ message Conds {
 
 message CreateEndpointRequest { EndpointReq Info = 10; }
 message CreateEndpointResponse { Endpoint Info = 10; }
-
-message CreateEndpointsRequest { repeated EndpointReq Infos = 10; }
-message CreateEndpointsResponse { repeated Endpoint Infos = 10; }
 
 message GetEndpointRequest { string ID = 10; }
 message GetEndpointResponse { Endpoint Info = 10; }
@@ -97,17 +79,6 @@ message GetEndpointsResponse {
   repeated Endpoint Infos = 10;
   uint32 Total = 20;
 }
-
-message FailedInfo {
-  string ID  = 10;
-  string MSG  = 20;
-}
-
-message UpdateEndpointRequest { EndpointReq Info = 10; }
-message UpdateEndpointResponse { Endpoint Info = 10; }
-
-message UpdateEndpointsRequest { repeated EndpointReq Infos = 10; }
-message UpdateEndpointsResponse { repeated FailedInfo Infos = 10; }
 
 message DeleteEndpointRequest { string ID = 10; }
 message DeleteEndpointResponse { Endpoint Info = 10; }

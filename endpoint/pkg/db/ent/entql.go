@@ -28,6 +28,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			endpoint.FieldCreatedAt: {Type: field.TypeUint32, Column: endpoint.FieldCreatedAt},
 			endpoint.FieldUpdatedAt: {Type: field.TypeUint32, Column: endpoint.FieldUpdatedAt},
 			endpoint.FieldDeletedAt: {Type: field.TypeUint32, Column: endpoint.FieldDeletedAt},
+			endpoint.FieldName:      {Type: field.TypeString, Column: endpoint.FieldName},
 			endpoint.FieldAddress:   {Type: field.TypeString, Column: endpoint.FieldAddress},
 			endpoint.FieldState:     {Type: field.TypeString, Column: endpoint.FieldState},
 			endpoint.FieldRps:       {Type: field.TypeUint32, Column: endpoint.FieldRps},
@@ -96,6 +97,11 @@ func (f *EndpointFilter) WhereUpdatedAt(p entql.Uint32P) {
 // WhereDeletedAt applies the entql uint32 predicate on the deleted_at field.
 func (f *EndpointFilter) WhereDeletedAt(p entql.Uint32P) {
 	f.Where(p.Field(endpoint.FieldDeletedAt))
+}
+
+// WhereName applies the entql string predicate on the name field.
+func (f *EndpointFilter) WhereName(p entql.StringP) {
+	f.Where(p.Field(endpoint.FieldName))
 }
 
 // WhereAddress applies the entql string predicate on the address field.
