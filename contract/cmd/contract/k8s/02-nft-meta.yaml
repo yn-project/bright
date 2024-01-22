@@ -18,7 +18,7 @@ spec:
       containers:
         - name: nft-meta
           # image: bright/nft-meta:latest
-          image: uhub.service.ucloud.cn/bright/nft-meta:latest
+          image: docker.io/bright/nft-meta:latest
           imagePullPolicy: Always
           volumeMounts:
             - name: service-config

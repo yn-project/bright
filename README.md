@@ -165,3 +165,13 @@ grant all privileges on *.* to 'root'@'%' identified by '123456' with grant opti
 flush privileges;
 
  docker run -itd --name redis-test -p 6379:6379 redis
+
+harbor 搭建
+https://blog.csdn.net/qing040513/article/details/115750334
+https://blog.csdn.net/IOT_AI/article/details/131839679
+
+使用nerdctl替代docker命令以支持将image添加到containerd的命名空间下
+https://www.qikqiak.com/k8strain2/containerd/nerdctl/ 安装
+使用nertctl -n k8s.io  可看到containerd下的镜像
+
+使用frp实现内网穿透，可访问内网机器

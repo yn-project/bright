@@ -37,7 +37,7 @@ fi
 if [[ "xdev" == "x$1" ]]; then
   version=latest
 fi
-registry=uhub.service.ucloud.cn
+registry=docker.io
 OrginazeName=bright
 
 if [[ "x" != $2 ]]; then

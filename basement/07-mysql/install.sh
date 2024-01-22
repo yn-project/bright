@@ -13,7 +13,7 @@ set -o nounset
 set -o pipefail
 
 helm repo add bitnami https://charts.bitnami.com/bitnami
-helm install mysql bitnami/mysql
+helm install  -n kube-system  mysql bitnami/mysql
 
 sleep 5
 kubectl get pods | grep mysql

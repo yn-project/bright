@@ -44,7 +44,8 @@ fi
 if [[ "xdev" == "x$1" ]]; then
     version=latest
 fi
-registry=uhub.service.ucloud.cn
+
+registry=
 OrginazeName=bright
 
 if [[ "x" != $2 ]]; then
@@ -70,7 +71,7 @@ cd $output_d
 
 user=$(whoami)
 if [ "$user" == "root" ]; then
-    docker build -t ${registry}/${OrginazeName}/$service_name:$version .
+   nerdctl -n k8s.io build -t ${registry}/${OrginazeName}/$service_name:$version .
 else
-    sudo docker build -t ${registry}/${OrginazeName}/$service_name:$version .
+    sudo nerdctl -n k8s.io build -t ${registry}/${OrginazeName}/$service_name:$version .
 fi

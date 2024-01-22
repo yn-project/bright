@@ -7,8 +7,8 @@ COLOR:=\\033[36m
 NOCOLOR:=\\033[0m
 GITREPO=$(shell git remote -v | grep fetch | awk '{print $$2}' | sed 's/\.git//g' | sed 's/https:\/\///g')
 
-PROJECTS= nft-meta ranker webui dashboard
-GO_PROJECTS= nft-meta ranker
+PROJECTS= endpoint account
+GO_PROJECTS= endpoint account
 
 ##@ init project
 init:
@@ -53,7 +53,7 @@ DEVELOPMENT= dev
 endif
 
 ifndef DOCKER_REGISTRY
-DOCKER_REGISTRY= uhub.service.ucloud.cn
+DOCKER_REGISTRY=docker.io
 endif
 
 ifndef TAG
@@ -65,12 +65,12 @@ endif
 
 build:  ## Build project
 	@for x in $(PROJECTS); do \
-		${REPO_ROOT}/$${x}/script/build.sh $(TAG);\
+		bash ${REPO_ROOT}/$${x}/script/build.sh $(TAG);\
 	done
 
 build-docker:
 	@for x in $(PROJECTS); do \
-		${REPO_ROOT}/$${x}/script/build-docker-image.sh $(TAG) $(DOCKER_REGISTRY);\
+		bash -x ${REPO_ROOT}/$${x}/script/build-docker-image.sh $(TAG) $(DOCKER_REGISTRY);\
 	done
 
 release-docker:

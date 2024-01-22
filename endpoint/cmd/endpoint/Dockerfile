@@ -1,7 +1,7 @@
 FROM centos:centos7.9.2009
 
-COPY nft-meta /usr/local/bin/nft-meta
-COPY NFTMeta.viper.yaml /etc/NFTMeta/NFTMeta.viper.yaml
+COPY endpoint /usr/local/bin/endpoint
+COPY Endpoint.viper.yaml /etc/endpoint/Endpoint.viper.yaml
 ENV ENV_DATA_DIR=/data \
     ENV_LOG_DIR=/var/log \
     ENV_LOG_LEVEL=debug \
@@ -14,4 +14,4 @@ RUN yum install ca-certificates curl -y
 
 WORKDIR /usr/local/bin/
 
-CMD ./nft-meta run
+CMD ./endpoint run

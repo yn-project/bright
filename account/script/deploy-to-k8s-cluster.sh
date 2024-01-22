@@ -34,7 +34,7 @@ if [ "$1" == "dev" ]; then
   version=latest
 fi
 
-DOCKER_REGISTRY=uhub.service.ucloud.cn
+DOCKER_REGISTRY=docker.io
 # For testing or production environment, pass the second variable
 if [[ "x" != "x$2" ]]; then
    DOCKER_REGISTRY=$2
