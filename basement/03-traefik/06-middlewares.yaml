@@ -117,31 +117,6 @@ spec:
       - PATCH
     accessControlAllowOriginList:
       - https://genesis.development.npool.top
-      - https://genesis.japan-procyon-production.npool.top
-      - https://admin.development.npool.top
-      - https://www.procyon.xpool.top
-      - https://dashboard.procyon.xpool.top
-      - https://www.procyon.vip
-      - https://procyon.vip
-      - https://dashboard.procyon.vip
-      - https://admin.japan-procyon-production.npool.top
-      - https://dashboard.procyon.npool.top:20402
-      - https://admin.jh-testing.npool.top:20402
-      - https://www.procyon.npool.top:20402
-      - https://www.ohhash.xpool.top
-      - https://dashboard.ohhash.xpool.top
-      - https://ohhash.com
-      - https://www.ohhash.com
-      - https://www.ohhash.npool.top:20402
-      - https://dashboard.ohhash.com
-      - https://dashboard.ohhash.npool.top:20402
-      - https://admin.ohhash-production.npool.top
-      - https://admin.singapore-testing.npool.top
-      - http://swagger-ui.internal-devops.development.npool.top
-      - http://traefik-webui.internal-devops.development.npool.top
-      - https://www.lpsecretbase.com
-      - https://lpsecretbase.com
-      - https://dashboard.lpsecretbase.com
     accessControlMaxAge: 100
     addVaryHeader: true
 

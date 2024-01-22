@@ -19,7 +19,7 @@ grpc-port=30131
 log-file="/var/log/account.log"
 
 [mysql]
-domain="127.0.0.1"
+domain="mysql-headless"
 port=3306
 user="root"
 password="123456"

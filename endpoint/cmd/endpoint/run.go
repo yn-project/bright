@@ -38,11 +38,11 @@ var runCmd = &cli.Command{
 		return logger.Sync()
 	},
 	Before: func(ctx *cli.Context) error {
-		err := db.Init()
+		err := logger.Init(logger.DebugLevel, config.GetConfig().Endpoint.LogFile)
 		if err != nil {
 			return err
 		}
-		return logger.Init(logger.DebugLevel, config.GetConfig().Endpoint.LogFile)
+		return db.Init()
 	},
 	Action: func(c *cli.Context) error {
 		go mgr.Maintain(c.Context)

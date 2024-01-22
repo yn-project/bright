@@ -4,67 +4,75 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"net"
 	"sync"
 	"time"
 
+	"entgo.io/ent/dialect"
+	entsql "entgo.io/ent/dialect/sql"
 	"yun.tea/block/bright/common/logger"
-
 	"yun.tea/block/bright/config"
 	"yun.tea/block/bright/endpoint/pkg/db/ent"
 
-	"entgo.io/ent/dialect"
-	entsql "entgo.io/ent/dialect/sql"
-
-	// ent policy runtime
 	_ "github.com/go-sql-driver/mysql"
 	_ "yun.tea/block/bright/endpoint/pkg/db/ent/runtime"
 )
 
 const (
-	maxLifeTime     = time.Minute
-	maxConns        = 100
-	maxFailedConter = 3
-)
-
-var (
-	mu            = sync.Mutex{}
-	failedConter  = 0
-	masterMysqlIP string
+	maxLifeTime = time.Minute * 5
+	maxConns    = 100
 )
 
 func client() (*ent.Client, error) {
-	var err error
-	if failedConter >= maxFailedConter {
-		failedConter = 0
-		masterMysqlIP, err = GetMasterIP()
-		if err != nil {
-			panic(err)
-		}
-	}
-
 	conn, err := GetConn()
 	if err != nil {
-		failedConter++
 		return nil, err
 	}
 	drv := entsql.OpenDB(dialect.MySQL, conn)
 	return ent.NewClient(ent.Driver(drv)), nil
 }
 
+var (
+	mu   = sync.Mutex{}
+	conn *sql.DB
+)
+
 func GetConn() (*sql.DB, error) {
 	mu.Lock()
 	defer mu.Unlock()
+	if conn != nil {
+		return conn, nil
+	}
+	var err error
 
 	myConfig := config.GetConfig().MySQL
 
+	withoutDBMSN := fmt.Sprintf("%v:%v@tcp(%v:%v)/?parseTime=true&interpolateParams=true",
+		myConfig.User, myConfig.Password,
+		myConfig.Domain,
+		myConfig.Port,
+	)
+
+	createSQL := fmt.Sprintf("create database if not exists %v;", myConfig.Database)
+	conn, err := sql.Open("mysql", withoutDBMSN)
+	if err != nil {
+		logger.Sugar().Warnf("call Open error: %v", err)
+		return nil, err
+	}
+
+	_, err = conn.Exec(createSQL)
+	if err != nil {
+		logger.Sugar().Warnf("exec sql failed: %v", err)
+		return nil, err
+	}
+	conn.Close()
+
 	dataSourceName := fmt.Sprintf("%v:%v@tcp(%v:%v)/%v?parseTime=true&interpolateParams=true",
 		myConfig.User, myConfig.Password,
-		masterMysqlIP,
+		myConfig.Domain,
 		myConfig.Port,
 		myConfig.Database,
 	)
-	conn, err := sql.Open("mysql", dataSourceName)
+	conn, err = sql.Open("mysql", dataSourceName)
 	if err != nil {
 		logger.Sugar().Warnf("call Open error: %v", err)
 		return nil, err
@@ -79,92 +87,18 @@ func GetConn() (*sql.DB, error) {
 	return conn, nil
 }
 
-func InitDatabase() error {
-	mu.Lock()
-	defer mu.Unlock()
-	var err error
-
-	myConfig := config.GetConfig().MySQL
-
-	withoutDBMSN := fmt.Sprintf("%v:%v@tcp(%v:%v)/?parseTime=true&interpolateParams=true",
-		myConfig.User, myConfig.Password,
-		masterMysqlIP,
-		myConfig.Port,
-	)
-
-	createSQL := fmt.Sprintf("create database if not exists %v;", myConfig.Database)
-	conn, err := sql.Open("mysql", withoutDBMSN)
-	if err != nil {
-		logger.Sugar().Warnf("call Open error: %v", err)
-		return err
-	}
-
-	_, err = conn.Exec(createSQL)
-	if err != nil {
-		logger.Sugar().Warnf("exec sql failed: %v", err)
-		return err
-	}
-	return conn.Close()
-}
-
-func GetMasterIP() (string, error) {
-	myConfig := config.GetConfig().MySQL
-	ips, err := net.LookupHost(myConfig.Domain)
-	if err != nil {
-		return "", err
-	}
-
-	for _, ip := range ips {
-		withoutDBMSN := fmt.Sprintf("%v:%v@tcp(%v:%v)/?parseTime=true&interpolateParams=true",
-			myConfig.User, myConfig.Password,
-			ip,
-			myConfig.Port,
-		)
-
-		checkReadOnly := "SELECT @@read_only;"
-		s := ""
-		func() {
-			conn, err := sql.Open("mysql", withoutDBMSN)
-			if err != nil {
-				logger.Sugar().Warnf("call Open error: %v, ip: %v", err, ip)
-			}
-			defer conn.Close()
-
-			result := conn.QueryRow(checkReadOnly)
-			if err != nil {
-				logger.Sugar().Warnf("check read only failed: %v, ip: %v", err, ip)
-			}
-			err = result.Scan(&s)
-			if err != nil {
-				logger.Sugar().Warnf("check read only failed: %v, ip: %v", err, ip)
-			}
-		}()
-
-		if s == "0" {
-			return ip, nil
-		}
-	}
-	return "", fmt.Errorf("cannot find mysql master node")
-}
-
 func Init() error {
-	var err error
-	masterMysqlIP, err = GetMasterIP()
-	if err != nil {
-		panic(err)
-	}
-
-	err = InitDatabase()
-	if err != nil {
-		panic(err)
-	}
-
 	cli, err := client()
 	if err != nil {
-		panic(err)
+		return err
 	}
-
-	return cli.Schema.Create(context.Background())
+	err = cli.Schema.Create(
+		context.Background(),
+	)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func Client() (*ent.Client, error) {
