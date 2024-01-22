@@ -175,3 +175,11 @@ https://www.qikqiak.com/k8strain2/containerd/nerdctl/ 安装
 使用nertctl -n k8s.io  可看到containerd下的镜像
 
 使用frp实现内网穿透，可访问内网机器
+
+
+export AIMPORT=endpint
+make build
+make build-docker
+
+AIMPORT=endpoint make build
+AIMPORT=endpoint make build-docker
