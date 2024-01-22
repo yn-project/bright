@@ -158,7 +158,6 @@ func WithClient(ctx context.Context, handle func(ctx context.Context, cli *ethcl
 			if err != nil {
 				return err
 			}
-
 			randIndex := int(_randIndex.Int64())
 			var interval time.Duration
 			endpoint := ""
@@ -168,8 +167,8 @@ func WithClient(ctx context.Context, handle func(ctx context.Context, cli *ethcl
 				if err != nil {
 					continue
 				}
-
 				locked, err := ctredis.TryPubLock(endpoint, interval)
+				fmt.Println(locked, err)
 				if err != nil || !locked {
 					continue
 				}
@@ -193,8 +192,8 @@ func WithClient(ctx context.Context, handle func(ctx context.Context, cli *ethcl
 				if checkErr != nil {
 					_ = eIMGR.BackoffEndpoint(endpoint)
 				}
-				return err
 			}
+			return err
 		case <-ctx.Done():
 			return ctx.Err()
 		}

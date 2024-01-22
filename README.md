@@ -176,10 +176,23 @@ https://www.qikqiak.com/k8strain2/containerd/nerdctl/ 安装
 
 使用frp实现内网穿透，可访问内网机器
 
-
+```Shell
+# build 和 打docker
 export AIMPORT=endpint
 make build
 make build-docker
 
 AIMPORT=endpoint make build
 AIMPORT=endpoint make build-docker
+```
+
+```Shell
+# development box 开发相关
+# 密码一般存在/etc/profile 中
+cat /etc/profile
+source /etc/profile
+
+# 连接数据库一般使用mycli
+apt install mycli -y
+mycli -uroot -hmysql
+```

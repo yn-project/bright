@@ -19,6 +19,12 @@ import (
 )
 
 func (s *Server) CreateEndpoint(ctx context.Context, in *proto.CreateEndpointRequest) (*proto.CreateEndpointResponse, error) {
+	if in.Info == nil {
+		return &proto.CreateEndpointResponse{}, status.Error(codes.Internal, "not allow nil params")
+	}
+	if *in.Info.RPS > 10000 || *in.Info.RPS < 1 {
+		return &proto.CreateEndpointResponse{}, status.Error(codes.Internal, "wrong rps range,allow [1,10000]")
+	}
 	var err error
 	in.GetInfo().State = basetype.EndpointState_EndpointDefault.Enum()
 	info, err := crud.Create(ctx, in.GetInfo())

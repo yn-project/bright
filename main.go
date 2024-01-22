@@ -1,16 +1,15 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"time"
 
-	"yun.tea/block/bright/endpoint/pkg/mgr"
+	"yun.tea/block/bright/account/pkg/mgr"
 )
 
 func main() {
-	val := []string{"sss", "zzz"}
-	fmt.Println(mgr.GetEndpintIntervalMGR().SetEndpoinsList(val))
-	val2 := []string{}
-	fmt.Println(mgr.GetEndpintIntervalMGR().GetEndpoinsList())
-	fmt.Println(val2)
-	// fmt.Println(mgr.CheckStateAndBalance(context.Background(), ""))
+	fmt.Println(time.Now().String())
+	fmt.Println(mgr.CheckStateAndBalance(context.Background(), "0x7243176257d634A65Ce737c2cd5FAb6B3f65154B"))
+	fmt.Println(time.Now().String())
 }
