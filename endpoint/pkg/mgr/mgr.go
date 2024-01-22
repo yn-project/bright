@@ -25,6 +25,8 @@ type EndpointInterval struct {
 	MaxInterval     time.Duration
 }
 
+type EndpointList []string
+
 var _eIMGR *endpointIntervalMGR
 
 const (
@@ -53,16 +55,17 @@ func (eIMGR *endpointIntervalMGR) putEndpoint(item *EndpointInterval, autoResetB
 }
 
 func (eIMGR *endpointIntervalMGR) SetEndpoinsList(infos []string) error {
-	return ctredis.Set(endpointsListKey, infos, endpointsListExpire)
+	_infos := EndpointList(infos)
+	return ctredis.Set(endpointsListKey, &_infos, endpointsListExpire)
 }
 
 func (eIMGR *endpointIntervalMGR) GetEndpoinsList() ([]string, error) {
-	infos := []string{}
+	infos := &EndpointList{}
 	err := ctredis.Get(endpointsListKey, infos)
 	if err != nil {
 		return nil, err
 	}
-	return infos, err
+	return *infos, err
 }
 
 func (eIMGR *endpointIntervalMGR) GoAheadEndpoint(item *EndpointInterval) error {
@@ -125,6 +128,15 @@ func (e *EndpointInterval) MarshalBinary() (data []byte, err error) {
 }
 
 func (e *EndpointInterval) UnmarshalBinary(data []byte) error {
+	return json.Unmarshal(data, e)
+}
+
+func (e *EndpointList) MarshalBinary() (data []byte, err error) {
+	data, err = json.Marshal(e)
+	return data, err
+}
+
+func (e *EndpointList) UnmarshalBinary(data []byte) error {
 	return json.Unmarshal(data, e)
 }
 
