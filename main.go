@@ -3,13 +3,23 @@ package main
 import (
 	"context"
 	"fmt"
-	"time"
 
+	"github.com/Vigo-Tea/go-ethereum-ant/common"
 	"yun.tea/block/bright/account/pkg/mgr"
+	"yun.tea/block/bright/common/logger"
+	"yun.tea/block/bright/common/utils"
+	contractmgr "yun.tea/block/bright/contract/pkg/mgr"
 )
 
 func main() {
-	fmt.Println(time.Now().String())
-	fmt.Println(mgr.CheckStateAndBalance(context.Background(), "0x7243176257d634A65Ce737c2cd5FAb6B3f65154B"))
-	fmt.Println(time.Now().String())
+	logger.Init(logger.DebugLevel, "./a.log")
+	contractAddr, err := contractmgr.GetContract()
+	if err != nil {
+		logger.Sugar().Errorw("Maintain", "Msg", "failed to check state of accounts", "Err", err)
+		return
+	}
+	rootAddr, treeAccounts, err := mgr.GetAllAdmin(context.Background(), contractAddr, common.HexToAddress("0xbE9Fdc66cB7c462354E95C99534fC6e0eDFeA0dc"))
+	fmt.Println(err)
+	fmt.Println(rootAddr)
+	fmt.Println(utils.PrettyStruct(treeAccounts))
 }

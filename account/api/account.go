@@ -12,14 +12,12 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"yun.tea/block/bright/common/cruder"
 	"yun.tea/block/bright/common/logger"
+	"yun.tea/block/bright/proto/bright"
 	proto "yun.tea/block/bright/proto/bright/account"
 
 	"github.com/google/uuid"
-)
-
-const (
-	maxAccountNum = 1000
 )
 
 func (s *Server) CreateAccount(ctx context.Context, in *proto.CreateAccountRequest) (*proto.CreateAccountResponse, error) {
@@ -29,18 +27,8 @@ func (s *Server) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 		return &proto.CreateAccountResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
-	_, total, err := crud.Rows(ctx, nil, 0, maxAccountNum)
-	if err != nil {
-		logger.Sugar().Errorw("CreateAccount", "error", err)
-		return &proto.CreateAccountResponse{}, status.Error(codes.Internal, err.Error())
-	}
-
-	isRoot := false
-	if total > 0 {
-		isRoot = true
-	}
-
 	enable := false
+	isRoot := false
 	balance, err := mgr.CheckStateAndBalance(ctx, pubKey)
 	if err == nil {
 		enable = true
@@ -67,27 +55,22 @@ func (s *Server) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 }
 
 func (s *Server) ImportAccount(ctx context.Context, in *proto.ImportAccountRequest) (*proto.ImportAccountResponse, error) {
-	pubKey, err := sign.GetPubKey(in.PriStr)
-	if err != nil {
-		logger.Sugar().Errorw("ImportAccount", "error", err)
-		return &proto.ImportAccountResponse{}, status.Error(codes.Internal, err.Error())
-	}
-	_, total, err := crud.Rows(ctx, nil, 0, maxAccountNum)
+	pubKey, err := sign.GetPubKey(in.PriKey)
 	if err != nil {
 		logger.Sugar().Errorw("ImportAccount", "error", err)
 		return &proto.ImportAccountResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
 	isRoot := false
-	if total > 0 {
-		isRoot = true
-	}
 	enable := false
-	balance := "0"
+	balance, err := mgr.CheckStateAndBalance(ctx, pubKey)
+	if err == nil {
+		enable = true
+	}
 
 	info := &proto.AccountReq{
 		Address: &pubKey,
-		PriKey:  &in.PriStr,
+		PriKey:  &in.PriKey,
 		Balance: &balance,
 		IsRoot:  &isRoot,
 		Enable:  &enable,
@@ -156,6 +139,42 @@ func (s *Server) GetAccounts(ctx context.Context, in *proto.GetAccountsRequest) 
 	return &proto.GetAccountsResponse{
 		Infos: converter.Ent2GrpcMany(rows),
 		Total: uint32(total),
+	}, nil
+}
+
+func (s *Server) SetRootAccount(ctx context.Context, in *proto.SetRootAccountRequest) (*proto.SetRootAccountResponse, error) {
+	var err error
+	conds := &proto.Conds{
+		IsRoot: &bright.BoolVal{
+			Op:    cruder.EQ,
+			Value: true,
+		},
+	}
+	_, total, err := crud.Rows(ctx, conds, 0, 0)
+	if err != nil {
+		logger.Sugar().Errorw("SetRootAccount", "error", err)
+		return &proto.SetRootAccountResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	if total == 0 {
+		// 检查是否有合约且是否在合约内是root
+	} else {
+		// 请求交换root账户，并更新redis中和数据库中的数据
+	}
+
+	isRoot := true
+	info, err := crud.Update(ctx, &proto.AccountReq{
+		ID:     &in.ID,
+		IsRoot: &isRoot,
+	})
+
+	if err != nil {
+		logger.Sugar().Errorw("SetRootAccount", "error", err)
+		return &proto.SetRootAccountResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &proto.SetRootAccountResponse{
+		Info: converter.Ent2Grpc(info),
 	}, nil
 }
 

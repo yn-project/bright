@@ -207,6 +207,38 @@
           "Manager"
         ]
       }
+    },
+    "/set/root/account": {
+      "post": {
+        "operationId": "Manager_SetRootAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/accountSetRootAccountResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/accountSetRootAccountRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Manager"
+        ]
+      }
     }
   },
   "definitions": {
@@ -358,7 +390,7 @@
     "accountImportAccountRequest": {
       "type": "object",
       "properties": {
-        "PriStr": {
+        "PriKey": {
           "type": "string"
         },
         "Remark": {
@@ -367,6 +399,22 @@
       }
     },
     "accountImportAccountResponse": {
+      "type": "object",
+      "properties": {
+        "Info": {
+          "$ref": "#/definitions/accountAccount"
+        }
+      }
+    },
+    "accountSetRootAccountRequest": {
+      "type": "object",
+      "properties": {
+        "ID": {
+          "type": "string"
+        }
+      }
+    },
+    "accountSetRootAccountResponse": {
       "type": "object",
       "properties": {
         "Info": {

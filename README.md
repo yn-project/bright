@@ -196,3 +196,7 @@ source /etc/profile
 apt install mycli -y
 mycli -uroot -hmysql
 ```
+
+# 蚂蚁链平台侧设置
+
+代扣燃料研究

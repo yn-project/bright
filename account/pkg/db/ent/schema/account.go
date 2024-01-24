@@ -3,6 +3,7 @@ package schema
 import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 
 	"github.com/google/uuid"
 	"yun.tea/block/bright/account/pkg/db/mixin"
@@ -24,7 +25,7 @@ func (Account) Fields() []ent.Field {
 			Default(uuid.New).
 			Unique(),
 		field.String("address"),
-		field.String("pri_key").Unique(),
+		field.String("pri_key"),
 		field.String("balance").Optional(),
 		field.Bool("enable").Default(false),
 		field.Bool("is_root").Default(false),
@@ -33,5 +34,7 @@ func (Account) Fields() []ent.Field {
 }
 
 func (Account) Indexes() []ent.Index {
-	return []ent.Index{}
+	return []ent.Index{
+		index.Fields("deleted_at", "pri_key").Unique(),
+	}
 }

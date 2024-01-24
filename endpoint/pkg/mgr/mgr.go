@@ -185,6 +185,7 @@ func WithClient(ctx context.Context, handle func(ctx context.Context, cli *ethcl
 				_ = eIMGR.BackoffEndpoint(endpoint)
 				return err
 			}
+			defer cli.Close()
 
 			err = handle(ctx, cli)
 			if err != nil {

@@ -15,7 +15,7 @@ var (
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
 		{Name: "address", Type: field.TypeString},
-		{Name: "pri_key", Type: field.TypeString, Unique: true},
+		{Name: "pri_key", Type: field.TypeString},
 		{Name: "balance", Type: field.TypeString, Nullable: true},
 		{Name: "enable", Type: field.TypeBool, Default: false},
 		{Name: "is_root", Type: field.TypeBool, Default: false},
@@ -26,6 +26,13 @@ var (
 		Name:       "accounts",
 		Columns:    AccountsColumns,
 		PrimaryKey: []*schema.Column{AccountsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "account_deleted_at_pri_key",
+				Unique:  true,
+				Columns: []*schema.Column{AccountsColumns[3], AccountsColumns[5]},
+			},
+		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{

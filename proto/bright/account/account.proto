@@ -39,6 +39,14 @@ service Manager {
       body:"*"
     };
   }
+
+  rpc SetRootAccount(SetRootAccountRequest) returns (SetRootAccountResponse) {
+    option (google.api.http) = {
+      post:"/set/root/account"
+      body:"*"
+    };
+  }
+  
   rpc DeleteAccount(DeleteAccountRequest) returns (DeleteAccountResponse) {
     option (google.api.http) = {
       post:"/delete/account"
@@ -80,7 +88,7 @@ message CreateAccountRequest {string Remark = 10; }
 message CreateAccountResponse { Account Info = 10; }
 
 message ImportAccountRequest {
-  string PriStr = 10;
+  string PriKey = 10;
   string Remark = 20;
 }
 message ImportAccountResponse { Account Info = 10; }
@@ -101,6 +109,12 @@ message GetAccountsResponse {
   repeated Account Infos = 10;
   uint32 Total = 20;
 }
+
+message SetRootAccountRequest {
+  string ID = 10;
+}
+message SetRootAccountResponse { Account Info = 10; }
+
 
 message DeleteAccountRequest { string ID = 10; }
 message DeleteAccountResponse { Account Info = 10; }

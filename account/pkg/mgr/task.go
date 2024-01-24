@@ -1,59 +1,167 @@
 package mgr
 
 import (
+	"context"
+	"fmt"
 	"time"
+
+	"github.com/Vigo-Tea/go-ethereum-ant/accounts/abi/bind"
+	"github.com/Vigo-Tea/go-ethereum-ant/common"
+	"github.com/Vigo-Tea/go-ethereum-ant/ethclient"
+	crud "yun.tea/block/bright/account/pkg/crud/account"
+	data_fin "yun.tea/block/bright/common/chains/eth/datafin"
+	"yun.tea/block/bright/common/logger"
+	contractmgr "yun.tea/block/bright/contract/pkg/mgr"
+	endpointmgr "yun.tea/block/bright/endpoint/pkg/mgr"
+	"yun.tea/block/bright/proto/bright/account"
 )
 
 const (
-	RefreshTime     = time.Minute
-	MaxUseEndpoints = 100
+	RefreshTime   = time.Minute
+	MaxUseAccount = 100
 )
 
-// func Maintain(ctx context.Context) {
-// 	for {
-// 		select {
-// 		case <-time.NewTicker(RefreshTime).C:
-// 			conds := &proto.Conds{}
-// 			infos, total, err := crud.Rows(ctx, conds, 0, MaxUseEndpoints)
-// 			if err != nil {
-// 				logger.Sugar().Error(err)
-// 				continue
-// 			}
+func Maintain(ctx context.Context) {
+	for {
+		select {
+		case <-time.NewTicker(RefreshTime).C:
+			rows, total, err := crud.Rows(ctx, nil, 0, MaxUseAccount)
+			if err != nil {
+				logger.Sugar().Errorw("Maintain", "Msg", "failed to check state of accounts", "Err", err)
+				continue
+			}
 
-// 			if total == 0 {
-// 				continue
-// 			}
+			if total == 0 || len(rows) == 0 {
+				return
+			}
 
-// 			okEndpoints := []string{}
-// 			for _, info := range infos {
-// 				err = CheckStateAndChainID(ctx, info.Address)
-// 				if err != nil {
-// 					info.State = basetype.EndpointState_EndpointError.String()
-// 					info.Remark = err.Error()
-// 					logger.Sugar().Warnf("endpoint:%v is not available,err: %v", info.Address, err)
-// 				} else {
-// 					okEndpoints = append(okEndpoints, info.Address)
-// 					info.State = basetype.EndpointState_EndpointAvaliable.String()
-// 					info.Remark = ""
-// 				}
+			contractAddr, err := contractmgr.GetContract()
+			if err != nil {
+				logger.Sugar().Errorw("Maintain", "Msg", "failed to check state of accounts", "Err", err)
+				continue
+			}
 
-// 				id := info.ID.String()
-// 				state := basetype.EndpointState(basetype.EndpointState_value[info.State])
-// 				crud.Update(ctx, &proto.EndpointReq{
-// 					ID:     &id,
-// 					State:  &state,
-// 					Remark: &info.Remark,
-// 				})
-// 			}
+			_from, err := getFromAccount(ctx)
+			if err != nil {
+				logger.Sugar().Errorw("Maintain", "Msg", "failed to check state of accounts", "Err", err)
+				continue
+			}
 
-// 			err = GetEndpintIntervalMGR().SetEndpoinsList(okEndpoints)
-// 			if err != nil {
-// 				logger.Sugar().Error(err)
-// 			}
+			from := common.HexToAddress(_from)
+			rootAccount, treeAccounts, err := GetAllAdmin(ctx, contractAddr, from)
+			if err != nil {
+				logger.Sugar().Errorw("Maintain", "Msg", "failed to check state of accounts", "Err", err)
+				continue
+			}
 
-// 			logger.Sugar().Infof("available endpoints: %v", okEndpoints)
-// 		case <-ctx.Done():
-// 			return
-// 		}
-// 	}
-// }
+			var availableRootAcc *AccountKey
+			availableTreeAccs := []AccountKey{}
+			for _, v := range rows {
+				if _, ok := treeAccounts[v.Address]; ok && v.Address != rootAccount {
+					availableTreeAccs = append(availableTreeAccs, AccountKey{Pub: v.Address, Pri: v.PriKey})
+					v.Enable = true
+				} else {
+					v.Enable = false
+				}
+
+				if v.Address == rootAccount {
+					availableRootAcc.Pub = v.Address
+					availableRootAcc.Pri = v.Address
+					v.IsRoot = true
+					v.Enable = true
+				} else {
+					v.IsRoot = false
+				}
+				id := v.ID.String()
+				_, err = crud.Update(ctx, &account.AccountReq{
+					ID:     &id,
+					IsRoot: &v.IsRoot,
+					Enable: &v.Enable,
+				})
+				if err != nil {
+					logger.Sugar().Warnw("Maintain", "Err", err)
+				}
+			}
+			if rootAccount != "" {
+				err = GetAccountMGR().SetRootAccount(rootAccount)
+				if err != nil {
+					logger.Sugar().Errorf("Maintain", "Err", err)
+				}
+			}
+
+			if len(availableTreeAccs) != 0 {
+				err = GetAccountMGR().SetTreeAccounts(availableTreeAccs)
+				if err != nil {
+					logger.Sugar().Errorf("Maintain", "Err", err)
+				}
+			}
+		case <-ctx.Done():
+			return
+		}
+	}
+}
+
+func GetAllAdmin(ctx context.Context, contractAddr, from common.Address) (string, map[string]bool, error) {
+	rootAccount := ""
+	treeAccounts := make(map[string]bool)
+	err := endpointmgr.WithClient(ctx, func(ctx context.Context, cli *ethclient.Client) error {
+		df, err := data_fin.NewDataFin(contractAddr, cli)
+		if err != nil {
+			logger.Sugar().Errorw("Maintain", "Msg", "failed to check state of accounts", "Err", err)
+			return err
+		}
+
+		owner, err := df.GetOwner(&bind.CallOpts{
+			Pending: true,
+			From:    from,
+			Context: ctx,
+		})
+		if err != nil {
+			logger.Sugar().Errorw("Maintain", "Msg", "failed to check state of accounts", "Err", err)
+			return err
+		}
+		rootAccount = owner.Hex()
+
+		addrs, infos, err := df.GetAdminInfos(&bind.CallOpts{
+			Pending: true,
+			From:    from,
+			Context: ctx,
+		})
+		if err != nil {
+			logger.Sugar().Errorw("Maintain", "Msg", "failed to check state of accounts", "Err", err)
+			return err
+		}
+
+		for i := 0; i < len(addrs); i++ {
+			if infos[i].Enable {
+				treeAccounts[addrs[i].Hex()] = infos[i].Enable
+			}
+		}
+		return nil
+	})
+
+	return rootAccount, treeAccounts, err
+}
+
+func getFromAccount(ctx context.Context) (string, error) {
+	amgr := GetAccountMGR()
+	pubkey, err := amgr.GetRootAccountPub(ctx)
+	if err == nil {
+		return pubkey, err
+	}
+	pubkeys, err := amgr.GetTreeAccountPub(ctx)
+	if err == nil && len(pubkeys) > 0 {
+		return pubkeys[0], err
+	}
+
+	rows, _, err := crud.Rows(ctx, &account.Conds{}, 0, 1)
+	if err != nil {
+		return "", err
+	}
+
+	if len(rows) == 0 {
+		return "", fmt.Errorf("have no available account")
+	}
+
+	return rows[0].Address, nil
+}
