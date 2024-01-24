@@ -2,6 +2,7 @@ package mgr
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"time"
@@ -42,15 +43,18 @@ type AccountKey struct {
 	Pub string
 }
 
-func (aMGR *accountsMGR) SetRootAccount(address string) error {
+type AccountKeyList []AccountKey
+
+func (aMGR *accountsMGR) SetRootAccount(address *AccountKey) error {
 	return ctredis.Set(rootAccountStoreKey, address, MaxAccountAliveTime)
 }
 
-func (aMGR *accountsMGR) GetRootAccount(ctx context.Context) (address *AccountKey, unlock func(), err error) {
+func (aMGR *accountsMGR) GetRootAccount(ctx context.Context) (acc *AccountKey, unlock func(), err error) {
+	acc = &AccountKey{}
 	for {
 		select {
 		case <-time.NewTicker(BlockTime).C:
-			err = ctredis.Get(rootAccountStoreKey, address)
+			err = ctredis.Get(rootAccountStoreKey, acc)
 			if err != nil {
 				return nil, nil, fmt.Errorf("have no avaliable tree accounts,err: %v", err)
 			}
@@ -59,7 +63,7 @@ func (aMGR *accountsMGR) GetRootAccount(ctx context.Context) (address *AccountKe
 				continue
 			}
 
-			return address, func() {
+			return acc, func() {
 				time.Sleep(SafeIntervalBlockTime)
 				ctredis.Unlock(rootAccountLockKey, unlockID)
 			}, nil
@@ -79,14 +83,14 @@ func (aMGR *accountsMGR) GetRootAccountPub(ctx context.Context) (pubKey string, 
 }
 
 func (aMGR *accountsMGR) SetTreeAccounts(addresses []AccountKey) error {
-	return ctredis.Set(treeAccountStoreKey, addresses, MaxAccountAliveTime)
+	return ctredis.Set(treeAccountStoreKey, AccountKeyList(addresses), MaxAccountAliveTime)
 }
 
 func (aMGR *accountsMGR) GetTreeAccount(ctx context.Context) (address *AccountKey, unlock func(), err error) {
 	for {
 		select {
 		case <-time.NewTicker(BlockTime).C:
-			addresses := []AccountKey{}
+			addresses := AccountKeyList{}
 			err = ctredis.Get(treeAccountStoreKey, addresses)
 			if err != nil {
 				return nil, nil, fmt.Errorf("have no avaliable tree accounts,err: %v", err)
@@ -136,4 +140,22 @@ func (aMGR *accountsMGR) GetTreeAccountPub(ctx context.Context) (pubKeys []strin
 		pubKeys = append(pubKeys, v.Pub)
 	}
 	return pubKeys, nil
+}
+
+func (e *AccountKey) MarshalBinary() (data []byte, err error) {
+	data, err = json.Marshal(e)
+	return data, err
+}
+
+func (e *AccountKey) UnmarshalBinary(data []byte) error {
+	return json.Unmarshal(data, e)
+}
+
+func (e *AccountKeyList) MarshalBinary() (data []byte, err error) {
+	data, err = json.Marshal(e)
+	return data, err
+}
+
+func (e *AccountKeyList) UnmarshalBinary(data []byte) error {
+	return json.Unmarshal(data, e)
 }

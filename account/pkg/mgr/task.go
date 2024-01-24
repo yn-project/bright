@@ -11,6 +11,7 @@ import (
 	crud "yun.tea/block/bright/account/pkg/crud/account"
 	data_fin "yun.tea/block/bright/common/chains/eth/datafin"
 	"yun.tea/block/bright/common/logger"
+	"yun.tea/block/bright/common/utils"
 	contractmgr "yun.tea/block/bright/contract/pkg/mgr"
 	endpointmgr "yun.tea/block/bright/endpoint/pkg/mgr"
 	"yun.tea/block/bright/proto/bright/account"
@@ -19,6 +20,7 @@ import (
 const (
 	RefreshTime   = time.Minute
 	MaxUseAccount = 100
+	MinBalance    = 100000
 )
 
 func Maintain(ctx context.Context) {
@@ -32,7 +34,7 @@ func Maintain(ctx context.Context) {
 			}
 
 			if total == 0 || len(rows) == 0 {
-				return
+				continue
 			}
 
 			contractAddr, err := contractmgr.GetContract()
@@ -41,14 +43,13 @@ func Maintain(ctx context.Context) {
 				continue
 			}
 
-			_from, err := getFromAccount(ctx)
+			from, err := getFromAccount(ctx)
 			if err != nil {
 				logger.Sugar().Errorw("Maintain", "Msg", "failed to check state of accounts", "Err", err)
 				continue
 			}
 
-			from := common.HexToAddress(_from)
-			rootAccount, treeAccounts, err := GetAllAdmin(ctx, contractAddr, from)
+			rootAccount, treeAccounts, err := GetAllEnableAdmin(ctx, contractAddr, from)
 			if err != nil {
 				logger.Sugar().Errorw("Maintain", "Msg", "failed to check state of accounts", "Err", err)
 				continue
@@ -65,8 +66,10 @@ func Maintain(ctx context.Context) {
 				}
 
 				if v.Address == rootAccount {
-					availableRootAcc.Pub = v.Address
-					availableRootAcc.Pri = v.Address
+					availableRootAcc = &AccountKey{
+						Pub: v.Address,
+						Pri: v.PriKey,
+					}
 					v.IsRoot = true
 					v.Enable = true
 				} else {
@@ -82,8 +85,9 @@ func Maintain(ctx context.Context) {
 					logger.Sugar().Warnw("Maintain", "Err", err)
 				}
 			}
-			if rootAccount != "" {
-				err = GetAccountMGR().SetRootAccount(rootAccount)
+
+			if availableRootAcc != nil {
+				err = GetAccountMGR().SetRootAccount(availableRootAcc)
 				if err != nil {
 					logger.Sugar().Errorf("Maintain", "Err", err)
 				}
@@ -95,19 +99,21 @@ func Maintain(ctx context.Context) {
 					logger.Sugar().Errorf("Maintain", "Err", err)
 				}
 			}
+
+			fmt.Println(rootAccount)
+			fmt.Println(utils.PrettyStruct(availableTreeAccs))
 		case <-ctx.Done():
 			return
 		}
 	}
 }
 
-func GetAllAdmin(ctx context.Context, contractAddr, from common.Address) (string, map[string]bool, error) {
+func GetAllEnableAdmin(ctx context.Context, contractAddr, from common.Address) (string, map[string]bool, error) {
 	rootAccount := ""
 	treeAccounts := make(map[string]bool)
 	err := endpointmgr.WithClient(ctx, func(ctx context.Context, cli *ethclient.Client) error {
 		df, err := data_fin.NewDataFin(contractAddr, cli)
 		if err != nil {
-			logger.Sugar().Errorw("Maintain", "Msg", "failed to check state of accounts", "Err", err)
 			return err
 		}
 
@@ -117,7 +123,6 @@ func GetAllAdmin(ctx context.Context, contractAddr, from common.Address) (string
 			Context: ctx,
 		})
 		if err != nil {
-			logger.Sugar().Errorw("Maintain", "Msg", "failed to check state of accounts", "Err", err)
 			return err
 		}
 		rootAccount = owner.Hex()
@@ -128,7 +133,6 @@ func GetAllAdmin(ctx context.Context, contractAddr, from common.Address) (string
 			Context: ctx,
 		})
 		if err != nil {
-			logger.Sugar().Errorw("Maintain", "Msg", "failed to check state of accounts", "Err", err)
 			return err
 		}
 
@@ -143,25 +147,25 @@ func GetAllAdmin(ctx context.Context, contractAddr, from common.Address) (string
 	return rootAccount, treeAccounts, err
 }
 
-func getFromAccount(ctx context.Context) (string, error) {
+func getFromAccount(ctx context.Context) (common.Address, error) {
 	amgr := GetAccountMGR()
 	pubkey, err := amgr.GetRootAccountPub(ctx)
 	if err == nil {
-		return pubkey, err
+		return common.HexToAddress(pubkey), err
 	}
 	pubkeys, err := amgr.GetTreeAccountPub(ctx)
 	if err == nil && len(pubkeys) > 0 {
-		return pubkeys[0], err
+		return common.HexToAddress(pubkeys[0]), err
 	}
 
 	rows, _, err := crud.Rows(ctx, &account.Conds{}, 0, 1)
 	if err != nil {
-		return "", err
+		return common.HexToAddress(""), err
 	}
 
 	if len(rows) == 0 {
-		return "", fmt.Errorf("have no available account")
+		return common.HexToAddress(""), fmt.Errorf("have no available account")
 	}
 
-	return rows[0].Address, nil
+	return common.HexToAddress(rows[0].Address), nil
 }

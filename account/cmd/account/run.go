@@ -13,11 +13,12 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	cli "github.com/urfave/cli/v2"
-	"yun.tea/block/bright/config"
 	"yun.tea/block/bright/account/pkg/db"
+	"yun.tea/block/bright/account/pkg/mgr"
+	"yun.tea/block/bright/config"
 
-	"yun.tea/block/bright/common/logger"
 	api "yun.tea/block/bright/account/api"
+	"yun.tea/block/bright/common/logger"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -44,6 +45,7 @@ var runCmd = &cli.Command{
 		return logger.Init(logger.DebugLevel, config.GetConfig().Account.LogFile)
 	},
 	Action: func(c *cli.Context) error {
+		go mgr.Maintain(c.Context)
 		go runGRPCServer(config.GetConfig().Account.GrpcPort)
 		go runHTTPServer(config.GetConfig().Account.HTTPPort, config.GetConfig().Account.GrpcPort)
 		sigchan := make(chan os.Signal, 1)

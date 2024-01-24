@@ -27,11 +27,9 @@ func (s *Server) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 		return &proto.CreateAccountResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
-	enable := false
-	isRoot := false
-	balance, err := mgr.CheckStateAndBalance(ctx, pubKey)
-	if err == nil {
-		enable = true
+	balance, isRoot, enable, err := mgr.CheckStateAndBalance(ctx, pubKey)
+	if err != nil {
+		logger.Sugar().Warnw("CreateAccount", "error", err)
 	}
 
 	info := &proto.AccountReq{
@@ -63,9 +61,9 @@ func (s *Server) ImportAccount(ctx context.Context, in *proto.ImportAccountReque
 
 	isRoot := false
 	enable := false
-	balance, err := mgr.CheckStateAndBalance(ctx, pubKey)
-	if err == nil {
-		enable = true
+	balance, isRoot, enable, err := mgr.CheckStateAndBalance(ctx, pubKey)
+	if err != nil {
+		logger.Sugar().Warnw("ImportAccount", "error", err)
 	}
 
 	info := &proto.AccountReq{
