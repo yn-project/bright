@@ -77,7 +77,7 @@ contract Admin is IAdmin,Owner{
 
     // 添加
     function AddAdmin(address admin,string memory info) override  external isOwner{
-        require(!adminMap[admin].enable,"cannot change info of admin in using");
+        require(adminMap[admin].isValid,"cannot change info of admin in using");
         adminMap[admin] = AdminInfo(true,info,true);
         adminArr.push(admin);
         adminTotal++;
@@ -85,6 +85,7 @@ contract Admin is IAdmin,Owner{
 
     // 设置可用性
     function SetEnableAdmin(address admin,bool enable) override external isOwner{
+        require(!adminMap[admin].isValid,"cannot change info of admin not used");
         adminMap[admin].enable=enable;
     }
 
@@ -114,7 +115,7 @@ contract Admin is IAdmin,Owner{
 
     // 删除管理员
     function DeleteAdmin(address admin) override external isOwner{
-        // require(!adminMap[admin].enable,"cannot delete admin in using");
+        require(!adminMap[admin].isValid,"cannot change info of admin not used");
         delete adminMap[admin];
         adminTotal--;
         for (uint i=0;i<adminArr.length;i++){

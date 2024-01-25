@@ -12,7 +12,7 @@ import (
 
 const (
 	BlockTime             = time.Second * 3
-	SafeIntervalBlock     = 5
+	SafeIntervalBlock     = 1
 	SafeIntervalBlockTime = SafeIntervalBlock * BlockTime
 	MaxAccountLockTime    = time.Minute
 	MaxAccountAliveTime   = time.Hour * 24
@@ -43,7 +43,7 @@ type AccountKey struct {
 	Pub string
 }
 
-type AccountKeyList []AccountKey
+type AccountKeyList []*AccountKey
 
 func (aMGR *accountsMGR) SetRootAccount(address *AccountKey) error {
 	return ctredis.Set(rootAccountStoreKey, address, MaxAccountAliveTime)
@@ -82,8 +82,9 @@ func (aMGR *accountsMGR) GetRootAccountPub(ctx context.Context) (pubKey string, 
 	return address.Pub, nil
 }
 
-func (aMGR *accountsMGR) SetTreeAccounts(addresses []AccountKey) error {
-	return ctredis.Set(treeAccountStoreKey, AccountKeyList(addresses), MaxAccountAliveTime)
+func (aMGR *accountsMGR) SetTreeAccounts(addresses []*AccountKey) error {
+	accList := AccountKeyList(addresses)
+	return ctredis.Set(treeAccountStoreKey, accList, MaxAccountAliveTime)
 }
 
 func (aMGR *accountsMGR) GetTreeAccount(ctx context.Context) (address *AccountKey, unlock func(), err error) {
@@ -104,7 +105,7 @@ func (aMGR *accountsMGR) GetTreeAccount(ctx context.Context) (address *AccountKe
 			lockKey := ""
 			unlockID := ""
 			for i := 0; i < len(addresses); i++ {
-				address = &addresses[(randN+i)%len(addresses)]
+				address = addresses[(randN+i)%len(addresses)]
 				lockKey = fmt.Sprintf("%v:%v", treeAccountLockKey, address)
 				unlockID, err = ctredis.TryLock(lockKey, aMGR.RedisExpireTime)
 				if err == nil {

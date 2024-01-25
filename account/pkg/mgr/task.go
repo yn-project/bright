@@ -56,10 +56,10 @@ func Maintain(ctx context.Context) {
 			}
 
 			var availableRootAcc *AccountKey
-			availableTreeAccs := []AccountKey{}
+			availableTreeAccs := []*AccountKey{}
 			for _, v := range rows {
 				if _, ok := treeAccounts[v.Address]; ok && v.Address != rootAccount {
-					availableTreeAccs = append(availableTreeAccs, AccountKey{Pub: v.Address, Pri: v.PriKey})
+					availableTreeAccs = append(availableTreeAccs, &AccountKey{Pub: v.Address, Pri: v.PriKey})
 					v.Enable = true
 				} else {
 					v.Enable = false
@@ -169,3 +169,5 @@ func getFromAccount(ctx context.Context) (common.Address, error) {
 
 	return common.HexToAddress(rows[0].Address), nil
 }
+
+func WithAccountClient(ctx context.Context, needRoot bool)

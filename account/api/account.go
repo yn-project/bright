@@ -140,6 +140,7 @@ func (s *Server) GetAccounts(ctx context.Context, in *proto.GetAccountsRequest) 
 	}, nil
 }
 
+// should be change root account
 func (s *Server) SetRootAccount(ctx context.Context, in *proto.SetRootAccountRequest) (*proto.SetRootAccountResponse, error) {
 	var err error
 	conds := &proto.Conds{
@@ -172,6 +173,35 @@ func (s *Server) SetRootAccount(ctx context.Context, in *proto.SetRootAccountReq
 	}
 
 	return &proto.SetRootAccountResponse{
+		Info: converter.Ent2Grpc(info),
+	}, nil
+}
+
+// SetAdminAccount
+func (s *Server) SetAdminAccount(ctx context.Context, in *proto.SetAdminAccountRequest) (*proto.SetAdminAccountResponse, error) {
+	var err error
+
+	id, err := uuid.Parse(in.GetID())
+	if err != nil {
+		logger.Sugar().Errorw("SetAdminAccount", "ID", in.GetID(), "error", err)
+		return &proto.SetAdminAccountResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	info, err := crud.Row(ctx, id)
+	if err != nil {
+		logger.Sugar().Errorw("SetAdminAccount", "ID", in.GetID(), "error", err)
+		return &proto.SetAdminAccountResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	if info.Enable {
+		return &proto.SetAdminAccountResponse{
+			Info: converter.Ent2Grpc(info),
+		}, nil
+	}
+
+	// set it to admin
+
+	return &proto.SetAdminAccountResponse{
 		Info: converter.Ent2Grpc(info),
 	}, nil
 }

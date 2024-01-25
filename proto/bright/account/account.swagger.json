@@ -208,6 +208,38 @@
         ]
       }
     },
+    "/set/addmin/account": {
+      "post": {
+        "operationId": "Manager_SetAdminAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/accountSetAdminAccountResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/accountSetAdminAccountRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Manager"
+        ]
+      }
+    },
     "/set/root/account": {
       "post": {
         "operationId": "Manager_SetRootAccount",
@@ -399,6 +431,22 @@
       }
     },
     "accountImportAccountResponse": {
+      "type": "object",
+      "properties": {
+        "Info": {
+          "$ref": "#/definitions/accountAccount"
+        }
+      }
+    },
+    "accountSetAdminAccountRequest": {
+      "type": "object",
+      "properties": {
+        "ID": {
+          "type": "string"
+        }
+      }
+    },
+    "accountSetAdminAccountResponse": {
       "type": "object",
       "properties": {
         "Info": {

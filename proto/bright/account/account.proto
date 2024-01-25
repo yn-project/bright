@@ -46,6 +46,13 @@ service Manager {
       body:"*"
     };
   }
+
+  rpc SetAdminAccount(SetAdminAccountRequest) returns (SetAdminAccountResponse) {
+    option (google.api.http) = {
+      post:"/set/addmin/account"
+      body:"*"
+    };
+  }
   
   rpc DeleteAccount(DeleteAccountRequest) returns (DeleteAccountResponse) {
     option (google.api.http) = {
@@ -115,6 +122,8 @@ message SetRootAccountRequest {
 }
 message SetRootAccountResponse { Account Info = 10; }
 
+message SetAdminAccountRequest { string ID = 10; }
+message SetAdminAccountResponse { Account Info = 10; }
 
 message DeleteAccountRequest { string ID = 10; }
 message DeleteAccountResponse { Account Info = 10; }

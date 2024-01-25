@@ -28,6 +28,7 @@ type ManagerClient interface {
 	GetAccountPriKey(ctx context.Context, in *GetAccountPriKeyRequest, opts ...grpc.CallOption) (*GetAccountPriKeyResponse, error)
 	GetAccounts(ctx context.Context, in *GetAccountsRequest, opts ...grpc.CallOption) (*GetAccountsResponse, error)
 	SetRootAccount(ctx context.Context, in *SetRootAccountRequest, opts ...grpc.CallOption) (*SetRootAccountResponse, error)
+	SetAdminAccount(ctx context.Context, in *SetAdminAccountRequest, opts ...grpc.CallOption) (*SetAdminAccountResponse, error)
 	DeleteAccount(ctx context.Context, in *DeleteAccountRequest, opts ...grpc.CallOption) (*DeleteAccountResponse, error)
 }
 
@@ -93,6 +94,15 @@ func (c *managerClient) SetRootAccount(ctx context.Context, in *SetRootAccountRe
 	return out, nil
 }
 
+func (c *managerClient) SetAdminAccount(ctx context.Context, in *SetAdminAccountRequest, opts ...grpc.CallOption) (*SetAdminAccountResponse, error) {
+	out := new(SetAdminAccountResponse)
+	err := c.cc.Invoke(ctx, "/bright.account.Manager/SetAdminAccount", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *managerClient) DeleteAccount(ctx context.Context, in *DeleteAccountRequest, opts ...grpc.CallOption) (*DeleteAccountResponse, error) {
 	out := new(DeleteAccountResponse)
 	err := c.cc.Invoke(ctx, "/bright.account.Manager/DeleteAccount", in, out, opts...)
@@ -112,6 +122,7 @@ type ManagerServer interface {
 	GetAccountPriKey(context.Context, *GetAccountPriKeyRequest) (*GetAccountPriKeyResponse, error)
 	GetAccounts(context.Context, *GetAccountsRequest) (*GetAccountsResponse, error)
 	SetRootAccount(context.Context, *SetRootAccountRequest) (*SetRootAccountResponse, error)
+	SetAdminAccount(context.Context, *SetAdminAccountRequest) (*SetAdminAccountResponse, error)
 	DeleteAccount(context.Context, *DeleteAccountRequest) (*DeleteAccountResponse, error)
 	mustEmbedUnimplementedManagerServer()
 }
@@ -137,6 +148,9 @@ func (UnimplementedManagerServer) GetAccounts(context.Context, *GetAccountsReque
 }
 func (UnimplementedManagerServer) SetRootAccount(context.Context, *SetRootAccountRequest) (*SetRootAccountResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetRootAccount not implemented")
+}
+func (UnimplementedManagerServer) SetAdminAccount(context.Context, *SetAdminAccountRequest) (*SetAdminAccountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetAdminAccount not implemented")
 }
 func (UnimplementedManagerServer) DeleteAccount(context.Context, *DeleteAccountRequest) (*DeleteAccountResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteAccount not implemented")
@@ -262,6 +276,24 @@ func _Manager_SetRootAccount_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Manager_SetAdminAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetAdminAccountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagerServer).SetAdminAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/bright.account.Manager/SetAdminAccount",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagerServer).SetAdminAccount(ctx, req.(*SetAdminAccountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Manager_DeleteAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteAccountRequest)
 	if err := dec(in); err != nil {
@@ -310,6 +342,10 @@ var Manager_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetRootAccount",
 			Handler:    _Manager_SetRootAccount_Handler,
+		},
+		{
+			MethodName: "SetAdminAccount",
+			Handler:    _Manager_SetAdminAccount_Handler,
 		},
 		{
 			MethodName: "DeleteAccount",
