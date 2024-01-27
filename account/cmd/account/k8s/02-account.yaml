@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: kube-system
+  name: account
+  annotations:
+    "sidecar.jaegertracing.io/inject": "true"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: account
+  template:
+    metadata:
+      labels:
+        app: account
+    spec:
+      containers:
+        - name: account
+          # image: bright/account:latest
+          image: docker.io/bright/account:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: service-config
+              mountPath: /etc/account
+          env:
+            - name: ENV_CLUSTER_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: mysql_password
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-password-secret
+                  key: rootpassword
+            - name: redis_password
+              valueFrom:
+                secretKeyRef:
+                  name: redis-cluster
+                  key: redis-password
+      volumes:
+        - name: service-config
+          configMap:
+            name: account-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: kube-system
+  name: account
+spec:
+  ports:
+    - name: http
+      port: 30130
+      targetPort: 30130
+    - name: grpc
+      port: 30131
+      targetPort: 30131
+    - name: healthz
+      port: 30132
+      targetPort: 30132
+  selector:
+    app: account
