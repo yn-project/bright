@@ -16,7 +16,7 @@
     "application/json"
   ],
   "paths": {
-    "/v1/compile/contract/code": {
+    "/compile/contract/code": {
       "post": {
         "operationId": "Manager_CompileContractCode",
         "responses": {
@@ -48,7 +48,103 @@
         ]
       }
     },
-    "/v1/get/contract/code": {
+    "/create/contract": {
+      "post": {
+        "operationId": "Manager_CreateContract",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/blockCreateContractResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/blockCreateContractRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Manager"
+        ]
+      }
+    },
+    "/delete/contract": {
+      "post": {
+        "operationId": "Manager_DeleteContract",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/blockDeleteContractResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/blockDeleteContractRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Manager"
+        ]
+      }
+    },
+    "/get/contract": {
+      "post": {
+        "operationId": "Manager_GetContract",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/blockGetContractResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/blockGetContractRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Manager"
+        ]
+      }
+    },
+    "/get/contract/code": {
       "post": {
         "operationId": "Manager_GetContractCode",
         "responses": {
@@ -104,6 +200,34 @@
         }
       }
     },
+    "blockContract": {
+      "type": "object",
+      "properties": {
+        "ID": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "Address": {
+          "type": "string"
+        },
+        "Version": {
+          "type": "string"
+        },
+        "Remark": {
+          "type": "string"
+        },
+        "CreatedAt": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "UpdatedAt": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
     "blockContractCode": {
       "type": "object",
       "properties": {
@@ -135,6 +259,41 @@
         }
       }
     },
+    "blockCreateContractRequest": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string"
+        },
+        "Remark": {
+          "type": "string"
+        }
+      }
+    },
+    "blockCreateContractResponse": {
+      "type": "object",
+      "properties": {
+        "Info": {
+          "$ref": "#/definitions/blockContract"
+        }
+      }
+    },
+    "blockDeleteContractRequest": {
+      "type": "object",
+      "properties": {
+        "ID": {
+          "type": "string"
+        }
+      }
+    },
+    "blockDeleteContractResponse": {
+      "type": "object",
+      "properties": {
+        "Info": {
+          "$ref": "#/definitions/blockContract"
+        }
+      }
+    },
     "blockGetContractCodeRequest": {
       "type": "object"
     },
@@ -143,6 +302,22 @@
       "properties": {
         "Info": {
           "$ref": "#/definitions/blockContractCode"
+        }
+      }
+    },
+    "blockGetContractRequest": {
+      "type": "object",
+      "properties": {
+        "ID": {
+          "type": "string"
+        }
+      }
+    },
+    "blockGetContractResponse": {
+      "type": "object",
+      "properties": {
+        "Info": {
+          "$ref": "#/definitions/blockContract"
         }
       }
     },

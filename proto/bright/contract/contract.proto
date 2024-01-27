@@ -3,20 +3,40 @@ syntax = "proto3";
 package nftmeta.v1.block;
 
 option go_package = "yun.tea/block/bright/proto/bright/nftmeta/v1/block";
+import "bright/bright.proto";
+import "bright/basetype/basetype.proto";
 import "google/api/annotations.proto";
-
 
 service Manager {
   rpc GetContractCode(GetContractCodeRequest) returns (GetContractCodeResponse) {
     option (google.api.http) = {
-      post:"/v1/get/contract/code"
+      post:"/get/contract/code"
       body:"*"
     };
   }
 
   rpc CompileContractCode(CompileContractCodeRequest) returns (CompileContractCodeResponse) {
     option (google.api.http) = {
-      post:"/v1/compile/contract/code"
+      post:"/compile/contract/code"
+      body:"*"
+    };
+  }
+
+  rpc CreateContract(CreateContractRequest) returns (CreateContractResponse) {
+    option (google.api.http) = {
+      post:"/create/contract"
+      body:"*"
+    };
+  }
+  rpc GetContract(GetContractRequest) returns (GetContractResponse) {
+    option (google.api.http) = {
+      post:"/get/contract"
+      body:"*"
+    };
+  }
+  rpc DeleteContract(DeleteContractRequest) returns (DeleteContractResponse) {
+    option (google.api.http) = {
+      post:"/delete/contract"
       body:"*"
     };
   }
@@ -45,3 +65,35 @@ message CompileContractCodeRequest {
 }
 
 message CompileContractCodeResponse { ContractGEN Info = 10; }
+
+message ContractReq {
+  optional string ID = 10;
+  optional string Name = 11;
+  optional string Address = 20;
+  optional string Version = 30;
+  optional string Remark = 40;
+}
+
+message Contract {
+  string ID = 10;
+  string Name = 11;
+  string Address = 20;
+  string Version = 30;
+  string Remark = 40;
+  uint64 CreatedAt = 60;
+  uint64 UpdatedAt = 70;
+}
+
+
+message CreateContractRequest { 
+  string Name = 10;
+  string Remark = 20;
+}
+
+message CreateContractResponse { Contract Info = 10; }
+
+message GetContractRequest { string ID = 10; }
+message GetContractResponse { Contract Info = 10; }
+
+message DeleteContractRequest { string ID = 10; }
+message DeleteContractResponse { Contract Info = 10; }

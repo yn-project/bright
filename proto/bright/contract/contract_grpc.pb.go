@@ -24,6 +24,9 @@ const _ = grpc.SupportPackageIsVersion7
 type ManagerClient interface {
 	GetContractCode(ctx context.Context, in *GetContractCodeRequest, opts ...grpc.CallOption) (*GetContractCodeResponse, error)
 	CompileContractCode(ctx context.Context, in *CompileContractCodeRequest, opts ...grpc.CallOption) (*CompileContractCodeResponse, error)
+	CreateContract(ctx context.Context, in *CreateContractRequest, opts ...grpc.CallOption) (*CreateContractResponse, error)
+	GetContract(ctx context.Context, in *GetContractRequest, opts ...grpc.CallOption) (*GetContractResponse, error)
+	DeleteContract(ctx context.Context, in *DeleteContractRequest, opts ...grpc.CallOption) (*DeleteContractResponse, error)
 }
 
 type managerClient struct {
@@ -52,12 +55,42 @@ func (c *managerClient) CompileContractCode(ctx context.Context, in *CompileCont
 	return out, nil
 }
 
+func (c *managerClient) CreateContract(ctx context.Context, in *CreateContractRequest, opts ...grpc.CallOption) (*CreateContractResponse, error) {
+	out := new(CreateContractResponse)
+	err := c.cc.Invoke(ctx, "/nftmeta.v1.block.Manager/CreateContract", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *managerClient) GetContract(ctx context.Context, in *GetContractRequest, opts ...grpc.CallOption) (*GetContractResponse, error) {
+	out := new(GetContractResponse)
+	err := c.cc.Invoke(ctx, "/nftmeta.v1.block.Manager/GetContract", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *managerClient) DeleteContract(ctx context.Context, in *DeleteContractRequest, opts ...grpc.CallOption) (*DeleteContractResponse, error) {
+	out := new(DeleteContractResponse)
+	err := c.cc.Invoke(ctx, "/nftmeta.v1.block.Manager/DeleteContract", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ManagerServer is the server API for Manager service.
 // All implementations must embed UnimplementedManagerServer
 // for forward compatibility
 type ManagerServer interface {
 	GetContractCode(context.Context, *GetContractCodeRequest) (*GetContractCodeResponse, error)
 	CompileContractCode(context.Context, *CompileContractCodeRequest) (*CompileContractCodeResponse, error)
+	CreateContract(context.Context, *CreateContractRequest) (*CreateContractResponse, error)
+	GetContract(context.Context, *GetContractRequest) (*GetContractResponse, error)
+	DeleteContract(context.Context, *DeleteContractRequest) (*DeleteContractResponse, error)
 	mustEmbedUnimplementedManagerServer()
 }
 
@@ -70,6 +103,15 @@ func (UnimplementedManagerServer) GetContractCode(context.Context, *GetContractC
 }
 func (UnimplementedManagerServer) CompileContractCode(context.Context, *CompileContractCodeRequest) (*CompileContractCodeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CompileContractCode not implemented")
+}
+func (UnimplementedManagerServer) CreateContract(context.Context, *CreateContractRequest) (*CreateContractResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateContract not implemented")
+}
+func (UnimplementedManagerServer) GetContract(context.Context, *GetContractRequest) (*GetContractResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetContract not implemented")
+}
+func (UnimplementedManagerServer) DeleteContract(context.Context, *DeleteContractRequest) (*DeleteContractResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteContract not implemented")
 }
 func (UnimplementedManagerServer) mustEmbedUnimplementedManagerServer() {}
 
@@ -120,6 +162,60 @@ func _Manager_CompileContractCode_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Manager_CreateContract_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateContractRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagerServer).CreateContract(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/nftmeta.v1.block.Manager/CreateContract",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagerServer).CreateContract(ctx, req.(*CreateContractRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Manager_GetContract_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetContractRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagerServer).GetContract(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/nftmeta.v1.block.Manager/GetContract",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagerServer).GetContract(ctx, req.(*GetContractRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Manager_DeleteContract_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteContractRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagerServer).DeleteContract(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/nftmeta.v1.block.Manager/DeleteContract",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagerServer).DeleteContract(ctx, req.(*DeleteContractRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Manager_ServiceDesc is the grpc.ServiceDesc for Manager service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -134,6 +230,18 @@ var Manager_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CompileContractCode",
 			Handler:    _Manager_CompileContractCode_Handler,
+		},
+		{
+			MethodName: "CreateContract",
+			Handler:    _Manager_CreateContract_Handler,
+		},
+		{
+			MethodName: "GetContract",
+			Handler:    _Manager_GetContract_Handler,
+		},
+		{
+			MethodName: "DeleteContract",
+			Handler:    _Manager_DeleteContract_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

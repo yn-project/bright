@@ -4,8 +4,13 @@ package contract
 import (
 	"context"
 
+	"github.com/google/uuid"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"yun.tea/block/bright/common/logger"
 	"yun.tea/block/bright/common/solc"
+	converter "yun.tea/block/bright/contract/pkg/converter/contract"
+	crud "yun.tea/block/bright/contract/pkg/crud/contract"
 	"yun.tea/block/bright/contract/pkg/solcode"
 	proto "yun.tea/block/bright/proto/bright/contract"
 )
@@ -41,5 +46,61 @@ func (s *Server) CompileContractCode(ctx context.Context, in *proto.CompileContr
 			API: apiCode,
 			BIN: binCode,
 		},
+	}, nil
+}
+func (s *Server) CreateContract(ctx context.Context, in *proto.CreateContractRequest) (*proto.CreateContractResponse, error) {
+	version := solcode.VERSION
+	info, err := crud.Create(ctx, &proto.ContractReq{
+		Name:    &in.Name,
+		Address: &in.Name,
+		Version: &version,
+		Remark:  &in.Remark,
+	})
+	if err != nil {
+		return &proto.CreateContractResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &proto.CreateContractResponse{
+		Info: converter.Ent2Grpc(info),
+	}, nil
+}
+
+func (s *Server) GetContract(ctx context.Context, in *proto.GetContractRequest) (*proto.GetContractResponse, error) {
+	var err error
+
+	id, err := uuid.Parse(in.GetID())
+	if err != nil {
+		logger.Sugar().Errorw("GetContract", "ID", in.GetID(), "error", err)
+		return &proto.GetContractResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	info, err := crud.Row(ctx, id)
+	if err != nil {
+		logger.Sugar().Errorw("GetContract", "ID", in.GetID(), "error", err)
+		return &proto.GetContractResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &proto.GetContractResponse{
+		Info: converter.Ent2Grpc(info),
+	}, nil
+}
+
+func (s *Server) DeleteContract(ctx context.Context, in *proto.DeleteContractRequest) (*proto.DeleteContractResponse, error) {
+	var err error
+
+	id, err := uuid.Parse(in.GetID())
+	if err != nil {
+		logger.Sugar().Errorw("DeleteContract", "ID", in.GetID(), "error", err)
+		return &proto.DeleteContractResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	info, err := crud.Delete(ctx, id)
+	if err != nil {
+		logger.Sugar().Errorw("DeleteContract", "ID", in.GetID(), "error", err)
+		return &proto.DeleteContractResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &proto.DeleteContractResponse{
+		Info: converter.Ent2Grpc(info),
 	}, nil
 }

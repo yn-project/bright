@@ -17,96 +17,100 @@ import (
 )
 
 const (
-	RefreshTime   = time.Minute
+	RefreshTime   = time.Minute * 10
 	MaxUseAccount = 100
 	MinBalance    = 100000
 )
 
 func Maintain(ctx context.Context) {
+	CheckAllAccountState(ctx)
 	for {
 		select {
 		case <-time.NewTicker(RefreshTime).C:
-			rows, total, err := crud.Rows(ctx, nil, 0, MaxUseAccount)
-			if err != nil {
-				logger.Sugar().Errorw("Maintain", "Msg", "failed to check state of accounts", "Err", err)
-				continue
-			}
-
-			if total == 0 || len(rows) == 0 {
-				continue
-			}
-
-			contractAddr, err := contractmgr.GetContract()
-			if err != nil {
-				logger.Sugar().Errorw("Maintain", "Msg", "failed to check state of accounts", "Err", err)
-				continue
-			}
-
-			from, err := getFromAccount(ctx)
-			if err != nil {
-				logger.Sugar().Errorw("Maintain", "Msg", "failed to check state of accounts", "Err", err)
-				continue
-			}
-
-			fmt.Println(contractAddr, from)
-			rootAccount, treeAccounts, err := GetAllEnableAdmin(ctx, contractAddr, from)
-			if err != nil {
-				logger.Sugar().Errorw("Maintain", "Msg", "failed to check state of accounts", "Err", err)
-				continue
-			}
-
-			var availableRootAcc *AccountKey
-			availableTreeAccs := []*AccountKey{}
-			for _, v := range rows {
-				if _, ok := treeAccounts[v.Address]; ok && v.Address != rootAccount {
-					availableTreeAccs = append(availableTreeAccs, &AccountKey{Pub: v.Address, Pri: v.PriKey})
-					v.Enable = true
-				} else {
-					v.Enable = false
-				}
-
-				if v.Address == rootAccount {
-					availableRootAcc = &AccountKey{
-						Pub: v.Address,
-						Pri: v.PriKey,
-					}
-					v.IsRoot = true
-					v.Enable = true
-				} else {
-					v.IsRoot = false
-				}
-				id := v.ID.String()
-				_, err = crud.Update(ctx, &account.AccountReq{
-					ID:     &id,
-					IsRoot: &v.IsRoot,
-					Enable: &v.Enable,
-				})
-				if err != nil {
-					logger.Sugar().Warnw("Maintain", "Err", err)
-				}
-			}
-
-			err = GetAccountMGR().SetRootAccount(availableRootAcc)
-			if err != nil {
-				logger.Sugar().Errorf("Maintain", "Err", err)
-			}
-
-			err = GetAccountMGR().SetTreeAccounts(availableTreeAccs)
-			if err != nil {
-				logger.Sugar().Errorf("Maintain", "Err", err)
-			}
-
-			logger.Sugar().Infow("Maintain", "contract", contractAddr.Hex(), "root account", rootAccount)
-			treeAccList := []string{}
-			for _, v := range availableTreeAccs {
-				treeAccList = append(treeAccList, v.Pub)
-			}
-			logger.Sugar().Infow("Maintain", "contract", contractAddr.Hex(), "tree accounts", treeAccList)
-
+			CheckAllAccountState(ctx)
 		case <-ctx.Done():
 			return
 		}
 	}
+}
+
+func CheckAllAccountState(ctx context.Context) {
+	rows, total, err := crud.Rows(ctx, nil, 0, MaxUseAccount)
+	if err != nil {
+		logger.Sugar().Errorw("CheckAllAccountState", "Msg", "failed to check state of accounts", "Err", err)
+		return
+	}
+
+	if total == 0 || len(rows) == 0 {
+		return
+	}
+
+	contractAddr, err := contractmgr.GetContract()
+	if err != nil {
+		logger.Sugar().Errorw("CheckAllAccountState", "Msg", "failed to check state of accounts", "Err", err)
+		return
+	}
+
+	from, err := getFromAccount(ctx)
+	if err != nil {
+		logger.Sugar().Errorw("CheckAllAccountState", "Msg", "failed to check state of accounts", "Err", err)
+		return
+	}
+
+	fmt.Println(contractAddr, from)
+	rootAccount, treeAccounts, err := GetAllEnableAdmin(ctx, contractAddr, from)
+	if err != nil {
+		logger.Sugar().Errorw("CheckAllAccountState", "Msg", "failed to check state of accounts", "Err", err)
+		return
+	}
+
+	var availableRootAcc *AccountKey
+	availableTreeAccs := []*AccountKey{}
+	for _, v := range rows {
+		if _, ok := treeAccounts[v.Address]; ok && v.Address != rootAccount {
+			availableTreeAccs = append(availableTreeAccs, &AccountKey{Pub: v.Address, Pri: v.PriKey})
+			v.Enable = true
+		} else {
+			v.Enable = false
+		}
+
+		if v.Address == rootAccount {
+			availableRootAcc = &AccountKey{
+				Pub: v.Address,
+				Pri: v.PriKey,
+			}
+			v.IsRoot = true
+			v.Enable = true
+		} else {
+			v.IsRoot = false
+		}
+		id := v.ID.String()
+		_, err = crud.Update(ctx, &account.AccountReq{
+			ID:     &id,
+			IsRoot: &v.IsRoot,
+			Enable: &v.Enable,
+		})
+		if err != nil {
+			logger.Sugar().Warnw("CheckAllAccountState", "Err", err)
+		}
+	}
+
+	err = GetAccountMGR().SetRootAccount(availableRootAcc)
+	if err != nil {
+		logger.Sugar().Errorf("CheckAllAccountState", "Err", err)
+	}
+
+	err = GetAccountMGR().SetTreeAccounts(availableTreeAccs)
+	if err != nil {
+		logger.Sugar().Errorf("CheckAllAccountState", "Err", err)
+	}
+
+	logger.Sugar().Infow("CheckAllAccountState", "contract", contractAddr.Hex(), "root account", rootAccount)
+	treeAccList := []string{}
+	for _, v := range availableTreeAccs {
+		treeAccList = append(treeAccList, v.Pub)
+	}
+	logger.Sugar().Infow("CheckAllAccountState", "contract", contractAddr.Hex(), "tree accounts", treeAccList)
 }
 
 func GetAllEnableAdmin(ctx context.Context, contractAddr, from common.Address) (string, map[string]bool, error) {
