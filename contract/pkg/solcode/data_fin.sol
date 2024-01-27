@@ -76,21 +76,21 @@ contract Admin is IAdmin,Owner{
     }
 
     // 添加
-    function AddAdmin(address admin,string memory info) override  external isOwner{
-        require(adminMap[admin].isValid,"cannot change info of admin in using");
+    function AddAdmin(address admin,string memory info)   external  isOwner{
+        require(!adminMap[admin].enable,"cannot change info of admin in using");
         adminMap[admin] = AdminInfo(true,info,true);
         adminArr.push(admin);
         adminTotal++;
     }
 
     // 设置可用性
-    function SetEnableAdmin(address admin,bool enable) override external isOwner{
-        require(!adminMap[admin].isValid,"cannot change info of admin not used");
+    function SetEnableAdmin(address admin,bool enable)  external isOwner{
+        require(adminMap[admin].isValid,"cannot change info of unkown admin");
         adminMap[admin].enable=enable;
     }
 
     // 查看可用性
-    function IsAdminEnable(address admin) override external view returns(bool){
+    function IsAdminEnable(address admin)  external view returns(bool){
         return adminMap[admin].enable;
     }
     
@@ -98,7 +98,7 @@ contract Admin is IAdmin,Owner{
     function GetAdminInfos() external view returns(address[] memory,AdminInfo[] memory){
         AdminInfo[] memory rets=new AdminInfo[](adminTotal);
         address[] memory addrs=new address[](adminTotal);
-        
+
         uint j=0;
         for (uint i=0;i<adminArr.length;i++){
             if(adminArr[i]==address(0)){
@@ -114,8 +114,8 @@ contract Admin is IAdmin,Owner{
     }
 
     // 删除管理员
-    function DeleteAdmin(address admin) override external isOwner{
-        require(!adminMap[admin].isValid,"cannot change info of admin not used");
+    function DeleteAdmin(address admin)  external isOwner{
+        require(adminMap[admin].isValid,"cannot delete admin not used");
         delete adminMap[admin];
         adminTotal--;
         for (uint i=0;i<adminArr.length;i++){
@@ -175,19 +175,19 @@ contract DataFin is Admin{
         emit DataFinCreate(msg.sender);
     }
 
-    function CreateTopic(string memory topicID,string memory name,string memory info) external isAdmin() {
+    function CreateTopic(string memory topicID,string memory name,string memory info) public isAdmin() {
         require(!finInfoMap[topicID].isValid,"topic is already exist");
         finInfoMap[topicID] = FinInfo(topicID,name,info,true);
         finInfoArr.push(topicID);
     }
     
-    function CreateIDTopic(string memory topicID,string memory name,string memory info,bool changeAble) external isAdmin() {
+    function CreateIDTopic(string memory topicID,string memory name,string memory info,bool changeAble) public isAdmin() {
         require(!idFinInfoMap[topicID].isValid,"topic is already exist");
         idFinInfoMap[topicID] = IDFinInfo(topicID,name,info,changeAble,true);
         idFinInfoArr.push(topicID);
     }
 
-    function AddItems(string memory topicID,uint256[] memory vals)external isAdmin() returns (bool[] memory){
+    function AddItems(string memory topicID,uint256[] memory vals)public isAdmin() returns (bool[] memory){
         require(finInfoMap[topicID].isValid,"topic is not exist");
 
         bool [] memory rets=new bool[](vals.length);
@@ -202,7 +202,7 @@ contract DataFin is Admin{
         return rets;
     }
 
-    function AddIDsItems(string memory topicID,uint64[] memory ids,uint256[] memory vals)external isAdmin() returns (bool[] memory){
+    function AddIDsItems(string memory topicID,uint64[] memory ids,uint256[] memory vals)public isAdmin() returns (bool[] memory){
         require(idFinInfoMap[topicID].isValid,"topic is not exist");
         require(ids.length==vals.length,"the lengths of the two are different");
         bool [] memory rets=new bool[](ids.length);
@@ -225,7 +225,7 @@ contract DataFin is Admin{
     }
 
     // if the rets[i] > 0 ,it`s true
-    function VerifyItems(string memory topicID,uint256[] memory vals) view external isAdmin() returns (uint[] memory){
+    function VerifyItems(string memory topicID,uint256[] memory vals) view public isAdmin() returns (uint[] memory){
         require(finInfoMap[topicID].isValid,"topic is not exist");
 
         uint [] memory rets=new uint[](vals.length);
@@ -235,7 +235,7 @@ contract DataFin is Admin{
         return rets;
     }
 
-    function VerifyIDItems(string memory topicID,uint64[] memory ids,uint256[] memory vals) view external isAdmin() returns (uint[] memory){
+    function VerifyIDItems(string memory topicID,uint64[] memory ids,uint256[] memory vals) view public isAdmin() returns (uint[] memory){
         require(idFinInfoMap[topicID].isValid,"topic is not exist");
         require(ids.length==vals.length,"the lengths of the two are different");
         uint [] memory rets=new uint[](ids.length);
@@ -247,7 +247,7 @@ contract DataFin is Admin{
         return rets;
     }
 
-    function Version(string memory _version) view external returns (bool ret){
+    function Version(string memory _version) view public returns (bool ret){
         bytes memory v1 = bytes(_version);
         bytes memory v2 = bytes(version);
         // 如果长度不等，直接返回
@@ -258,7 +258,7 @@ contract DataFin is Admin{
         }
     }
 
-    function GetTopics()view external returns (FinInfo[] memory) {
+    function GetTopics() public returns (FinInfo[] memory) {
         FinInfo[] memory rets=new FinInfo[](finInfoArr.length);
         for(uint i=0 ; i< finInfoArr.length; i++){
             rets[i]=finInfoMap[finInfoArr[i]];
@@ -266,7 +266,7 @@ contract DataFin is Admin{
         return rets;
     }
 
-    function GetIDTopics()view external returns (IDFinInfo[] memory) {
+    function GetIDTopics()view public returns (IDFinInfo[] memory) {
         IDFinInfo[] memory rets=new IDFinInfo[](idFinInfoArr.length);
         for(uint i=0 ; i< idFinInfoArr.length; i++){
             rets[i]=idFinInfoMap[idFinInfoArr[i]];

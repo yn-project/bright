@@ -3,7 +3,6 @@ package contract
 
 import (
 	"context"
-	"fmt"
 
 	"yun.tea/block/bright/common/logger"
 	"yun.tea/block/bright/common/solc"
@@ -35,7 +34,6 @@ func (s *Server) CompileContractCode(ctx context.Context, in *proto.CompileContr
 		return &proto.CompileContractCodeResponse{}, err
 	}
 
-	fmt.Println(apiCode)
 	logger.Sugar().Infof("success to complie contract code(%v)", in.AimContractName)
 	return &proto.CompileContractCodeResponse{
 		Info: &proto.ContractGEN{

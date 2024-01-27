@@ -168,7 +168,6 @@ func WithClient(ctx context.Context, handle func(ctx context.Context, cli *ethcl
 					continue
 				}
 				locked, err := ctredis.TryPubLock(endpoint, interval)
-				fmt.Println(locked, err)
 				if err != nil || !locked {
 					continue
 				}

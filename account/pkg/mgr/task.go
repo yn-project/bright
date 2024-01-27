@@ -11,7 +11,6 @@ import (
 	crud "yun.tea/block/bright/account/pkg/crud/account"
 	data_fin "yun.tea/block/bright/common/chains/eth/datafin"
 	"yun.tea/block/bright/common/logger"
-	"yun.tea/block/bright/common/utils"
 	contractmgr "yun.tea/block/bright/contract/pkg/mgr"
 	endpointmgr "yun.tea/block/bright/endpoint/pkg/mgr"
 	"yun.tea/block/bright/proto/bright/account"
@@ -49,6 +48,7 @@ func Maintain(ctx context.Context) {
 				continue
 			}
 
+			fmt.Println(contractAddr, from)
 			rootAccount, treeAccounts, err := GetAllEnableAdmin(ctx, contractAddr, from)
 			if err != nil {
 				logger.Sugar().Errorw("Maintain", "Msg", "failed to check state of accounts", "Err", err)
@@ -86,22 +86,23 @@ func Maintain(ctx context.Context) {
 				}
 			}
 
-			if availableRootAcc != nil {
-				err = GetAccountMGR().SetRootAccount(availableRootAcc)
-				if err != nil {
-					logger.Sugar().Errorf("Maintain", "Err", err)
-				}
+			err = GetAccountMGR().SetRootAccount(availableRootAcc)
+			if err != nil {
+				logger.Sugar().Errorf("Maintain", "Err", err)
 			}
 
-			if len(availableTreeAccs) != 0 {
-				err = GetAccountMGR().SetTreeAccounts(availableTreeAccs)
-				if err != nil {
-					logger.Sugar().Errorf("Maintain", "Err", err)
-				}
+			err = GetAccountMGR().SetTreeAccounts(availableTreeAccs)
+			if err != nil {
+				logger.Sugar().Errorf("Maintain", "Err", err)
 			}
 
-			fmt.Println(rootAccount)
-			fmt.Println(utils.PrettyStruct(availableTreeAccs))
+			logger.Sugar().Infow("Maintain", "contract", contractAddr.Hex(), "root account", rootAccount)
+			treeAccList := []string{}
+			for _, v := range availableTreeAccs {
+				treeAccList = append(treeAccList, v.Pub)
+			}
+			logger.Sugar().Infow("Maintain", "contract", contractAddr.Hex(), "tree accounts", treeAccList)
+
 		case <-ctx.Done():
 			return
 		}
@@ -170,4 +171,31 @@ func getFromAccount(ctx context.Context) (common.Address, error) {
 	return common.HexToAddress(rows[0].Address), nil
 }
 
-func WithAccountClient(ctx context.Context, needRoot bool)
+func WithWriteContract(ctx context.Context, needRoot bool, handle func(ctx context.Context, acc *AccountKey, contract *data_fin.DataFin) error) error {
+	contractAddr, err := contractmgr.GetContract()
+	if err != nil {
+		return err
+	}
+
+	amgr := GetAccountMGR()
+	var unlock func()
+	var acc *AccountKey
+	if needRoot {
+		acc, unlock, err = amgr.GetRootAccount(ctx)
+	} else {
+		acc, unlock, err = amgr.GetTreeAccount(ctx)
+	}
+
+	if err != nil {
+		return err
+	}
+	defer unlock()
+
+	return endpointmgr.WithClient(ctx, func(ctx context.Context, cli *ethclient.Client) error {
+		contract, err := data_fin.NewDataFin(contractAddr, cli)
+		if err != nil {
+			return err
+		}
+		return handle(ctx, acc, contract)
+	})
+}

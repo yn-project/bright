@@ -19,7 +19,7 @@ const (
 	rootAccountLockKey    = "lock-root-account"
 	rootAccountStoreKey   = "root-account"
 	treeAccountLockKey    = "lock-tree-account"
-	treeAccountStoreKey   = "tree-account"
+	treeAccountsStoreKey  = "tree-accounts"
 )
 
 type accountsMGR struct {
@@ -84,7 +84,7 @@ func (aMGR *accountsMGR) GetRootAccountPub(ctx context.Context) (pubKey string, 
 
 func (aMGR *accountsMGR) SetTreeAccounts(addresses []*AccountKey) error {
 	accList := AccountKeyList(addresses)
-	return ctredis.Set(treeAccountStoreKey, accList, MaxAccountAliveTime)
+	return ctredis.Set(treeAccountsStoreKey, &accList, MaxAccountAliveTime)
 }
 
 func (aMGR *accountsMGR) GetTreeAccount(ctx context.Context) (address *AccountKey, unlock func(), err error) {
@@ -92,7 +92,7 @@ func (aMGR *accountsMGR) GetTreeAccount(ctx context.Context) (address *AccountKe
 		select {
 		case <-time.NewTicker(BlockTime).C:
 			addresses := AccountKeyList{}
-			err = ctredis.Get(treeAccountStoreKey, addresses)
+			err = ctredis.Get(treeAccountsStoreKey, addresses)
 			if err != nil {
 				return nil, nil, fmt.Errorf("have no avaliable tree accounts,err: %v", err)
 			}
@@ -127,7 +127,7 @@ func (aMGR *accountsMGR) GetTreeAccount(ctx context.Context) (address *AccountKe
 
 func (aMGR *accountsMGR) GetTreeAccountPub(ctx context.Context) (pubKeys []string, err error) {
 	addresses := []AccountKey{}
-	err = ctredis.Get(treeAccountStoreKey, addresses)
+	err = ctredis.Get(treeAccountsStoreKey, addresses)
 	if err != nil {
 		return nil, fmt.Errorf("have no avaliable tree accounts,err: %v", err)
 	}
