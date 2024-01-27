@@ -215,7 +215,7 @@ func RegisterManagerHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/nftmeta.v1.block.Manager/GetContractCode", runtime.WithHTTPPathPattern("/get/contract/code"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bright.contract.Manager/GetContractCode", runtime.WithHTTPPathPattern("/get/contract/code"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -240,7 +240,7 @@ func RegisterManagerHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/nftmeta.v1.block.Manager/CompileContractCode", runtime.WithHTTPPathPattern("/compile/contract/code"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bright.contract.Manager/CompileContractCode", runtime.WithHTTPPathPattern("/compile/contract/code"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -265,7 +265,7 @@ func RegisterManagerHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/nftmeta.v1.block.Manager/CreateContract", runtime.WithHTTPPathPattern("/create/contract"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bright.contract.Manager/CreateContract", runtime.WithHTTPPathPattern("/create/contract"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -290,7 +290,7 @@ func RegisterManagerHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/nftmeta.v1.block.Manager/GetContract", runtime.WithHTTPPathPattern("/get/contract"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bright.contract.Manager/GetContract", runtime.WithHTTPPathPattern("/get/contract"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -315,7 +315,7 @@ func RegisterManagerHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/nftmeta.v1.block.Manager/DeleteContract", runtime.WithHTTPPathPattern("/delete/contract"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bright.contract.Manager/DeleteContract", runtime.WithHTTPPathPattern("/delete/contract"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -379,7 +379,7 @@ func RegisterManagerHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/nftmeta.v1.block.Manager/GetContractCode", runtime.WithHTTPPathPattern("/get/contract/code"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bright.contract.Manager/GetContractCode", runtime.WithHTTPPathPattern("/get/contract/code"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -401,7 +401,7 @@ func RegisterManagerHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/nftmeta.v1.block.Manager/CompileContractCode", runtime.WithHTTPPathPattern("/compile/contract/code"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bright.contract.Manager/CompileContractCode", runtime.WithHTTPPathPattern("/compile/contract/code"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -423,7 +423,7 @@ func RegisterManagerHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/nftmeta.v1.block.Manager/CreateContract", runtime.WithHTTPPathPattern("/create/contract"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bright.contract.Manager/CreateContract", runtime.WithHTTPPathPattern("/create/contract"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -445,7 +445,7 @@ func RegisterManagerHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/nftmeta.v1.block.Manager/GetContract", runtime.WithHTTPPathPattern("/get/contract"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bright.contract.Manager/GetContract", runtime.WithHTTPPathPattern("/get/contract"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -467,7 +467,7 @@ func RegisterManagerHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/nftmeta.v1.block.Manager/DeleteContract", runtime.WithHTTPPathPattern("/delete/contract"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bright.contract.Manager/DeleteContract", runtime.WithHTTPPathPattern("/delete/contract"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return

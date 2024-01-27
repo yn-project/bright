@@ -60,6 +60,7 @@ func (s *Server) CreateContract(ctx context.Context, in *proto.CreateContractReq
 		return &proto.CreateContractResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
+	logger.Sugar().Infof("success to create contract,name: %v,address: %v", info.Name, info.Address)
 	return &proto.CreateContractResponse{
 		Info: converter.Ent2Grpc(info),
 	}, nil
@@ -80,6 +81,7 @@ func (s *Server) GetContract(ctx context.Context, in *proto.GetContractRequest) 
 		return &proto.GetContractResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
+	logger.Sugar().Infof("success to get contract,name: %v,address: %v", info.Name, info.Address)
 	return &proto.GetContractResponse{
 		Info: converter.Ent2Grpc(info),
 	}, nil
@@ -100,6 +102,7 @@ func (s *Server) DeleteContract(ctx context.Context, in *proto.DeleteContractReq
 		return &proto.DeleteContractResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
+	logger.Sugar().Infof("success to delete contract,name: %v,address: %v", info.Name, info.Address)
 	return &proto.DeleteContractResponse{
 		Info: converter.Ent2Grpc(info),
 	}, nil

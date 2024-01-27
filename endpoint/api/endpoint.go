@@ -38,6 +38,7 @@ func (s *Server) CreateEndpoint(ctx context.Context, in *proto.CreateEndpointReq
 		logger.Sugar().Warnw("CreateEndpoint", "warning", err)
 	}
 
+	logger.Sugar().Infof("success to create endpoint,name: %v,address: %v", info.Name, info.Address)
 	return &proto.CreateEndpointResponse{
 		Info: converter.Ent2Grpc(info),
 	}, nil
@@ -58,6 +59,7 @@ func (s *Server) GetEndpoint(ctx context.Context, in *proto.GetEndpointRequest) 
 		return &proto.GetEndpointResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
+	logger.Sugar().Infof("success to get endpoint,name: %v,address: %v", info.Name, info.Address)
 	return &proto.GetEndpointResponse{
 		Info: converter.Ent2Grpc(info),
 	}, nil
@@ -72,6 +74,7 @@ func (s *Server) GetEndpoints(ctx context.Context, in *proto.GetEndpointsRequest
 		return &proto.GetEndpointsResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
+	logger.Sugar().Infof("success to get endpoints,offset-limit: %v-%v,total: %v", in.GetOffset(), in.GetLimit(), total)
 	return &proto.GetEndpointsResponse{
 		Infos: converter.Ent2GrpcMany(rows),
 		Total: uint32(total),
@@ -93,6 +96,7 @@ func (s *Server) DeleteEndpoint(ctx context.Context, in *proto.DeleteEndpointReq
 		return &proto.DeleteEndpointResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
+	logger.Sugar().Infof("success to delete endpoint,name: %v,address: %v", info.Name, info.Address)
 	return &proto.DeleteEndpointResponse{
 		Info: converter.Ent2Grpc(info),
 	}, nil

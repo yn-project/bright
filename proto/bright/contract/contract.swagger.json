@@ -23,7 +23,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/blockCompileContractCodeResponse"
+              "$ref": "#/definitions/contractCompileContractCodeResponse"
             }
           },
           "default": {
@@ -39,7 +39,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/blockCompileContractCodeRequest"
+              "$ref": "#/definitions/contractCompileContractCodeRequest"
             }
           }
         ],
@@ -55,7 +55,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/blockCreateContractResponse"
+              "$ref": "#/definitions/contractCreateContractResponse"
             }
           },
           "default": {
@@ -71,7 +71,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/blockCreateContractRequest"
+              "$ref": "#/definitions/contractCreateContractRequest"
             }
           }
         ],
@@ -87,7 +87,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/blockDeleteContractResponse"
+              "$ref": "#/definitions/contractDeleteContractResponse"
             }
           },
           "default": {
@@ -103,7 +103,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/blockDeleteContractRequest"
+              "$ref": "#/definitions/contractDeleteContractRequest"
             }
           }
         ],
@@ -119,7 +119,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/blockGetContractResponse"
+              "$ref": "#/definitions/contractGetContractResponse"
             }
           },
           "default": {
@@ -135,7 +135,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/blockGetContractRequest"
+              "$ref": "#/definitions/contractGetContractRequest"
             }
           }
         ],
@@ -151,7 +151,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/blockGetContractCodeResponse"
+              "$ref": "#/definitions/contractGetContractCodeResponse"
             }
           },
           "default": {
@@ -167,7 +167,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/blockGetContractCodeRequest"
+              "$ref": "#/definitions/contractGetContractCodeRequest"
             }
           }
         ],
@@ -178,7 +178,7 @@
     }
   },
   "definitions": {
-    "blockCompileContractCodeRequest": {
+    "contractCompileContractCodeRequest": {
       "type": "object",
       "properties": {
         "Code": {
@@ -192,15 +192,15 @@
         }
       }
     },
-    "blockCompileContractCodeResponse": {
+    "contractCompileContractCodeResponse": {
       "type": "object",
       "properties": {
         "Info": {
-          "$ref": "#/definitions/blockContractGEN"
+          "$ref": "#/definitions/contractContractGEN"
         }
       }
     },
-    "blockContract": {
+    "contractContract": {
       "type": "object",
       "properties": {
         "ID": {
@@ -228,7 +228,7 @@
         }
       }
     },
-    "blockContractCode": {
+    "contractContractCode": {
       "type": "object",
       "properties": {
         "Data": {
@@ -245,7 +245,7 @@
         }
       }
     },
-    "blockContractGEN": {
+    "contractContractGEN": {
       "type": "object",
       "properties": {
         "ABI": {
@@ -259,7 +259,7 @@
         }
       }
     },
-    "blockCreateContractRequest": {
+    "contractCreateContractRequest": {
       "type": "object",
       "properties": {
         "Name": {
@@ -270,15 +270,15 @@
         }
       }
     },
-    "blockCreateContractResponse": {
+    "contractCreateContractResponse": {
       "type": "object",
       "properties": {
         "Info": {
-          "$ref": "#/definitions/blockContract"
+          "$ref": "#/definitions/contractContract"
         }
       }
     },
-    "blockDeleteContractRequest": {
+    "contractDeleteContractRequest": {
       "type": "object",
       "properties": {
         "ID": {
@@ -286,26 +286,26 @@
         }
       }
     },
-    "blockDeleteContractResponse": {
+    "contractDeleteContractResponse": {
       "type": "object",
       "properties": {
         "Info": {
-          "$ref": "#/definitions/blockContract"
+          "$ref": "#/definitions/contractContract"
         }
       }
     },
-    "blockGetContractCodeRequest": {
+    "contractGetContractCodeRequest": {
       "type": "object"
     },
-    "blockGetContractCodeResponse": {
+    "contractGetContractCodeResponse": {
       "type": "object",
       "properties": {
         "Info": {
-          "$ref": "#/definitions/blockContractCode"
+          "$ref": "#/definitions/contractContractCode"
         }
       }
     },
-    "blockGetContractRequest": {
+    "contractGetContractRequest": {
       "type": "object",
       "properties": {
         "ID": {
@@ -313,11 +313,11 @@
         }
       }
     },
-    "blockGetContractResponse": {
+    "contractGetContractResponse": {
       "type": "object",
       "properties": {
         "Info": {
-          "$ref": "#/definitions/blockContract"
+          "$ref": "#/definitions/contractContract"
         }
       }
     },

@@ -39,7 +39,7 @@ func NewManagerClient(cc grpc.ClientConnInterface) ManagerClient {
 
 func (c *managerClient) GetContractCode(ctx context.Context, in *GetContractCodeRequest, opts ...grpc.CallOption) (*GetContractCodeResponse, error) {
 	out := new(GetContractCodeResponse)
-	err := c.cc.Invoke(ctx, "/nftmeta.v1.block.Manager/GetContractCode", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/bright.contract.Manager/GetContractCode", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (c *managerClient) GetContractCode(ctx context.Context, in *GetContractCode
 
 func (c *managerClient) CompileContractCode(ctx context.Context, in *CompileContractCodeRequest, opts ...grpc.CallOption) (*CompileContractCodeResponse, error) {
 	out := new(CompileContractCodeResponse)
-	err := c.cc.Invoke(ctx, "/nftmeta.v1.block.Manager/CompileContractCode", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/bright.contract.Manager/CompileContractCode", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (c *managerClient) CompileContractCode(ctx context.Context, in *CompileCont
 
 func (c *managerClient) CreateContract(ctx context.Context, in *CreateContractRequest, opts ...grpc.CallOption) (*CreateContractResponse, error) {
 	out := new(CreateContractResponse)
-	err := c.cc.Invoke(ctx, "/nftmeta.v1.block.Manager/CreateContract", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/bright.contract.Manager/CreateContract", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func (c *managerClient) CreateContract(ctx context.Context, in *CreateContractRe
 
 func (c *managerClient) GetContract(ctx context.Context, in *GetContractRequest, opts ...grpc.CallOption) (*GetContractResponse, error) {
 	out := new(GetContractResponse)
-	err := c.cc.Invoke(ctx, "/nftmeta.v1.block.Manager/GetContract", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/bright.contract.Manager/GetContract", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (c *managerClient) GetContract(ctx context.Context, in *GetContractRequest,
 
 func (c *managerClient) DeleteContract(ctx context.Context, in *DeleteContractRequest, opts ...grpc.CallOption) (*DeleteContractResponse, error) {
 	out := new(DeleteContractResponse)
-	err := c.cc.Invoke(ctx, "/nftmeta.v1.block.Manager/DeleteContract", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/bright.contract.Manager/DeleteContract", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +136,7 @@ func _Manager_GetContractCode_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/nftmeta.v1.block.Manager/GetContractCode",
+		FullMethod: "/bright.contract.Manager/GetContractCode",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ManagerServer).GetContractCode(ctx, req.(*GetContractCodeRequest))
@@ -154,7 +154,7 @@ func _Manager_CompileContractCode_Handler(srv interface{}, ctx context.Context, 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/nftmeta.v1.block.Manager/CompileContractCode",
+		FullMethod: "/bright.contract.Manager/CompileContractCode",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ManagerServer).CompileContractCode(ctx, req.(*CompileContractCodeRequest))
@@ -172,7 +172,7 @@ func _Manager_CreateContract_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/nftmeta.v1.block.Manager/CreateContract",
+		FullMethod: "/bright.contract.Manager/CreateContract",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ManagerServer).CreateContract(ctx, req.(*CreateContractRequest))
@@ -190,7 +190,7 @@ func _Manager_GetContract_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/nftmeta.v1.block.Manager/GetContract",
+		FullMethod: "/bright.contract.Manager/GetContract",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ManagerServer).GetContract(ctx, req.(*GetContractRequest))
@@ -208,7 +208,7 @@ func _Manager_DeleteContract_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/nftmeta.v1.block.Manager/DeleteContract",
+		FullMethod: "/bright.contract.Manager/DeleteContract",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ManagerServer).DeleteContract(ctx, req.(*DeleteContractRequest))
@@ -220,7 +220,7 @@ func _Manager_DeleteContract_Handler(srv interface{}, ctx context.Context, dec f
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Manager_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "nftmeta.v1.block.Manager",
+	ServiceName: "bright.contract.Manager",
 	HandlerType: (*ManagerServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

@@ -59,6 +59,7 @@ func (s *Server) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 		return &proto.CreateAccountResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
+	logger.Sugar().Infof("success to create account,address: %v", info.Address)
 	return &proto.CreateAccountResponse{
 		Info: converter.Ent2Grpc(crudInfo),
 	}, nil
@@ -92,6 +93,7 @@ func (s *Server) ImportAccount(ctx context.Context, in *proto.ImportAccountReque
 		return &proto.ImportAccountResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
+	logger.Sugar().Infof("success to import account,address: %v", info.Address)
 	return &proto.ImportAccountResponse{
 		Info: converter.Ent2Grpc(crudInfo),
 	}, nil
@@ -112,6 +114,7 @@ func (s *Server) GetAccount(ctx context.Context, in *proto.GetAccountRequest) (*
 		return &proto.GetAccountResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
+	logger.Sugar().Infof("success to get account,address: %v", info.Address)
 	return &proto.GetAccountResponse{
 		Info: converter.Ent2Grpc(info),
 	}, nil
@@ -132,6 +135,7 @@ func (s *Server) GetAccountPriKey(ctx context.Context, in *proto.GetAccountPriKe
 		return &proto.GetAccountPriKeyResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
+	logger.Sugar().Infof("success to get account pri key,address: %v", info.Address)
 	return &proto.GetAccountPriKeyResponse{
 		PriKey: info.PriKey,
 	}, nil
@@ -146,6 +150,7 @@ func (s *Server) GetAccounts(ctx context.Context, in *proto.GetAccountsRequest) 
 		return &proto.GetAccountsResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
+	logger.Sugar().Infof("success to get accounts,offset-limit: %v-%v,total: %v", in.GetOffset(), in.GetLimit(), total)
 	return &proto.GetAccountsResponse{
 		Infos: converter.Ent2GrpcMany(rows),
 		Total: uint32(total),
@@ -209,6 +214,7 @@ func (s *Server) SetRootAccount(ctx context.Context, in *proto.SetRootAccountReq
 	info.Enable = true
 	info.IsRoot = true
 
+	logger.Sugar().Infof("success to set root for account,address: %v", info.Address)
 	return &proto.SetRootAccountResponse{
 		Info: converter.Ent2Grpc(info),
 	}, nil
@@ -265,6 +271,7 @@ func (s *Server) SetAdminAccount(ctx context.Context, in *proto.SetAdminAccountR
 
 	go mgr.CheckAllAccountState(context.Background())
 	info.Enable = true
+	logger.Sugar().Infof("success to set admin for account ,address: %v", info.Address)
 	return &proto.SetAdminAccountResponse{
 		Info: converter.Ent2Grpc(info),
 	}, nil
@@ -285,6 +292,7 @@ func (s *Server) DeleteAccount(ctx context.Context, in *proto.DeleteAccountReque
 		return &proto.DeleteAccountResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
+	logger.Sugar().Infof("success to delete account,address: %v", info.Address)
 	return &proto.DeleteAccountResponse{
 		Info: converter.Ent2Grpc(info),
 	}, nil

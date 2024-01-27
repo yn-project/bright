@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package nftmeta.v1.block;
+package bright.contract;
 
-option go_package = "yun.tea/block/bright/proto/bright/nftmeta/v1/block";
+option go_package = "yun.tea/block/bright/proto/bright/proto/block";
 import "bright/bright.proto";
 import "bright/basetype/basetype.proto";
 import "google/api/annotations.proto";

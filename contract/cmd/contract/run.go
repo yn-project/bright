@@ -18,6 +18,7 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"yun.tea/block/bright/contract/pkg/db"
 	"yun.tea/block/bright/contract/pkg/servicename"
 )
 
@@ -33,7 +34,11 @@ var runCmd = &cli.Command{
 		return logger.Sync()
 	},
 	Before: func(ctx *cli.Context) error {
-		return logger.Init(logger.DebugLevel, config.GetConfig().Contract.LogFile)
+		err := logger.Init(logger.DebugLevel, config.GetConfig().Contract.LogFile)
+		if err != nil {
+			return err
+		}
+		return db.Init()
 	},
 	Action: func(c *cli.Context) error {
 		go runGRPCServer(config.GetConfig().Contract.GrpcPort)
