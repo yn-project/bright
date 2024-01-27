@@ -1,7 +1,7 @@
 ---
 config:
   hostname: "endpoint.yn"
-  http_port: 30100
-  grpc_port: 30101
-  prometheus_port: 30102
+  http_port: 30120
+  grpc_port: 30121
+  prometheus_port: 30122
   logdir: "./"
