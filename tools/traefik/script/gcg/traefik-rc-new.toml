@@ -1,0 +1,27 @@
+Owner = "traefik"
+RepositoryName = "traefik"
+
+OutputType = "file"
+FileName = "traefik_changelog.md"
+
+# example RC5 of v2.9.0
+CurrentRef = "v2.9"
+PreviousRef = "v2.9.0-rc4"
+BaseBranch = "v2.9"
+FutureCurrentRefName = "v2.9.0-rc5"
+
+ThresholdPreviousRef = 10
+ThresholdCurrentRef = 10
+
+Debug = true
+DisplayLabel = true
+
+LabelExcludes = ["area/infrastructure"]
+LabelEnhancement = "kind/enhancement"
+LabelDocumentation = "area/documentation"
+LabelBug = "kind/bug/fix"
+
+[DisplayLabelOptions]
+  FilteredPrefixes = ["area/", "platform/"]
+  ExcludedSuffixes = ["documentation"]
+  TrimmedPrefixes = ["area/provider/", "area/middleware/", "area/", "platform/"]
