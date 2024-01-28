@@ -1,3 +1,5 @@
 resources:
   - 01-account.viper.yaml
   - 02-account.yaml
+  - 03-middleware.yaml
+  - 04-ingress.yaml

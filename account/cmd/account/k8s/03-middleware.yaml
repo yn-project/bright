@@ -1,0 +1,10 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  namespace: kube-system
+  name: strip-account-prefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /api/account

@@ -1,3 +1,5 @@
 resources:
-  - 01-nft-meta.viper.yaml
-  - 02-nft-meta.yaml
+  - 01-contract.viper.yaml
+  - 02-contract.yaml
+  - 03-middleware.yaml
+  - 04-ingress.yaml

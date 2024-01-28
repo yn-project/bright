@@ -69,61 +69,6 @@
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
-  name: common-headers
-  namespace: kube-system
-spec:
-  headers:
-    accessControlAllowCredentials: true
-    accessControlAllowHeaders:
-      - X-App-ID
-      - X-Lang-ID
-      - X-User-ID
-      - X-App-Login-Token
-      - X-Locale
-      - X-Login-Verify
-      - DNT
-      - X-CustomHeader
-      - Keep-Alive
-      - User-Agent
-      - X-Requested-With
-      - If-Modified-Since
-      - Cache-Control
-      - Content-Type
-      - Authorization
-    accessControlExposeHeaders:
-      - X-App-ID
-      - X-Lang-ID
-      - X-User-ID
-      - X-App-Login-Token
-      - X-Locale
-      - X-Login-Verify
-      - DNT
-      - X-CustomHeader
-      - Keep-Alive
-      - User-Agent
-      - X-Requested-With
-      - If-Modified-Since
-      - Cache-Control
-      - Content-Type
-      - Authorization
-    accessControlAllowMethods:
-      - GET
-      - POST
-      - OPTIONS
-      - HEAD
-      - PUT
-      - DELETE
-      - TRACE
-      - PATCH
-    accessControlAllowOriginList:
-      regex: ^http://([-a-zA-Z0-9|.]*):/(.*)
-    accessControlMaxAge: 100
-    addVaryHeader: true
-
----
-apiVersion: traefik.containo.us/v1alpha1
-kind: Middleware
-metadata:
   name: http-redirect-https-testing
   namespace: kube-system
 spec:

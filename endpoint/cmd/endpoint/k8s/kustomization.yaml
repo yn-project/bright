@@ -1,3 +1,5 @@
 resources:
   - 01-endpoint.viper.yaml
   - 02-endpoint.yaml
+  - 03-middleware.yaml
+  - 04-ingress.yaml

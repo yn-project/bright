@@ -1,6 +1,6 @@
 ---
 config:
-  hostname: "nft-meta.npool.top"
+  hostname: "nft-meta.yn"
   http_port: 30100
   grpc_port: 30101
   prometheus_port: 30102
