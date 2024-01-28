@@ -16,9 +16,8 @@ const (
 	SafeIntervalBlockTime = SafeIntervalBlock * BlockTime
 	MaxAccountLockTime    = time.Minute
 	MaxAccountAliveTime   = time.Hour * 24
-	rootAccountLockKey    = "lock-root-account"
+	accountLockKey        = "lock-using-account"
 	rootAccountStoreKey   = "root-account"
-	treeAccountLockKey    = "lock-tree-account"
 	treeAccountsStoreKey  = "tree-accounts"
 )
 
@@ -58,14 +57,15 @@ func (aMGR *accountsMGR) GetRootAccount(ctx context.Context) (acc *AccountKey, u
 			if err != nil {
 				return nil, nil, fmt.Errorf("have no avaliable tree accounts,err: %v", err)
 			}
-			unlockID, err := ctredis.TryLock(rootAccountLockKey, aMGR.RedisExpireTime)
+
+			lockKey, unlockID, err := aMGR.LockUsingAccount(acc, aMGR.RedisExpireTime)
 			if err != nil {
 				continue
 			}
 
 			return acc, func() {
 				time.Sleep(SafeIntervalBlockTime)
-				ctredis.Unlock(rootAccountLockKey, unlockID)
+				ctredis.Unlock(lockKey, unlockID)
 			}, nil
 		case <-ctx.Done():
 			return nil, nil, fmt.Errorf("failed to get root account timeout")
@@ -106,11 +106,7 @@ func (aMGR *accountsMGR) GetTreeAccount(ctx context.Context) (address *AccountKe
 			unlockID := ""
 			for i := 0; i < len(addresses); i++ {
 				address = addresses[(randN+i)%len(addresses)]
-				lockKey = fmt.Sprintf("%v:%v", treeAccountLockKey, address)
-				unlockID, err = ctredis.TryLock(lockKey, aMGR.RedisExpireTime)
-				if err == nil {
-					break
-				}
+				lockKey, unlockID, err = aMGR.LockUsingAccount(address, aMGR.RedisExpireTime)
 			}
 			if err != nil {
 				continue
@@ -123,6 +119,15 @@ func (aMGR *accountsMGR) GetTreeAccount(ctx context.Context) (address *AccountKe
 			return nil, nil, fmt.Errorf("failed to get tree account timeout")
 		}
 	}
+}
+
+func (aMGR *accountsMGR) LockUsingAccount(address *AccountKey, expire time.Duration) (string, string, error) {
+	lockKey := fmt.Sprintf("%v:%v", accountLockKey, address)
+	unlockID, err := ctredis.TryLock(lockKey, aMGR.RedisExpireTime)
+	if err != nil {
+		return "", "", err
+	}
+	return lockKey, unlockID, err
 }
 
 func (aMGR *accountsMGR) GetTreeAccountPub(ctx context.Context) (pubKeys []string, err error) {

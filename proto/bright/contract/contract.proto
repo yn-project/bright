@@ -22,9 +22,9 @@ service Manager {
     };
   }
 
-  rpc CreateContract(CreateContractRequest) returns (CreateContractResponse) {
+  rpc CreateContractWithAccount(CreateContractWithAccountRequest) returns (CreateContractWithAccountResponse) {
     option (google.api.http) = {
-      post:"/create/contract"
+      post:"/create/contract/with/account"
       body:"*"
     };
   }
@@ -85,12 +85,13 @@ message Contract {
 }
 
 
-message CreateContractRequest { 
+message CreateContractWithAccountRequest { 
   string Name = 10;
   string Remark = 20;
+  string AccountID = 30;
 }
 
-message CreateContractResponse { Contract Info = 10; }
+message CreateContractWithAccountResponse { Contract Info = 10; }
 
 message GetContractRequest { string ID = 10; }
 message GetContractResponse { Contract Info = 10; }

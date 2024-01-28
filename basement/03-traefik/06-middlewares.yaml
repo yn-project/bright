@@ -116,7 +116,7 @@ spec:
       - TRACE
       - PATCH
     accessControlAllowOriginList:
-      - https://genesis.development.npool.top
+      regex: ^http://([-a-zA-Z0-9|.]*):/(.*)
     accessControlMaxAge: 100
     addVaryHeader: true
 

@@ -24,7 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type ManagerClient interface {
 	GetContractCode(ctx context.Context, in *GetContractCodeRequest, opts ...grpc.CallOption) (*GetContractCodeResponse, error)
 	CompileContractCode(ctx context.Context, in *CompileContractCodeRequest, opts ...grpc.CallOption) (*CompileContractCodeResponse, error)
-	CreateContract(ctx context.Context, in *CreateContractRequest, opts ...grpc.CallOption) (*CreateContractResponse, error)
+	CreateContractWithAccount(ctx context.Context, in *CreateContractWithAccountRequest, opts ...grpc.CallOption) (*CreateContractWithAccountResponse, error)
 	GetContract(ctx context.Context, in *GetContractRequest, opts ...grpc.CallOption) (*GetContractResponse, error)
 	DeleteContract(ctx context.Context, in *DeleteContractRequest, opts ...grpc.CallOption) (*DeleteContractResponse, error)
 }
@@ -55,9 +55,9 @@ func (c *managerClient) CompileContractCode(ctx context.Context, in *CompileCont
 	return out, nil
 }
 
-func (c *managerClient) CreateContract(ctx context.Context, in *CreateContractRequest, opts ...grpc.CallOption) (*CreateContractResponse, error) {
-	out := new(CreateContractResponse)
-	err := c.cc.Invoke(ctx, "/bright.contract.Manager/CreateContract", in, out, opts...)
+func (c *managerClient) CreateContractWithAccount(ctx context.Context, in *CreateContractWithAccountRequest, opts ...grpc.CallOption) (*CreateContractWithAccountResponse, error) {
+	out := new(CreateContractWithAccountResponse)
+	err := c.cc.Invoke(ctx, "/bright.contract.Manager/CreateContractWithAccount", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (c *managerClient) DeleteContract(ctx context.Context, in *DeleteContractRe
 type ManagerServer interface {
 	GetContractCode(context.Context, *GetContractCodeRequest) (*GetContractCodeResponse, error)
 	CompileContractCode(context.Context, *CompileContractCodeRequest) (*CompileContractCodeResponse, error)
-	CreateContract(context.Context, *CreateContractRequest) (*CreateContractResponse, error)
+	CreateContractWithAccount(context.Context, *CreateContractWithAccountRequest) (*CreateContractWithAccountResponse, error)
 	GetContract(context.Context, *GetContractRequest) (*GetContractResponse, error)
 	DeleteContract(context.Context, *DeleteContractRequest) (*DeleteContractResponse, error)
 	mustEmbedUnimplementedManagerServer()
@@ -104,8 +104,8 @@ func (UnimplementedManagerServer) GetContractCode(context.Context, *GetContractC
 func (UnimplementedManagerServer) CompileContractCode(context.Context, *CompileContractCodeRequest) (*CompileContractCodeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CompileContractCode not implemented")
 }
-func (UnimplementedManagerServer) CreateContract(context.Context, *CreateContractRequest) (*CreateContractResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateContract not implemented")
+func (UnimplementedManagerServer) CreateContractWithAccount(context.Context, *CreateContractWithAccountRequest) (*CreateContractWithAccountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateContractWithAccount not implemented")
 }
 func (UnimplementedManagerServer) GetContract(context.Context, *GetContractRequest) (*GetContractResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetContract not implemented")
@@ -162,20 +162,20 @@ func _Manager_CompileContractCode_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Manager_CreateContract_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateContractRequest)
+func _Manager_CreateContractWithAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateContractWithAccountRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ManagerServer).CreateContract(ctx, in)
+		return srv.(ManagerServer).CreateContractWithAccount(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/bright.contract.Manager/CreateContract",
+		FullMethod: "/bright.contract.Manager/CreateContractWithAccount",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ManagerServer).CreateContract(ctx, req.(*CreateContractRequest))
+		return srv.(ManagerServer).CreateContractWithAccount(ctx, req.(*CreateContractWithAccountRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -232,8 +232,8 @@ var Manager_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Manager_CompileContractCode_Handler,
 		},
 		{
-			MethodName: "CreateContract",
-			Handler:    _Manager_CreateContract_Handler,
+			MethodName: "CreateContractWithAccount",
+			Handler:    _Manager_CreateContractWithAccount_Handler,
 		},
 		{
 			MethodName: "GetContract",

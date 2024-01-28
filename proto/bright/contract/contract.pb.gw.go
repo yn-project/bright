@@ -99,8 +99,8 @@ func local_request_Manager_CompileContractCode_0(ctx context.Context, marshaler 
 
 }
 
-func request_Manager_CreateContract_0(ctx context.Context, marshaler runtime.Marshaler, client ManagerClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq CreateContractRequest
+func request_Manager_CreateContractWithAccount_0(ctx context.Context, marshaler runtime.Marshaler, client ManagerClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq CreateContractWithAccountRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -111,13 +111,13 @@ func request_Manager_CreateContract_0(ctx context.Context, marshaler runtime.Mar
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.CreateContract(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.CreateContractWithAccount(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_Manager_CreateContract_0(ctx context.Context, marshaler runtime.Marshaler, server ManagerServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq CreateContractRequest
+func local_request_Manager_CreateContractWithAccount_0(ctx context.Context, marshaler runtime.Marshaler, server ManagerServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq CreateContractWithAccountRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -128,7 +128,7 @@ func local_request_Manager_CreateContract_0(ctx context.Context, marshaler runti
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := server.CreateContract(ctx, &protoReq)
+	msg, err := server.CreateContractWithAccount(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -257,7 +257,7 @@ func RegisterManagerHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 
 	})
 
-	mux.Handle("POST", pattern_Manager_CreateContract_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_Manager_CreateContractWithAccount_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -265,12 +265,12 @@ func RegisterManagerHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bright.contract.Manager/CreateContract", runtime.WithHTTPPathPattern("/create/contract"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bright.contract.Manager/CreateContractWithAccount", runtime.WithHTTPPathPattern("/create/contract/with/account"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Manager_CreateContract_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Manager_CreateContractWithAccount_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
@@ -278,7 +278,7 @@ func RegisterManagerHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 			return
 		}
 
-		forward_Manager_CreateContract_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Manager_CreateContractWithAccount_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -417,25 +417,25 @@ func RegisterManagerHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 
 	})
 
-	mux.Handle("POST", pattern_Manager_CreateContract_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_Manager_CreateContractWithAccount_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bright.contract.Manager/CreateContract", runtime.WithHTTPPathPattern("/create/contract"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bright.contract.Manager/CreateContractWithAccount", runtime.WithHTTPPathPattern("/create/contract/with/account"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Manager_CreateContract_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_Manager_CreateContractWithAccount_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Manager_CreateContract_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Manager_CreateContractWithAccount_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -491,7 +491,7 @@ var (
 
 	pattern_Manager_CompileContractCode_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"compile", "contract", "code"}, ""))
 
-	pattern_Manager_CreateContract_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"create", "contract"}, ""))
+	pattern_Manager_CreateContractWithAccount_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"create", "contract", "with", "account"}, ""))
 
 	pattern_Manager_GetContract_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"get", "contract"}, ""))
 
@@ -503,7 +503,7 @@ var (
 
 	forward_Manager_CompileContractCode_0 = runtime.ForwardResponseMessage
 
-	forward_Manager_CreateContract_0 = runtime.ForwardResponseMessage
+	forward_Manager_CreateContractWithAccount_0 = runtime.ForwardResponseMessage
 
 	forward_Manager_GetContract_0 = runtime.ForwardResponseMessage
 

@@ -48,7 +48,7 @@ func (s *Server) CompileContractCode(ctx context.Context, in *proto.CompileContr
 		},
 	}, nil
 }
-func (s *Server) CreateContract(ctx context.Context, in *proto.CreateContractRequest) (*proto.CreateContractResponse, error) {
+func (s *Server) CreateContractWithAccount(ctx context.Context, in *proto.CreateContractWithAccountRequest) (*proto.CreateContractWithAccountResponse, error) {
 	version := solcode.VERSION
 	info, err := crud.Create(ctx, &proto.ContractReq{
 		Name:    &in.Name,
@@ -57,11 +57,11 @@ func (s *Server) CreateContract(ctx context.Context, in *proto.CreateContractReq
 		Remark:  &in.Remark,
 	})
 	if err != nil {
-		return &proto.CreateContractResponse{}, status.Error(codes.Internal, err.Error())
+		return &proto.CreateContractWithAccountResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
 	logger.Sugar().Infof("success to create contract,name: %v,address: %v", info.Name, info.Address)
-	return &proto.CreateContractResponse{
+	return &proto.CreateContractWithAccountResponse{
 		Info: converter.Ent2Grpc(info),
 	}, nil
 }

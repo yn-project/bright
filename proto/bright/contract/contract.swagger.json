@@ -48,14 +48,14 @@
         ]
       }
     },
-    "/create/contract": {
+    "/create/contract/with/account": {
       "post": {
-        "operationId": "Manager_CreateContract",
+        "operationId": "Manager_CreateContractWithAccount",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/contractCreateContractResponse"
+              "$ref": "#/definitions/contractCreateContractWithAccountResponse"
             }
           },
           "default": {
@@ -71,7 +71,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/contractCreateContractRequest"
+              "$ref": "#/definitions/contractCreateContractWithAccountRequest"
             }
           }
         ],
@@ -259,7 +259,7 @@
         }
       }
     },
-    "contractCreateContractRequest": {
+    "contractCreateContractWithAccountRequest": {
       "type": "object",
       "properties": {
         "Name": {
@@ -267,10 +267,13 @@
         },
         "Remark": {
           "type": "string"
+        },
+        "AccountID": {
+          "type": "string"
         }
       }
     },
-    "contractCreateContractResponse": {
+    "contractCreateContractWithAccountResponse": {
       "type": "object",
       "properties": {
         "Info": {
