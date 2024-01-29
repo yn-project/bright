@@ -14,8 +14,6 @@ set -o pipefail
 
 PLATFORMS=(
     linux/amd64
-    # windows/amd64
-    # darwin/amd64
 )
 OUTPUT=$PROJECT_FOLDER/output
 

@@ -2,8 +2,14 @@ package utils
 
 import (
 	"bytes"
+	"crypto/rand"
 	"encoding/binary"
+	"math"
+	"math/big"
 	"strconv"
+	"strings"
+
+	"github.com/mr-tron/base58"
 )
 
 func MinInt(a, b int) int {
@@ -40,4 +46,17 @@ func Bytes2Uint64(b []byte) (uint64, error) {
 	var n uint64
 	err := binary.Read(buf, binary.BigEndian, &n)
 	return n, err
+}
+
+func RandomBase58(n int) string {
+	startLetters := []rune("abcdefghijklmnopqretuvwxyz")
+	randn, _ := rand.Int(rand.Reader, big.NewInt(int64(len(startLetters))))
+	target := string(startLetters[randn.Int64()])
+	for {
+		randn, _ := rand.Int(rand.Reader, big.NewInt(math.MaxInt64))
+		if len(target) >= n {
+			return strings.ToLower(target[:n])
+		}
+		target += base58.Encode(randn.Bytes())
+	}
 }

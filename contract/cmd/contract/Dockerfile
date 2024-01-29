@@ -1,4 +1,4 @@
-FROM centos:centos7.9.2009
+FROM debian:stable-slim
 
 COPY contract /usr/local/bin/contract
 COPY Contract.viper.yaml /etc/contract/Contract.viper.yaml
@@ -9,7 +9,10 @@ ENV ENV_DATA_DIR=/data \
     ENV_INVERSTOR_KEY=""
 RUN mkdir $ENV_DATA_DIR
 
-RUN yum install ca-certificates curl -y
+
+RUN apt  update \
+    && apt install -y --no-install-recommends ca-certificates curl
+RUN apt install gcc-multilib g++-multilib -y
 
 WORKDIR /usr/local/bin/
 

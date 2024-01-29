@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/Vigo-Tea/go-ethereum-ant/ethclient"
@@ -20,13 +19,7 @@ func main() {
 	}
 
 	defer cli.Close()
-
-	ret, err := cli.PeerCount(context.Background())
-	if err != nil {
-		fmt.Println(err)
-		return
+	for i := 0; i < 10; i++ {
+		fmt.Println(utils.RandomBase58(64))
 	}
-
-	fmt.Println(utils.PrettyStruct(ret))
-
 }

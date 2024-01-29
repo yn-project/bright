@@ -5,11 +5,13 @@ import (
 	"log"
 	"math/rand"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	cli "github.com/urfave/cli/v2"
 	"yun.tea/block/bright/config"
 
@@ -17,6 +19,7 @@ import (
 	api "yun.tea/block/bright/contract/api"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 	"yun.tea/block/bright/contract/pkg/db"
 	"yun.tea/block/bright/contract/pkg/servicename"
@@ -42,6 +45,7 @@ var runCmd = &cli.Command{
 	},
 	Action: func(c *cli.Context) error {
 		go runGRPCServer(config.GetConfig().Contract.GrpcPort)
+		go runHTTPServer(config.GetConfig().Contract.HTTPPort, config.GetConfig().Contract.GrpcPort)
 		sigchan := make(chan os.Signal, 1)
 		signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 
@@ -63,5 +67,22 @@ func runGRPCServer(grpcPort int) {
 	reflection.Register(server)
 	if err := server.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
+	}
+}
+
+func runHTTPServer(httpPort, grpcPort int) {
+	httpEndpoint := fmt.Sprintf(":%v", httpPort)
+	grpcEndpoint := fmt.Sprintf(":%v", grpcPort)
+
+	mux := runtime.NewServeMux()
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+	err := api.RegisterGateway(mux, grpcEndpoint, opts)
+	if err != nil {
+		log.Fatalf("Fail to register gRPC gateway service endpoint: %v", err)
+	}
+
+	err = http.ListenAndServe(httpEndpoint, mux)
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
 	}
 }
