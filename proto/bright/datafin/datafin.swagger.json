@@ -1,0 +1,353 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "bright/datafin/datafin.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Manager"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/check/datafin": {
+      "post": {
+        "operationId": "Manager_CheckDataFin",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/datafinCheckDataFinResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/datafinCheckDataFinRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Manager"
+        ]
+      }
+    },
+    "/check/datafin/with/data": {
+      "post": {
+        "operationId": "Manager_CheckDataFinWithData",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/datafinCheckDataFinResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/datafinCheckDataFinWithDataRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Manager"
+        ]
+      }
+    },
+    "/create/datafin": {
+      "post": {
+        "operationId": "Manager_CreateDataFin",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/datafinCreateDataFinResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/datafinCreateDataFinRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Manager"
+        ]
+      }
+    },
+    "/get/datafins": {
+      "post": {
+        "operationId": "Manager_GetDataFins",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/datafinGetDataFinsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/datafinGetDataFinsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Manager"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "datafinCheckDataFinRequest": {
+      "type": "object",
+      "properties": {
+        "topicID": {
+          "type": "string"
+        },
+        "dataID": {
+          "type": "string"
+        },
+        "dataFin": {
+          "type": "string"
+        }
+      }
+    },
+    "datafinCheckDataFinResponse": {
+      "type": "object",
+      "properties": {
+        "topicID": {
+          "type": "string"
+        },
+        "onChainDataFin": {
+          "type": "string"
+        },
+        "txTime": {
+          "type": "string"
+        },
+        "passed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "datafinCheckDataFinWithDataRequest": {
+      "type": "object",
+      "properties": {
+        "topicID": {
+          "type": "string"
+        },
+        "dataID": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/datafinDataType"
+        },
+        "data": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "datafinCreateDataFinRequest": {
+      "type": "object",
+      "properties": {
+        "topicID": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/datafinDataType"
+        },
+        "infos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/datafinDataItemReq"
+          }
+        }
+      }
+    },
+    "datafinCreateDataFinResponse": {
+      "type": "object",
+      "properties": {
+        "infos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/datafinDataItemResp"
+          }
+        }
+      }
+    },
+    "datafinDataFinState": {
+      "type": "string",
+      "enum": [
+        "dataFinStateDefault",
+        "dataFinStateProcessing",
+        "dataFinStateSeccess",
+        "dataFinStateFailed"
+      ],
+      "default": "dataFinStateDefault"
+    },
+    "datafinDataItemReq": {
+      "type": "object",
+      "properties": {
+        "dataID": {
+          "type": "string"
+        },
+        "data": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "datafinDataItemResp": {
+      "type": "object",
+      "properties": {
+        "dataID": {
+          "type": "string"
+        },
+        "dataFinID": {
+          "type": "string"
+        },
+        "topicID": {
+          "type": "string"
+        },
+        "dataFin": {
+          "type": "string"
+        },
+        "txTime": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "txHash": {
+          "type": "string"
+        },
+        "blockHeight": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "state": {
+          "$ref": "#/definitions/datafinDataFinState"
+        },
+        "createdAt": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "updatedAt": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "datafinDataType": {
+      "type": "string",
+      "enum": [
+        "dataTypeDefault",
+        "rawType",
+        "jsonType"
+      ],
+      "default": "dataTypeDefault"
+    },
+    "datafinGetDataFinsRequest": {
+      "type": "object",
+      "properties": {
+        "topicID": {
+          "type": "string"
+        },
+        "dataFinIDs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "datafinGetDataFinsResponse": {
+      "type": "object",
+      "properties": {
+        "infos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/datafinDataItemResp"
+          }
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

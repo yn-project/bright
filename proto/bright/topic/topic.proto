@@ -1,0 +1,101 @@
+syntax = "proto3";
+
+package bright.topic;
+
+option go_package = "yun.tea/block/bright/proto/bright/proto/topic";
+import "bright/bright.proto";
+import "bright/basetype/basetype.proto";
+import "google/api/annotations.proto";
+
+service Manager {
+  rpc CreateTopic(CreateTopicRequest) returns (CreateTopicResponse) {
+    option (google.api.http) = {
+      post:"/create/topic"
+      body:"*"
+    };
+  }
+
+  rpc GetTopic(GetTopicRequest) returns (GetTopicResponse) {
+    option (google.api.http) = {
+      post:"/get/topic"
+      body:"*"
+    };
+  }
+
+  rpc GetTopics(GetTopicsRequest) returns (GetTopicsResponse) {
+    option (google.api.http) = {
+      post:"/get/topics"
+      body:"*"
+    };
+  }
+
+  rpc DeleteTopic(DeleteTopicRequest) returns (DeleteTopicResponse) {
+    option (google.api.http) = {
+      post:"/delete/topic"
+      body:"*"
+    };
+  }
+}
+
+enum TopicType {
+  topicTypeDefault = 0;
+  iDType = 10;
+  originalType = 20;
+}
+
+message CreateTopicRequest{
+  string    name  = 10;
+  TopicType type = 20;
+  bool      changeAble  = 30;
+  string    remark  = 40;
+}
+
+message CreateTopicResponse{
+  string    topicID = 10;
+  string    name = 20;
+  TopicType type = 30;
+  bool      changeAble = 40;
+  string    remark = 50;
+  uint32    createdAt = 60;
+}
+
+message TopicInfo {
+  string    topicID = 10;
+  string    name = 20;
+  TopicType type = 30;
+  bool      changeAble = 40;
+  string    remark = 50;
+  uint32    createdAt = 60;
+}
+
+message GetTopicRequest { 
+  string topicID = 10;
+ }
+message GetTopicResponse { 
+  string    topicID = 10;
+  string    name = 20;
+  TopicType type = 30;
+  bool      changeAble = 40;
+  string    remark = 50;
+  uint32    createdAt = 60;
+}
+
+message GetTopicsRequest { 
+  uint32 offset = 10;
+  uint32 limit = 20;
+}
+
+message GetTopicsResponse {
+  uint32 total = 10; 
+  repeated TopicInfo  infos = 20; 
+}
+
+message DeleteTopicRequest { string topicID = 10; }
+message DeleteTopicResponse {
+  string    topicID = 10;
+  string    name = 20;
+  TopicType type = 30;
+  bool      changeAble = 40;
+  string    remark = 50;
+  uint32    createdAt = 60;
+}

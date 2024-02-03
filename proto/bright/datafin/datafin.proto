@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+package bright.datafin;
+
+option go_package = "yun.tea/block/bright/proto/bright/proto/datafin";
+import "bright/bright.proto";
+import "bright/basetype/basetype.proto";
+import "google/api/annotations.proto";
+
+service Manager {
+  rpc  CreateDataFin(CreateDataFinRequest) returns (CreateDataFinResponse) {
+    option (google.api.http) = {
+      post:"/create/datafin"
+      body:"*"
+    };
+  }
+
+  rpc GetDataFins(GetDataFinsRequest) returns (GetDataFinsResponse) {
+    option (google.api.http) = {
+      post:"/get/datafins"
+      body:"*"
+    };
+  }
+  rpc CheckDataFin(CheckDataFinRequest) returns (CheckDataFinResponse) {
+    option (google.api.http) = {
+      post:"/check/datafin"
+      body:"*"
+    };
+  }
+  rpc CheckDataFinWithData(CheckDataFinWithDataRequest) returns (CheckDataFinResponse) {
+    option (google.api.http) = {
+      post:"/check/datafin/with/data"
+      body:"*"
+    };
+  }
+}
+
+message CreateDataFinRequest{
+  string        TopicID = 10;
+  DataType      Type = 20;
+  repeated DataItemReq Infos = 30;
+}
+
+message CreateDataFinResponse{
+  repeated DataItemResp Infos = 10;
+}
+
+message DataItemReq{
+  string DataID = 10;
+  bytes  Data = 20;
+}
+
+message DataItemResp{
+  string       DataID = 10; 
+  string       DataFinID = 20; 
+  string       TopicID = 30; 
+  string       DataFin = 40;    
+  uint32       TxTime = 50;      
+  string       TxHash = 60;       
+  uint64       BlockHeight = 70;  
+  DataFinState State = 80;       
+  uint32       CreatedAt = 90; 
+  uint32       UpdatedAt = 100; 
+}
+
+enum DataType{
+  DataTypeDefault = 0;
+  RawType = 10;
+  JsonType = 20;
+}
+
+enum DataFinState{
+  DataFinStateDefault = 0;   
+  DataFinStateProcessing = 10; 
+  DataFinStateSeccess = 20;    
+  DataFinStateFailed = 30;    
+}
+
+message GetDataFinsRequest{
+  string   TopicID = 10; 
+  repeated string DataFinIDs = 20; 
+}
+
+message GetDataFinsResponse{
+  repeated DataItemResp Infos = 10; 
+}
+
+
+message CheckDataFinRequest{
+  string TopicID = 10; 
+  optional string DataID = 20;  
+  optional string DataFin = 30;   
+}
+
+message CheckDataFinResponse{
+  string TopicID = 10; 
+  string OnChainDataFin = 20;  
+  string TxTime = 30;   
+  bool   Passed = 40;   
+}
+
+message CheckDataFinWithDataRequest{
+  string   TopicID = 10; 
+  string   DataID = 20;  
+  DataType Type = 30;   
+  bytes    Data = 40;   
+}

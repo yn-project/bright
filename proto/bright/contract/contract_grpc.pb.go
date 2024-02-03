@@ -4,7 +4,7 @@
 // - protoc             v3.18.1
 // source: bright/contract/contract.proto
 
-package block
+package contract
 
 import (
 	context "context"

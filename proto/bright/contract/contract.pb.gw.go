@@ -2,11 +2,11 @@
 // source: bright/contract/contract.proto
 
 /*
-Package block is a reverse proxy.
+Package contract is a reverse proxy.
 
 It translates gRPC into RESTful JSON APIs.
 */
-package block
+package contract
 
 import (
 	"context"

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package bright.contract;
 
-option go_package = "yun.tea/block/bright/proto/bright/proto/block";
+option go_package = "yun.tea/block/bright/proto/bright/proto/contract";
 import "bright/bright.proto";
 import "bright/basetype/basetype.proto";
 import "google/api/annotations.proto";
