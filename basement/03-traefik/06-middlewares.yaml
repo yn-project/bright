@@ -86,3 +86,22 @@ spec:
   redirectRegex:
     regex: ^http://([-a-zA-Z0-9|.]*)/(.*)
     replacement: https://${1}/${2}
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: head-cors
+  namespace: kube-system
+spec:
+  headers:
+    accessControlAllowMethods:
+      - "GET"
+      - "OPTIONS"
+      - "PUT"
+      - "POST"
+    accessControlAllowHeaders:
+      - "*"
+    accessControlAllowOriginList:
+      - "*"
+    accessControlMaxAge: 100
+    addVaryHeader: true
