@@ -42,7 +42,9 @@ type AccountMutation struct {
 	address       *string
 	pri_key       *string
 	balance       *string
-	enable        *bool
+	nonce         *uint64
+	addnonce      *int64
+	state         *string
 	is_root       *bool
 	remark        *string
 	clearedFields map[string]struct{}
@@ -444,40 +446,110 @@ func (m *AccountMutation) ResetBalance() {
 	delete(m.clearedFields, account.FieldBalance)
 }
 
-// SetEnable sets the "enable" field.
-func (m *AccountMutation) SetEnable(b bool) {
-	m.enable = &b
+// SetNonce sets the "nonce" field.
+func (m *AccountMutation) SetNonce(u uint64) {
+	m.nonce = &u
+	m.addnonce = nil
 }
 
-// Enable returns the value of the "enable" field in the mutation.
-func (m *AccountMutation) Enable() (r bool, exists bool) {
-	v := m.enable
+// Nonce returns the value of the "nonce" field in the mutation.
+func (m *AccountMutation) Nonce() (r uint64, exists bool) {
+	v := m.nonce
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldEnable returns the old "enable" field's value of the Account entity.
+// OldNonce returns the old "nonce" field's value of the Account entity.
 // If the Account object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AccountMutation) OldEnable(ctx context.Context) (v bool, err error) {
+func (m *AccountMutation) OldNonce(ctx context.Context) (v uint64, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldEnable is only allowed on UpdateOne operations")
+		return v, errors.New("OldNonce is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldEnable requires an ID field in the mutation")
+		return v, errors.New("OldNonce requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldEnable: %w", err)
+		return v, fmt.Errorf("querying old value for OldNonce: %w", err)
 	}
-	return oldValue.Enable, nil
+	return oldValue.Nonce, nil
 }
 
-// ResetEnable resets all changes to the "enable" field.
-func (m *AccountMutation) ResetEnable() {
-	m.enable = nil
+// AddNonce adds u to the "nonce" field.
+func (m *AccountMutation) AddNonce(u int64) {
+	if m.addnonce != nil {
+		*m.addnonce += u
+	} else {
+		m.addnonce = &u
+	}
+}
+
+// AddedNonce returns the value that was added to the "nonce" field in this mutation.
+func (m *AccountMutation) AddedNonce() (r int64, exists bool) {
+	v := m.addnonce
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearNonce clears the value of the "nonce" field.
+func (m *AccountMutation) ClearNonce() {
+	m.nonce = nil
+	m.addnonce = nil
+	m.clearedFields[account.FieldNonce] = struct{}{}
+}
+
+// NonceCleared returns if the "nonce" field was cleared in this mutation.
+func (m *AccountMutation) NonceCleared() bool {
+	_, ok := m.clearedFields[account.FieldNonce]
+	return ok
+}
+
+// ResetNonce resets all changes to the "nonce" field.
+func (m *AccountMutation) ResetNonce() {
+	m.nonce = nil
+	m.addnonce = nil
+	delete(m.clearedFields, account.FieldNonce)
+}
+
+// SetState sets the "state" field.
+func (m *AccountMutation) SetState(s string) {
+	m.state = &s
+}
+
+// State returns the value of the "state" field in the mutation.
+func (m *AccountMutation) State() (r string, exists bool) {
+	v := m.state
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldState returns the old "state" field's value of the Account entity.
+// If the Account object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AccountMutation) OldState(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldState is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldState requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldState: %w", err)
+	}
+	return oldValue.State, nil
+}
+
+// ResetState resets all changes to the "state" field.
+func (m *AccountMutation) ResetState() {
+	m.state = nil
 }
 
 // SetIsRoot sets the "is_root" field.
@@ -584,7 +656,7 @@ func (m *AccountMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AccountMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 10)
 	if m.created_at != nil {
 		fields = append(fields, account.FieldCreatedAt)
 	}
@@ -603,8 +675,11 @@ func (m *AccountMutation) Fields() []string {
 	if m.balance != nil {
 		fields = append(fields, account.FieldBalance)
 	}
-	if m.enable != nil {
-		fields = append(fields, account.FieldEnable)
+	if m.nonce != nil {
+		fields = append(fields, account.FieldNonce)
+	}
+	if m.state != nil {
+		fields = append(fields, account.FieldState)
 	}
 	if m.is_root != nil {
 		fields = append(fields, account.FieldIsRoot)
@@ -632,8 +707,10 @@ func (m *AccountMutation) Field(name string) (ent.Value, bool) {
 		return m.PriKey()
 	case account.FieldBalance:
 		return m.Balance()
-	case account.FieldEnable:
-		return m.Enable()
+	case account.FieldNonce:
+		return m.Nonce()
+	case account.FieldState:
+		return m.State()
 	case account.FieldIsRoot:
 		return m.IsRoot()
 	case account.FieldRemark:
@@ -659,8 +736,10 @@ func (m *AccountMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldPriKey(ctx)
 	case account.FieldBalance:
 		return m.OldBalance(ctx)
-	case account.FieldEnable:
-		return m.OldEnable(ctx)
+	case account.FieldNonce:
+		return m.OldNonce(ctx)
+	case account.FieldState:
+		return m.OldState(ctx)
 	case account.FieldIsRoot:
 		return m.OldIsRoot(ctx)
 	case account.FieldRemark:
@@ -716,12 +795,19 @@ func (m *AccountMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetBalance(v)
 		return nil
-	case account.FieldEnable:
-		v, ok := value.(bool)
+	case account.FieldNonce:
+		v, ok := value.(uint64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetEnable(v)
+		m.SetNonce(v)
+		return nil
+	case account.FieldState:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetState(v)
 		return nil
 	case account.FieldIsRoot:
 		v, ok := value.(bool)
@@ -754,6 +840,9 @@ func (m *AccountMutation) AddedFields() []string {
 	if m.adddeleted_at != nil {
 		fields = append(fields, account.FieldDeletedAt)
 	}
+	if m.addnonce != nil {
+		fields = append(fields, account.FieldNonce)
+	}
 	return fields
 }
 
@@ -768,6 +857,8 @@ func (m *AccountMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedUpdatedAt()
 	case account.FieldDeletedAt:
 		return m.AddedDeletedAt()
+	case account.FieldNonce:
+		return m.AddedNonce()
 	}
 	return nil, false
 }
@@ -798,6 +889,13 @@ func (m *AccountMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddDeletedAt(v)
 		return nil
+	case account.FieldNonce:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddNonce(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Account numeric field %s", name)
 }
@@ -808,6 +906,9 @@ func (m *AccountMutation) ClearedFields() []string {
 	var fields []string
 	if m.FieldCleared(account.FieldBalance) {
 		fields = append(fields, account.FieldBalance)
+	}
+	if m.FieldCleared(account.FieldNonce) {
+		fields = append(fields, account.FieldNonce)
 	}
 	if m.FieldCleared(account.FieldRemark) {
 		fields = append(fields, account.FieldRemark)
@@ -828,6 +929,9 @@ func (m *AccountMutation) ClearField(name string) error {
 	switch name {
 	case account.FieldBalance:
 		m.ClearBalance()
+		return nil
+	case account.FieldNonce:
+		m.ClearNonce()
 		return nil
 	case account.FieldRemark:
 		m.ClearRemark()
@@ -858,8 +962,11 @@ func (m *AccountMutation) ResetField(name string) error {
 	case account.FieldBalance:
 		m.ResetBalance()
 		return nil
-	case account.FieldEnable:
-		m.ResetEnable()
+	case account.FieldNonce:
+		m.ResetNonce()
+		return nil
+	case account.FieldState:
+		m.ResetState()
 		return nil
 	case account.FieldIsRoot:
 		m.ResetIsRoot()

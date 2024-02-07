@@ -14,6 +14,7 @@ import (
 	contractmgr "yun.tea/block/bright/contract/pkg/mgr"
 	endpointmgr "yun.tea/block/bright/endpoint/pkg/mgr"
 	"yun.tea/block/bright/proto/bright/account"
+	"yun.tea/block/bright/proto/bright/basetype"
 )
 
 const (
@@ -67,11 +68,12 @@ func CheckAllAccountState(ctx context.Context) {
 	var availableRootAcc *AccountKey
 	availableTreeAccs := []*AccountKey{}
 	for _, v := range rows {
+		state := basetype.AccountState_AccountUnkonwn
 		if _, ok := treeAccounts[v.Address]; ok && v.Address != rootAccount {
 			availableTreeAccs = append(availableTreeAccs, &AccountKey{Pub: v.Address, Pri: v.PriKey})
-			v.Enable = true
+			state = basetype.AccountState_AccountAvaliable
 		} else {
-			v.Enable = false
+			state = basetype.AccountState_AccountError
 		}
 
 		if v.Address == rootAccount {
@@ -80,7 +82,7 @@ func CheckAllAccountState(ctx context.Context) {
 				Pri: v.PriKey,
 			}
 			v.IsRoot = true
-			v.Enable = true
+			state = basetype.AccountState_AccountAvaliable
 		} else {
 			v.IsRoot = false
 		}
@@ -88,7 +90,7 @@ func CheckAllAccountState(ctx context.Context) {
 		_, err = crud.Update(ctx, &account.AccountReq{
 			ID:     &id,
 			IsRoot: &v.IsRoot,
-			Enable: &v.Enable,
+			State:  &state,
 		})
 		if err != nil {
 			logger.Sugar().Warnw("CheckAllAccountState", "Err", err)

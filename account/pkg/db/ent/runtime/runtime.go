@@ -45,12 +45,16 @@ func init() {
 	accountDescDeletedAt := accountMixinFields0[2].Descriptor()
 	// account.DefaultDeletedAt holds the default value on creation for the deleted_at field.
 	account.DefaultDeletedAt = accountDescDeletedAt.Default.(func() uint32)
-	// accountDescEnable is the schema descriptor for enable field.
-	accountDescEnable := accountFields[4].Descriptor()
-	// account.DefaultEnable holds the default value on creation for the enable field.
-	account.DefaultEnable = accountDescEnable.Default.(bool)
+	// accountDescNonce is the schema descriptor for nonce field.
+	accountDescNonce := accountFields[4].Descriptor()
+	// account.DefaultNonce holds the default value on creation for the nonce field.
+	account.DefaultNonce = accountDescNonce.Default.(uint64)
+	// accountDescState is the schema descriptor for state field.
+	accountDescState := accountFields[5].Descriptor()
+	// account.DefaultState holds the default value on creation for the state field.
+	account.DefaultState = accountDescState.Default.(string)
 	// accountDescIsRoot is the schema descriptor for is_root field.
-	accountDescIsRoot := accountFields[5].Descriptor()
+	accountDescIsRoot := accountFields[6].Descriptor()
 	// account.DefaultIsRoot holds the default value on creation for the is_root field.
 	account.DefaultIsRoot = accountDescIsRoot.Default.(bool)
 	// accountDescID is the schema descriptor for id field.

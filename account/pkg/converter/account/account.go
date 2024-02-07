@@ -3,6 +3,7 @@ package account
 import (
 	"yun.tea/block/bright/account/pkg/db/ent"
 	proto "yun.tea/block/bright/proto/bright/account"
+	"yun.tea/block/bright/proto/bright/basetype"
 )
 
 func Ent2Grpc(row *ent.Account) *proto.Account {
@@ -14,7 +15,8 @@ func Ent2Grpc(row *ent.Account) *proto.Account {
 		ID:      row.ID.String(),
 		Address: row.Address,
 		Balance: row.Balance,
-		Enable:  row.Enable,
+		Nonce:   row.Nonce,
+		State:   basetype.AccountState(basetype.AccountState_value[row.State]),
 		IsRoot:  row.IsRoot,
 		Remark:  row.Remark,
 	}

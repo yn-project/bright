@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"yun.tea/block/bright/account/pkg/db/mixin"
+	"yun.tea/block/bright/proto/bright/basetype"
 )
 
 type Account struct {
@@ -27,7 +28,8 @@ func (Account) Fields() []ent.Field {
 		field.String("address"),
 		field.String("pri_key"),
 		field.String("balance").Optional(),
-		field.Bool("enable").Default(false),
+		field.Uint64("nonce").Optional().Default(0),
+		field.String("state").Default(basetype.AccountState_AccountUnkonwn.String()),
 		field.Bool("is_root").Default(false),
 		field.String("remark").Optional(),
 	}

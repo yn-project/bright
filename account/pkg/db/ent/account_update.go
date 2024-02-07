@@ -115,16 +115,43 @@ func (au *AccountUpdate) ClearBalance() *AccountUpdate {
 	return au
 }
 
-// SetEnable sets the "enable" field.
-func (au *AccountUpdate) SetEnable(b bool) *AccountUpdate {
-	au.mutation.SetEnable(b)
+// SetNonce sets the "nonce" field.
+func (au *AccountUpdate) SetNonce(u uint64) *AccountUpdate {
+	au.mutation.ResetNonce()
+	au.mutation.SetNonce(u)
 	return au
 }
 
-// SetNillableEnable sets the "enable" field if the given value is not nil.
-func (au *AccountUpdate) SetNillableEnable(b *bool) *AccountUpdate {
-	if b != nil {
-		au.SetEnable(*b)
+// SetNillableNonce sets the "nonce" field if the given value is not nil.
+func (au *AccountUpdate) SetNillableNonce(u *uint64) *AccountUpdate {
+	if u != nil {
+		au.SetNonce(*u)
+	}
+	return au
+}
+
+// AddNonce adds u to the "nonce" field.
+func (au *AccountUpdate) AddNonce(u int64) *AccountUpdate {
+	au.mutation.AddNonce(u)
+	return au
+}
+
+// ClearNonce clears the value of the "nonce" field.
+func (au *AccountUpdate) ClearNonce() *AccountUpdate {
+	au.mutation.ClearNonce()
+	return au
+}
+
+// SetState sets the "state" field.
+func (au *AccountUpdate) SetState(s string) *AccountUpdate {
+	au.mutation.SetState(s)
+	return au
+}
+
+// SetNillableState sets the "state" field if the given value is not nil.
+func (au *AccountUpdate) SetNillableState(s *string) *AccountUpdate {
+	if s != nil {
+		au.SetState(*s)
 	}
 	return au
 }
@@ -330,11 +357,31 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: account.FieldBalance,
 		})
 	}
-	if value, ok := au.mutation.Enable(); ok {
+	if value, ok := au.mutation.Nonce(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
+			Type:   field.TypeUint64,
 			Value:  value,
-			Column: account.FieldEnable,
+			Column: account.FieldNonce,
+		})
+	}
+	if value, ok := au.mutation.AddedNonce(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: account.FieldNonce,
+		})
+	}
+	if au.mutation.NonceCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Column: account.FieldNonce,
+		})
+	}
+	if value, ok := au.mutation.State(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: account.FieldState,
 		})
 	}
 	if value, ok := au.mutation.IsRoot(); ok {
@@ -465,16 +512,43 @@ func (auo *AccountUpdateOne) ClearBalance() *AccountUpdateOne {
 	return auo
 }
 
-// SetEnable sets the "enable" field.
-func (auo *AccountUpdateOne) SetEnable(b bool) *AccountUpdateOne {
-	auo.mutation.SetEnable(b)
+// SetNonce sets the "nonce" field.
+func (auo *AccountUpdateOne) SetNonce(u uint64) *AccountUpdateOne {
+	auo.mutation.ResetNonce()
+	auo.mutation.SetNonce(u)
 	return auo
 }
 
-// SetNillableEnable sets the "enable" field if the given value is not nil.
-func (auo *AccountUpdateOne) SetNillableEnable(b *bool) *AccountUpdateOne {
-	if b != nil {
-		auo.SetEnable(*b)
+// SetNillableNonce sets the "nonce" field if the given value is not nil.
+func (auo *AccountUpdateOne) SetNillableNonce(u *uint64) *AccountUpdateOne {
+	if u != nil {
+		auo.SetNonce(*u)
+	}
+	return auo
+}
+
+// AddNonce adds u to the "nonce" field.
+func (auo *AccountUpdateOne) AddNonce(u int64) *AccountUpdateOne {
+	auo.mutation.AddNonce(u)
+	return auo
+}
+
+// ClearNonce clears the value of the "nonce" field.
+func (auo *AccountUpdateOne) ClearNonce() *AccountUpdateOne {
+	auo.mutation.ClearNonce()
+	return auo
+}
+
+// SetState sets the "state" field.
+func (auo *AccountUpdateOne) SetState(s string) *AccountUpdateOne {
+	auo.mutation.SetState(s)
+	return auo
+}
+
+// SetNillableState sets the "state" field if the given value is not nil.
+func (auo *AccountUpdateOne) SetNillableState(s *string) *AccountUpdateOne {
+	if s != nil {
+		auo.SetState(*s)
 	}
 	return auo
 }
@@ -710,11 +784,31 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Column: account.FieldBalance,
 		})
 	}
-	if value, ok := auo.mutation.Enable(); ok {
+	if value, ok := auo.mutation.Nonce(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
+			Type:   field.TypeUint64,
 			Value:  value,
-			Column: account.FieldEnable,
+			Column: account.FieldNonce,
+		})
+	}
+	if value, ok := auo.mutation.AddedNonce(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: account.FieldNonce,
+		})
+	}
+	if auo.mutation.NonceCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Column: account.FieldNonce,
+		})
+	}
+	if value, ok := auo.mutation.State(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: account.FieldState,
 		})
 	}
 	if value, ok := auo.mutation.IsRoot(); ok {

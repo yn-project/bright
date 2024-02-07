@@ -31,7 +31,8 @@ var schemaGraph = func() *sqlgraph.Schema {
 			account.FieldAddress:   {Type: field.TypeString, Column: account.FieldAddress},
 			account.FieldPriKey:    {Type: field.TypeString, Column: account.FieldPriKey},
 			account.FieldBalance:   {Type: field.TypeString, Column: account.FieldBalance},
-			account.FieldEnable:    {Type: field.TypeBool, Column: account.FieldEnable},
+			account.FieldNonce:     {Type: field.TypeUint64, Column: account.FieldNonce},
+			account.FieldState:     {Type: field.TypeString, Column: account.FieldState},
 			account.FieldIsRoot:    {Type: field.TypeBool, Column: account.FieldIsRoot},
 			account.FieldRemark:    {Type: field.TypeString, Column: account.FieldRemark},
 		},
@@ -115,9 +116,14 @@ func (f *AccountFilter) WhereBalance(p entql.StringP) {
 	f.Where(p.Field(account.FieldBalance))
 }
 
-// WhereEnable applies the entql bool predicate on the enable field.
-func (f *AccountFilter) WhereEnable(p entql.BoolP) {
-	f.Where(p.Field(account.FieldEnable))
+// WhereNonce applies the entql uint64 predicate on the nonce field.
+func (f *AccountFilter) WhereNonce(p entql.Uint64P) {
+	f.Where(p.Field(account.FieldNonce))
+}
+
+// WhereState applies the entql string predicate on the state field.
+func (f *AccountFilter) WhereState(p entql.StringP) {
+	f.Where(p.Field(account.FieldState))
 }
 
 // WhereIsRoot applies the entql bool predicate on the is_root field.

@@ -28,8 +28,10 @@ type Account struct {
 	PriKey string `json:"pri_key,omitempty"`
 	// Balance holds the value of the "balance" field.
 	Balance string `json:"balance,omitempty"`
-	// Enable holds the value of the "enable" field.
-	Enable bool `json:"enable,omitempty"`
+	// Nonce holds the value of the "nonce" field.
+	Nonce uint64 `json:"nonce,omitempty"`
+	// State holds the value of the "state" field.
+	State string `json:"state,omitempty"`
 	// IsRoot holds the value of the "is_root" field.
 	IsRoot bool `json:"is_root,omitempty"`
 	// Remark holds the value of the "remark" field.
@@ -41,11 +43,11 @@ func (*Account) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case account.FieldEnable, account.FieldIsRoot:
+		case account.FieldIsRoot:
 			values[i] = new(sql.NullBool)
-		case account.FieldCreatedAt, account.FieldUpdatedAt, account.FieldDeletedAt:
+		case account.FieldCreatedAt, account.FieldUpdatedAt, account.FieldDeletedAt, account.FieldNonce:
 			values[i] = new(sql.NullInt64)
-		case account.FieldAddress, account.FieldPriKey, account.FieldBalance, account.FieldRemark:
+		case account.FieldAddress, account.FieldPriKey, account.FieldBalance, account.FieldState, account.FieldRemark:
 			values[i] = new(sql.NullString)
 		case account.FieldID:
 			values[i] = new(uuid.UUID)
@@ -106,11 +108,17 @@ func (a *Account) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				a.Balance = value.String
 			}
-		case account.FieldEnable:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field enable", values[i])
+		case account.FieldNonce:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field nonce", values[i])
 			} else if value.Valid {
-				a.Enable = value.Bool
+				a.Nonce = uint64(value.Int64)
+			}
+		case account.FieldState:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field state", values[i])
+			} else if value.Valid {
+				a.State = value.String
 			}
 		case account.FieldIsRoot:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -170,8 +178,11 @@ func (a *Account) String() string {
 	builder.WriteString("balance=")
 	builder.WriteString(a.Balance)
 	builder.WriteString(", ")
-	builder.WriteString("enable=")
-	builder.WriteString(fmt.Sprintf("%v", a.Enable))
+	builder.WriteString("nonce=")
+	builder.WriteString(fmt.Sprintf("%v", a.Nonce))
+	builder.WriteString(", ")
+	builder.WriteString("state=")
+	builder.WriteString(a.State)
 	builder.WriteString(", ")
 	builder.WriteString("is_root=")
 	builder.WriteString(fmt.Sprintf("%v", a.IsRoot))

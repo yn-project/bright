@@ -16,7 +16,7 @@
     "application/json"
   ],
   "paths": {
-    "/api/df/create/topic": {
+    "/create/topic": {
       "post": {
         "operationId": "Manager_CreateTopic",
         "responses": {
@@ -48,7 +48,7 @@
         ]
       }
     },
-    "/api/df/delete/topic": {
+    "/delete/topic": {
       "post": {
         "operationId": "Manager_DeleteTopic",
         "responses": {
@@ -80,7 +80,7 @@
         ]
       }
     },
-    "/api/df/get/topic": {
+    "/get/topic": {
       "post": {
         "operationId": "Manager_GetTopic",
         "responses": {
@@ -112,7 +112,7 @@
         ]
       }
     },
-    "/api/df/get/topics": {
+    "/get/topics": {
       "post": {
         "operationId": "Manager_GetTopics",
         "responses": {

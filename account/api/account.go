@@ -17,6 +17,7 @@ import (
 	data_fin "yun.tea/block/bright/common/chains/eth/datafin"
 	"yun.tea/block/bright/common/logger"
 	proto "yun.tea/block/bright/proto/bright/account"
+	"yun.tea/block/bright/proto/bright/basetype"
 
 	"github.com/Vigo-Tea/go-ethereum-ant/accounts/abi/bind"
 	"github.com/Vigo-Tea/go-ethereum-ant/common"
@@ -39,7 +40,7 @@ func (s *Server) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 		return &proto.CreateAccountResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
-	balance, isRoot, enable, err := mgr.CheckStateAndBalance(ctx, pubKey)
+	balance, isRoot, state, err := mgr.CheckStateAndBalance(ctx, pubKey)
 	if err != nil {
 		logger.Sugar().Warnw("CreateAccount", "error", err)
 	}
@@ -49,7 +50,7 @@ func (s *Server) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 		PriKey:  &priKey,
 		Balance: &balance,
 		IsRoot:  &isRoot,
-		Enable:  &enable,
+		State:   &state,
 		Remark:  &in.Remark,
 	}
 
@@ -72,9 +73,8 @@ func (s *Server) ImportAccount(ctx context.Context, in *proto.ImportAccountReque
 		return &proto.ImportAccountResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
-	isRoot := false
-	enable := false
-	balance, isRoot, enable, err := mgr.CheckStateAndBalance(ctx, pubKey)
+	nonce := uint64(0)
+	balance, isRoot, state, err := mgr.CheckStateAndBalance(ctx, pubKey)
 	if err != nil {
 		logger.Sugar().Warnw("ImportAccount", "error", err)
 	}
@@ -83,8 +83,9 @@ func (s *Server) ImportAccount(ctx context.Context, in *proto.ImportAccountReque
 		Address: &pubKey,
 		PriKey:  &in.PriKey,
 		Balance: &balance,
+		Nonce:   &nonce,
 		IsRoot:  &isRoot,
-		Enable:  &enable,
+		State:   &state,
 		Remark:  &in.Remark,
 	}
 	crudInfo, err := crud.Create(ctx, info)
@@ -211,7 +212,7 @@ func (s *Server) SetRootAccount(ctx context.Context, in *proto.SetRootAccountReq
 	}
 
 	go mgr.CheckAllAccountState(context.Background())
-	info.Enable = true
+	info.State = basetype.AccountState_AccountAvaliable.String()
 	info.IsRoot = true
 
 	logger.Sugar().Infof("success to set root for account,address: %v", info.Address)
@@ -245,7 +246,7 @@ func (s *Server) SetAdminAccount(ctx context.Context, in *proto.SetAdminAccountR
 		return &proto.SetAdminAccountResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
-	if info.Enable {
+	if info.State == basetype.AccountState_AccountAvaliable.String() {
 		return &proto.SetAdminAccountResponse{
 			Info: converter.Ent2Grpc(info),
 		}, nil
@@ -270,7 +271,7 @@ func (s *Server) SetAdminAccount(ctx context.Context, in *proto.SetAdminAccountR
 	}
 
 	go mgr.CheckAllAccountState(context.Background())
-	info.Enable = true
+	info.State = basetype.AccountState_AccountAvaliable.String()
 	logger.Sugar().Infof("success to set admin for account ,address: %v", info.Address)
 	return &proto.SetAdminAccountResponse{
 		Info: converter.Ent2Grpc(info),

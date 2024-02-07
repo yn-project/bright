@@ -17,7 +17,8 @@ var (
 		{Name: "address", Type: field.TypeString},
 		{Name: "pri_key", Type: field.TypeString},
 		{Name: "balance", Type: field.TypeString, Nullable: true},
-		{Name: "enable", Type: field.TypeBool, Default: false},
+		{Name: "nonce", Type: field.TypeUint64, Nullable: true, Default: 0},
+		{Name: "state", Type: field.TypeString, Default: "AccountUnkonwn"},
 		{Name: "is_root", Type: field.TypeBool, Default: false},
 		{Name: "remark", Type: field.TypeString, Nullable: true},
 	}

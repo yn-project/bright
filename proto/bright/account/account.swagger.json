@@ -286,8 +286,12 @@
         "Balance": {
           "type": "string"
         },
-        "Enable": {
-          "type": "boolean"
+        "Nonce": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "State": {
+          "$ref": "#/definitions/basetypeAccountState"
         },
         "IsRoot": {
           "type": "boolean"
@@ -309,8 +313,8 @@
         "Balance": {
           "$ref": "#/definitions/brightStringVal"
         },
-        "Enable": {
-          "$ref": "#/definitions/brightBoolVal"
+        "State": {
+          "$ref": "#/definitions/brightStringVal"
         },
         "IsRoot": {
           "$ref": "#/definitions/brightBoolVal"
@@ -469,6 +473,16 @@
           "$ref": "#/definitions/accountAccount"
         }
       }
+    },
+    "basetypeAccountState": {
+      "type": "string",
+      "enum": [
+        "AccountUnkonwn",
+        "AccountAvaliable",
+        "AccountLow",
+        "AccountError"
+      ],
+      "default": "AccountUnkonwn"
     },
     "brightBoolVal": {
       "type": "object",

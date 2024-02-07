@@ -24,8 +24,10 @@ const (
 	FieldPriKey = "pri_key"
 	// FieldBalance holds the string denoting the balance field in the database.
 	FieldBalance = "balance"
-	// FieldEnable holds the string denoting the enable field in the database.
-	FieldEnable = "enable"
+	// FieldNonce holds the string denoting the nonce field in the database.
+	FieldNonce = "nonce"
+	// FieldState holds the string denoting the state field in the database.
+	FieldState = "state"
 	// FieldIsRoot holds the string denoting the is_root field in the database.
 	FieldIsRoot = "is_root"
 	// FieldRemark holds the string denoting the remark field in the database.
@@ -43,7 +45,8 @@ var Columns = []string{
 	FieldAddress,
 	FieldPriKey,
 	FieldBalance,
-	FieldEnable,
+	FieldNonce,
+	FieldState,
 	FieldIsRoot,
 	FieldRemark,
 }
@@ -74,8 +77,10 @@ var (
 	UpdateDefaultUpdatedAt func() uint32
 	// DefaultDeletedAt holds the default value on creation for the "deleted_at" field.
 	DefaultDeletedAt func() uint32
-	// DefaultEnable holds the default value on creation for the "enable" field.
-	DefaultEnable bool
+	// DefaultNonce holds the default value on creation for the "nonce" field.
+	DefaultNonce uint64
+	// DefaultState holds the default value on creation for the "state" field.
+	DefaultState string
 	// DefaultIsRoot holds the default value on creation for the "is_root" field.
 	DefaultIsRoot bool
 	// DefaultID holds the default value on creation for the "id" field.

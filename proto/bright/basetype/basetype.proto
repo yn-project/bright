@@ -10,3 +10,10 @@ enum EndpointState {
     EndpointParse = 20;
     EndpointError = 40;
 }
+
+enum AccountState {
+    AccountUnkonwn = 0;
+    AccountAvaliable = 10;
+    AccountLow = 20;
+    AccountError = 40;
+}

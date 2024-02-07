@@ -67,7 +67,8 @@ message AccountReq {
   optional string Address = 20;
   optional string PriKey = 21;
   optional string Balance = 30;
-  optional bool Enable = 40;
+  optional uint64 Nonce = 31;
+  optional basetype.AccountState State = 40;
   optional bool IsRoot = 50;
   optional string Remark = 60;
 }
@@ -76,7 +77,8 @@ message Account {
   string ID = 10;
   string Address = 20;
   string Balance = 30;
-  bool Enable = 40;
+  uint64 Nonce = 31;
+  basetype.AccountState State = 40;
   bool IsRoot = 50;
   string Remark = 60;
 }
@@ -85,7 +87,7 @@ message Conds {
   bright.StringVal ID = 10;
   bright.StringVal Address = 20;
   bright.StringVal Balance = 30;
-  bright.BoolVal Enable = 40;
+  bright.StringVal State = 40;
   bright.BoolVal IsRoot = 50;
   bright.StringVal Remark = 60;
   bright.StringSliceVal IDs = 100;

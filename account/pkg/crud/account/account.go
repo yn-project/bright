@@ -48,8 +48,11 @@ func CreateSet(c *ent.AccountCreate, in *proto.AccountReq) *ent.AccountCreate {
 	if in.Balance != nil {
 		c.SetBalance(in.GetBalance())
 	}
-	if in.Enable != nil {
-		c.SetEnable(in.GetEnable())
+	if in.Nonce != nil {
+		c.SetNonce(in.GetNonce())
+	}
+	if in.State != nil {
+		c.SetState(in.GetState().String())
 	}
 	if in.IsRoot != nil {
 		c.SetIsRoot(in.GetIsRoot())
@@ -84,11 +87,17 @@ func UpdateSet(u *ent.AccountUpdateOne, in *proto.AccountReq) *ent.AccountUpdate
 	if in.Balance != nil {
 		u.SetBalance(in.GetBalance())
 	}
-	if in.Enable != nil {
-		u.SetEnable(in.GetEnable())
+	if in.State != nil {
+		u.SetState(in.GetState().String())
 	}
 	if in.IsRoot != nil {
 		u.SetIsRoot(in.GetIsRoot())
+	}
+	if in.Balance != nil {
+		u.SetBalance(in.GetBalance())
+	}
+	if in.Nonce != nil {
+		u.SetNonce(in.GetNonce())
 	}
 	if in.Remark != nil {
 		u.SetRemark(in.GetRemark())
@@ -160,12 +169,12 @@ func setQueryConds(conds *proto.Conds, cli *ent.Client) (*ent.AccountQuery, erro
 			return nil, fmt.Errorf("invalid account balance field")
 		}
 	}
-	if conds.Enable != nil {
-		switch conds.GetEnable().GetOp() {
+	if conds.State != nil {
+		switch conds.GetState().GetOp() {
 		case cruder.EQ:
-			stm.Where(account.Enable(conds.GetEnable().GetValue()))
+			stm.Where(account.State(conds.GetState().GetValue()))
 		default:
-			return nil, fmt.Errorf("invalid account enable field")
+			return nil, fmt.Errorf("invalid account state field")
 		}
 	}
 	if conds.IsRoot != nil {

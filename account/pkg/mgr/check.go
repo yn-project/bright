@@ -7,13 +7,14 @@ import (
 	"github.com/Vigo-Tea/go-ethereum-ant/ethclient"
 	contractmgr "yun.tea/block/bright/contract/pkg/mgr"
 	endpointmgr "yun.tea/block/bright/endpoint/pkg/mgr"
+	"yun.tea/block/bright/proto/bright/basetype"
 )
 
 const (
 	RightChainID = 16
 )
 
-func CheckStateAndBalance(ctx context.Context, address string) (balance string, isRoot, enable bool, err error) {
+func CheckStateAndBalance(ctx context.Context, address string) (balance string, isRoot bool, state basetype.AccountState, err error) {
 	pubAddr := common.HexToAddress(address)
 	balance = "0"
 
@@ -26,31 +27,31 @@ func CheckStateAndBalance(ctx context.Context, address string) (balance string, 
 	})
 
 	if err != nil {
-		return balance, false, false, err
+		return balance, false, basetype.AccountState_AccountUnkonwn, err
 	}
 
 	contractAddr, err := contractmgr.GetContract()
 	if err != nil {
-		return balance, false, false, err
+		return balance, false, basetype.AccountState_AccountUnkonwn, err
 	}
 
 	fromAddr, err := getFromAccount(ctx)
 	if err != nil {
-		return balance, false, false, err
+		return balance, false, basetype.AccountState_AccountUnkonwn, err
 	}
 
 	rootAcc, treeAccs, err := GetAllEnableAdmin(ctx, contractAddr, fromAddr)
 	if err != nil {
-		return balance, false, false, err
+		return balance, false, basetype.AccountState_AccountUnkonwn, err
 	}
 
 	if rootAcc == address {
-		return balance, true, true, nil
+		return balance, true, basetype.AccountState_AccountAvaliable, nil
 	}
 
 	if _, ok := treeAccs[address]; ok {
-		return balance, false, true, nil
+		return balance, false, basetype.AccountState_AccountAvaliable, nil
 	}
 
-	return balance, false, false, nil
+	return balance, false, basetype.AccountState_AccountAvaliable, nil
 }

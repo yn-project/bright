@@ -91,16 +91,30 @@ func (ac *AccountCreate) SetNillableBalance(s *string) *AccountCreate {
 	return ac
 }
 
-// SetEnable sets the "enable" field.
-func (ac *AccountCreate) SetEnable(b bool) *AccountCreate {
-	ac.mutation.SetEnable(b)
+// SetNonce sets the "nonce" field.
+func (ac *AccountCreate) SetNonce(u uint64) *AccountCreate {
+	ac.mutation.SetNonce(u)
 	return ac
 }
 
-// SetNillableEnable sets the "enable" field if the given value is not nil.
-func (ac *AccountCreate) SetNillableEnable(b *bool) *AccountCreate {
-	if b != nil {
-		ac.SetEnable(*b)
+// SetNillableNonce sets the "nonce" field if the given value is not nil.
+func (ac *AccountCreate) SetNillableNonce(u *uint64) *AccountCreate {
+	if u != nil {
+		ac.SetNonce(*u)
+	}
+	return ac
+}
+
+// SetState sets the "state" field.
+func (ac *AccountCreate) SetState(s string) *AccountCreate {
+	ac.mutation.SetState(s)
+	return ac
+}
+
+// SetNillableState sets the "state" field if the given value is not nil.
+func (ac *AccountCreate) SetNillableState(s *string) *AccountCreate {
+	if s != nil {
+		ac.SetState(*s)
 	}
 	return ac
 }
@@ -247,9 +261,13 @@ func (ac *AccountCreate) defaults() error {
 		v := account.DefaultDeletedAt()
 		ac.mutation.SetDeletedAt(v)
 	}
-	if _, ok := ac.mutation.Enable(); !ok {
-		v := account.DefaultEnable
-		ac.mutation.SetEnable(v)
+	if _, ok := ac.mutation.Nonce(); !ok {
+		v := account.DefaultNonce
+		ac.mutation.SetNonce(v)
+	}
+	if _, ok := ac.mutation.State(); !ok {
+		v := account.DefaultState
+		ac.mutation.SetState(v)
 	}
 	if _, ok := ac.mutation.IsRoot(); !ok {
 		v := account.DefaultIsRoot
@@ -282,8 +300,8 @@ func (ac *AccountCreate) check() error {
 	if _, ok := ac.mutation.PriKey(); !ok {
 		return &ValidationError{Name: "pri_key", err: errors.New(`ent: missing required field "Account.pri_key"`)}
 	}
-	if _, ok := ac.mutation.Enable(); !ok {
-		return &ValidationError{Name: "enable", err: errors.New(`ent: missing required field "Account.enable"`)}
+	if _, ok := ac.mutation.State(); !ok {
+		return &ValidationError{Name: "state", err: errors.New(`ent: missing required field "Account.state"`)}
 	}
 	if _, ok := ac.mutation.IsRoot(); !ok {
 		return &ValidationError{Name: "is_root", err: errors.New(`ent: missing required field "Account.is_root"`)}
@@ -373,13 +391,21 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		})
 		_node.Balance = value
 	}
-	if value, ok := ac.mutation.Enable(); ok {
+	if value, ok := ac.mutation.Nonce(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
+			Type:   field.TypeUint64,
 			Value:  value,
-			Column: account.FieldEnable,
+			Column: account.FieldNonce,
 		})
-		_node.Enable = value
+		_node.Nonce = value
+	}
+	if value, ok := ac.mutation.State(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: account.FieldState,
+		})
+		_node.State = value
 	}
 	if value, ok := ac.mutation.IsRoot(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -545,15 +571,39 @@ func (u *AccountUpsert) ClearBalance() *AccountUpsert {
 	return u
 }
 
-// SetEnable sets the "enable" field.
-func (u *AccountUpsert) SetEnable(v bool) *AccountUpsert {
-	u.Set(account.FieldEnable, v)
+// SetNonce sets the "nonce" field.
+func (u *AccountUpsert) SetNonce(v uint64) *AccountUpsert {
+	u.Set(account.FieldNonce, v)
 	return u
 }
 
-// UpdateEnable sets the "enable" field to the value that was provided on create.
-func (u *AccountUpsert) UpdateEnable() *AccountUpsert {
-	u.SetExcluded(account.FieldEnable)
+// UpdateNonce sets the "nonce" field to the value that was provided on create.
+func (u *AccountUpsert) UpdateNonce() *AccountUpsert {
+	u.SetExcluded(account.FieldNonce)
+	return u
+}
+
+// AddNonce adds v to the "nonce" field.
+func (u *AccountUpsert) AddNonce(v uint64) *AccountUpsert {
+	u.Add(account.FieldNonce, v)
+	return u
+}
+
+// ClearNonce clears the value of the "nonce" field.
+func (u *AccountUpsert) ClearNonce() *AccountUpsert {
+	u.SetNull(account.FieldNonce)
+	return u
+}
+
+// SetState sets the "state" field.
+func (u *AccountUpsert) SetState(v string) *AccountUpsert {
+	u.Set(account.FieldState, v)
+	return u
+}
+
+// UpdateState sets the "state" field to the value that was provided on create.
+func (u *AccountUpsert) UpdateState() *AccountUpsert {
+	u.SetExcluded(account.FieldState)
 	return u
 }
 
@@ -747,17 +797,45 @@ func (u *AccountUpsertOne) ClearBalance() *AccountUpsertOne {
 	})
 }
 
-// SetEnable sets the "enable" field.
-func (u *AccountUpsertOne) SetEnable(v bool) *AccountUpsertOne {
+// SetNonce sets the "nonce" field.
+func (u *AccountUpsertOne) SetNonce(v uint64) *AccountUpsertOne {
 	return u.Update(func(s *AccountUpsert) {
-		s.SetEnable(v)
+		s.SetNonce(v)
 	})
 }
 
-// UpdateEnable sets the "enable" field to the value that was provided on create.
-func (u *AccountUpsertOne) UpdateEnable() *AccountUpsertOne {
+// AddNonce adds v to the "nonce" field.
+func (u *AccountUpsertOne) AddNonce(v uint64) *AccountUpsertOne {
 	return u.Update(func(s *AccountUpsert) {
-		s.UpdateEnable()
+		s.AddNonce(v)
+	})
+}
+
+// UpdateNonce sets the "nonce" field to the value that was provided on create.
+func (u *AccountUpsertOne) UpdateNonce() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateNonce()
+	})
+}
+
+// ClearNonce clears the value of the "nonce" field.
+func (u *AccountUpsertOne) ClearNonce() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.ClearNonce()
+	})
+}
+
+// SetState sets the "state" field.
+func (u *AccountUpsertOne) SetState(v string) *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetState(v)
+	})
+}
+
+// UpdateState sets the "state" field to the value that was provided on create.
+func (u *AccountUpsertOne) UpdateState() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateState()
 	})
 }
 
@@ -1120,17 +1198,45 @@ func (u *AccountUpsertBulk) ClearBalance() *AccountUpsertBulk {
 	})
 }
 
-// SetEnable sets the "enable" field.
-func (u *AccountUpsertBulk) SetEnable(v bool) *AccountUpsertBulk {
+// SetNonce sets the "nonce" field.
+func (u *AccountUpsertBulk) SetNonce(v uint64) *AccountUpsertBulk {
 	return u.Update(func(s *AccountUpsert) {
-		s.SetEnable(v)
+		s.SetNonce(v)
 	})
 }
 
-// UpdateEnable sets the "enable" field to the value that was provided on create.
-func (u *AccountUpsertBulk) UpdateEnable() *AccountUpsertBulk {
+// AddNonce adds v to the "nonce" field.
+func (u *AccountUpsertBulk) AddNonce(v uint64) *AccountUpsertBulk {
 	return u.Update(func(s *AccountUpsert) {
-		s.UpdateEnable()
+		s.AddNonce(v)
+	})
+}
+
+// UpdateNonce sets the "nonce" field to the value that was provided on create.
+func (u *AccountUpsertBulk) UpdateNonce() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateNonce()
+	})
+}
+
+// ClearNonce clears the value of the "nonce" field.
+func (u *AccountUpsertBulk) ClearNonce() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.ClearNonce()
+	})
+}
+
+// SetState sets the "state" field.
+func (u *AccountUpsertBulk) SetState(v string) *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetState(v)
+	})
+}
+
+// UpdateState sets the "state" field to the value that was provided on create.
+func (u *AccountUpsertBulk) UpdateState() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateState()
 	})
 }
 

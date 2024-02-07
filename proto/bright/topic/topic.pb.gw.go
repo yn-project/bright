@@ -181,7 +181,7 @@ func RegisterManagerHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bright.topic.Manager/CreateTopic", runtime.WithHTTPPathPattern("/api/df/create/topic"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bright.topic.Manager/CreateTopic", runtime.WithHTTPPathPattern("/create/topic"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -206,7 +206,7 @@ func RegisterManagerHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bright.topic.Manager/GetTopic", runtime.WithHTTPPathPattern("/api/df/get/topic"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bright.topic.Manager/GetTopic", runtime.WithHTTPPathPattern("/get/topic"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -231,7 +231,7 @@ func RegisterManagerHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bright.topic.Manager/GetTopics", runtime.WithHTTPPathPattern("/api/df/get/topics"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bright.topic.Manager/GetTopics", runtime.WithHTTPPathPattern("/get/topics"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -256,7 +256,7 @@ func RegisterManagerHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bright.topic.Manager/DeleteTopic", runtime.WithHTTPPathPattern("/api/df/delete/topic"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/bright.topic.Manager/DeleteTopic", runtime.WithHTTPPathPattern("/delete/topic"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -320,7 +320,7 @@ func RegisterManagerHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bright.topic.Manager/CreateTopic", runtime.WithHTTPPathPattern("/api/df/create/topic"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bright.topic.Manager/CreateTopic", runtime.WithHTTPPathPattern("/create/topic"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -342,7 +342,7 @@ func RegisterManagerHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bright.topic.Manager/GetTopic", runtime.WithHTTPPathPattern("/api/df/get/topic"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bright.topic.Manager/GetTopic", runtime.WithHTTPPathPattern("/get/topic"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -364,7 +364,7 @@ func RegisterManagerHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bright.topic.Manager/GetTopics", runtime.WithHTTPPathPattern("/api/df/get/topics"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bright.topic.Manager/GetTopics", runtime.WithHTTPPathPattern("/get/topics"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -386,7 +386,7 @@ func RegisterManagerHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bright.topic.Manager/DeleteTopic", runtime.WithHTTPPathPattern("/api/df/delete/topic"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/bright.topic.Manager/DeleteTopic", runtime.WithHTTPPathPattern("/delete/topic"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -406,13 +406,13 @@ func RegisterManagerHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 }
 
 var (
-	pattern_Manager_CreateTopic_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "df", "create", "topic"}, ""))
+	pattern_Manager_CreateTopic_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"create", "topic"}, ""))
 
-	pattern_Manager_GetTopic_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "df", "get", "topic"}, ""))
+	pattern_Manager_GetTopic_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"get", "topic"}, ""))
 
-	pattern_Manager_GetTopics_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "df", "get", "topics"}, ""))
+	pattern_Manager_GetTopics_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"get", "topics"}, ""))
 
-	pattern_Manager_DeleteTopic_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "df", "delete", "topic"}, ""))
+	pattern_Manager_DeleteTopic_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"delete", "topic"}, ""))
 )
 
 var (
