@@ -46,12 +46,12 @@ func CheckStateAndBalance(ctx context.Context, address string) (balance string, 
 	}
 
 	if rootAcc == address {
-		return balance, true, basetype.AccountState_AccountAvaliable, nil
+		return balance, true, basetype.AccountState_AccountAvailable, nil
 	}
 
 	if _, ok := treeAccs[address]; ok {
-		return balance, false, basetype.AccountState_AccountAvaliable, nil
+		return balance, false, basetype.AccountState_AccountAvailable, nil
 	}
 
-	return balance, false, basetype.AccountState_AccountAvaliable, nil
+	return balance, false, basetype.AccountState_AccountAvailable, nil
 }

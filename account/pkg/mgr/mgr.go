@@ -55,7 +55,7 @@ func (aMGR *accountsMGR) GetRootAccount(ctx context.Context) (acc *AccountKey, u
 		case <-time.NewTicker(BlockTime).C:
 			err = ctredis.Get(rootAccountStoreKey, acc)
 			if err != nil {
-				return nil, nil, fmt.Errorf("have no avaliable tree accounts,err: %v", err)
+				return nil, nil, fmt.Errorf("have no available tree accounts,err: %v", err)
 			}
 
 			lockKey, unlockID, err := aMGR.LockUsingAccount(acc, aMGR.RedisExpireTime)
@@ -77,7 +77,7 @@ func (aMGR *accountsMGR) GetRootAccountPub(ctx context.Context) (pubKey string, 
 	address := &AccountKey{}
 	err = ctredis.Get(rootAccountStoreKey, address)
 	if err != nil {
-		return "", fmt.Errorf("have no avaliable root account")
+		return "", fmt.Errorf("have no available root account")
 	}
 	return address.Pub, nil
 }
@@ -94,11 +94,11 @@ func (aMGR *accountsMGR) GetTreeAccount(ctx context.Context) (address *AccountKe
 			addresses := AccountKeyList{}
 			err = ctredis.Get(treeAccountsStoreKey, addresses)
 			if err != nil {
-				return nil, nil, fmt.Errorf("have no avaliable tree accounts,err: %v", err)
+				return nil, nil, fmt.Errorf("have no available tree accounts,err: %v", err)
 			}
 
 			if len(addresses) == 0 {
-				return nil, nil, fmt.Errorf("have no avaliable tree accounts")
+				return nil, nil, fmt.Errorf("have no available tree accounts")
 			}
 
 			randN := rand.Intn(len(addresses))
@@ -134,11 +134,11 @@ func (aMGR *accountsMGR) GetTreeAccountPub(ctx context.Context) (pubKeys []strin
 	addresses := []AccountKey{}
 	err = ctredis.Get(treeAccountsStoreKey, addresses)
 	if err != nil {
-		return nil, fmt.Errorf("have no avaliable tree accounts,err: %v", err)
+		return nil, fmt.Errorf("have no available tree accounts,err: %v", err)
 	}
 
 	if len(addresses) == 0 {
-		return nil, fmt.Errorf("have no avaliable tree accounts")
+		return nil, fmt.Errorf("have no available tree accounts")
 	}
 
 	pubKeys = []string{}

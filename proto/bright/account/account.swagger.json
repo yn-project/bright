@@ -478,7 +478,7 @@
       "type": "string",
       "enum": [
         "AccountUnkonwn",
-        "AccountAvaliable",
+        "AccountAvailable",
         "AccountLow",
         "AccountError"
       ],

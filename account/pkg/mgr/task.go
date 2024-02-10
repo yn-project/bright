@@ -71,7 +71,7 @@ func CheckAllAccountState(ctx context.Context) {
 		state := basetype.AccountState_AccountUnkonwn
 		if _, ok := treeAccounts[v.Address]; ok && v.Address != rootAccount {
 			availableTreeAccs = append(availableTreeAccs, &AccountKey{Pub: v.Address, Pri: v.PriKey})
-			state = basetype.AccountState_AccountAvaliable
+			state = basetype.AccountState_AccountAvailable
 		} else {
 			state = basetype.AccountState_AccountError
 		}
@@ -82,7 +82,7 @@ func CheckAllAccountState(ctx context.Context) {
 				Pri: v.PriKey,
 			}
 			v.IsRoot = true
-			state = basetype.AccountState_AccountAvaliable
+			state = basetype.AccountState_AccountAvailable
 		} else {
 			v.IsRoot = false
 		}

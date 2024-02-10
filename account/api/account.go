@@ -212,7 +212,7 @@ func (s *Server) SetRootAccount(ctx context.Context, in *proto.SetRootAccountReq
 	}
 
 	go mgr.CheckAllAccountState(context.Background())
-	info.State = basetype.AccountState_AccountAvaliable.String()
+	info.State = basetype.AccountState_AccountAvailable.String()
 	info.IsRoot = true
 
 	logger.Sugar().Infof("success to set root for account,address: %v", info.Address)
@@ -246,7 +246,7 @@ func (s *Server) SetAdminAccount(ctx context.Context, in *proto.SetAdminAccountR
 		return &proto.SetAdminAccountResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
-	if info.State == basetype.AccountState_AccountAvaliable.String() {
+	if info.State == basetype.AccountState_AccountAvailable.String() {
 		return &proto.SetAdminAccountResponse{
 			Info: converter.Ent2Grpc(info),
 		}, nil
@@ -271,7 +271,7 @@ func (s *Server) SetAdminAccount(ctx context.Context, in *proto.SetAdminAccountR
 	}
 
 	go mgr.CheckAllAccountState(context.Background())
-	info.State = basetype.AccountState_AccountAvaliable.String()
+	info.State = basetype.AccountState_AccountAvailable.String()
 	logger.Sugar().Infof("success to set admin for account ,address: %v", info.Address)
 	return &proto.SetAdminAccountResponse{
 		Info: converter.Ent2Grpc(info),

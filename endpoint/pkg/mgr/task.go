@@ -67,7 +67,7 @@ func CheckAndUpdateEndpoint(ctx context.Context, info *ent.Endpoint) (*ent.Endpo
 		info.Remark = err.Error()
 		logger.Sugar().Warnf("endpoint:%v is not available,err: %v", info.Address, err)
 	} else {
-		info.State = basetype.EndpointState_EndpointAvaliable.String()
+		info.State = basetype.EndpointState_EndpointAvailable.String()
 		info.Remark = ""
 	}
 

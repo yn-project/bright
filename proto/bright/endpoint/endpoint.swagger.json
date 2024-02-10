@@ -150,7 +150,7 @@
       "type": "string",
       "enum": [
         "EndpointDefault",
-        "EndpointAvaliable",
+        "EndpointAvailable",
         "EndpointParse",
         "EndpointError"
       ],
