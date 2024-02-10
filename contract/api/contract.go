@@ -3,15 +3,24 @@ package contract
 
 import (
 	"context"
+	"fmt"
+	"time"
 
+	"github.com/Vigo-Tea/go-ethereum-ant/accounts/abi/bind"
+	"github.com/Vigo-Tea/go-ethereum-ant/crypto"
+	"github.com/Vigo-Tea/go-ethereum-ant/ethclient"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	acconutcrud "yun.tea/block/bright/account/pkg/crud/account"
+	accountmgr "yun.tea/block/bright/account/pkg/mgr"
+	data_fin "yun.tea/block/bright/common/chains/eth/datafin"
 	"yun.tea/block/bright/common/logger"
 	"yun.tea/block/bright/common/solc"
 	converter "yun.tea/block/bright/contract/pkg/converter/contract"
 	crud "yun.tea/block/bright/contract/pkg/crud/contract"
 	"yun.tea/block/bright/contract/pkg/solcode"
+	endpointmgr "yun.tea/block/bright/endpoint/pkg/mgr"
 	proto "yun.tea/block/bright/proto/bright/contract"
 )
 
@@ -48,11 +57,61 @@ func (s *Server) CompileContractCode(ctx context.Context, in *proto.CompileContr
 		},
 	}, nil
 }
+
 func (s *Server) CreateContractWithAccount(ctx context.Context, in *proto.CreateContractWithAccountRequest) (*proto.CreateContractWithAccountResponse, error) {
+	accID, err := uuid.Parse(in.AccountID)
+	if err != nil {
+		err = fmt.Errorf("wrong account id,cannot parse it to uuid")
+		return &proto.CreateContractWithAccountResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	acc, err := acconutcrud.Row(ctx, accID)
+	if err != nil {
+		err = fmt.Errorf("failed to get account info,err: %v", err)
+		return &proto.CreateContractWithAccountResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	aMGR := accountmgr.GetAccountMGR()
+	contractAddr := ""
+	endpointmgr.WithClient(ctx, func(ctx context.Context, cli *ethclient.Client) error {
+		unlockFunc, err := aMGR.GetAccount(ctx, &accountmgr.AccountKey{
+			Pri: acc.PriKey,
+			Pub: acc.Address,
+		}, 3)
+		if err != nil {
+			return err
+		}
+		defer unlockFunc()
+		privateKey, err := crypto.HexToECDSA(acc.PriKey)
+		if err != nil {
+			return err
+		}
+		chainID, err := cli.ChainID(context.Background())
+		if err != nil {
+			return fmt.Errorf("get eth chainID err: %v", err)
+		}
+		keyedTransctor, err := bind.NewKeyedTransactorWithChainID(privateKey, chainID)
+		if err != nil {
+			return fmt.Errorf("get eth chainID err: %v", err)
+		}
+
+		_, tx, _, err := data_fin.DeployDataFin(keyedTransctor, cli)
+		if err != nil {
+			return fmt.Errorf("failed to deploy contract, err: %v", err)
+		}
+
+		time.Sleep(time.Second * 3)
+		recipt, err := cli.TransactionReceipt(ctx, tx.Hash())
+		if err != nil {
+			return fmt.Errorf("failed to deploy contract, err: %v", err)
+		}
+		contractAddr = recipt.ContractAddress.Hex()
+		return nil
+	})
+
 	version := solcode.VERSION
 	info, err := crud.Create(ctx, &proto.ContractReq{
 		Name:    &in.Name,
-		Address: &in.Name,
+		Address: &contractAddr,
 		Version: &version,
 		Remark:  &in.Remark,
 	})
@@ -68,16 +127,9 @@ func (s *Server) CreateContractWithAccount(ctx context.Context, in *proto.Create
 
 func (s *Server) GetContract(ctx context.Context, in *proto.GetContractRequest) (*proto.GetContractResponse, error) {
 	var err error
-
-	id, err := uuid.Parse(in.GetID())
+	info, err := crud.Row(ctx)
 	if err != nil {
-		logger.Sugar().Errorw("GetContract", "ID", in.GetID(), "error", err)
-		return &proto.GetContractResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-
-	info, err := crud.Row(ctx, id)
-	if err != nil {
-		logger.Sugar().Errorw("GetContract", "ID", in.GetID(), "error", err)
+		logger.Sugar().Errorw("GetContract", "error", err)
 		return &proto.GetContractResponse{}, status.Error(codes.Internal, err.Error())
 	}
 

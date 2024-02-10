@@ -1,18 +1,15 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
-	"yun.tea/block/bright/common/utils"
-	"yun.tea/block/bright/proto/bright/datafin"
+	"yun.tea/block/bright/contract/pkg/db"
+
+	"yun.tea/block/bright/account/pkg/mgr"
 )
 
 func main() {
-	DataID := "a123"
-	DataFin := "0xajiemv"
-	fmt.Println(utils.PrettyStruct(datafin.CheckDataFinRequest{
-		TopicID: "id",
-		DataID:  &DataID,
-		DataFin: &DataFin,
-	}))
+	db.Init()
+	fmt.Println(mgr.GetAccountReport(context.Background(), "0xbE9Fdc66cB7c462354E95C99534fC6e0eDFeA0dc"))
 }

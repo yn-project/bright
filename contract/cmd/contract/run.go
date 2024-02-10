@@ -21,6 +21,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
+	accountdb "yun.tea/block/bright/account/pkg/db"
 	"yun.tea/block/bright/contract/pkg/db"
 	"yun.tea/block/bright/contract/pkg/servicename"
 )
@@ -41,7 +42,12 @@ var runCmd = &cli.Command{
 		if err != nil {
 			return err
 		}
-		return db.Init()
+
+		err = db.Init()
+		if err != nil {
+			return err
+		}
+		return accountdb.Init()
 	},
 	Action: func(c *cli.Context) error {
 		go runGRPCServer(config.GetConfig().Contract.GrpcPort)

@@ -2,7 +2,6 @@ package mgr
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/Vigo-Tea/go-ethereum-ant/accounts/abi/bind"
@@ -10,6 +9,7 @@ import (
 	"github.com/Vigo-Tea/go-ethereum-ant/ethclient"
 	crud "yun.tea/block/bright/account/pkg/crud/account"
 	data_fin "yun.tea/block/bright/common/chains/eth/datafin"
+	"yun.tea/block/bright/common/ctredis"
 	"yun.tea/block/bright/common/logger"
 	contractmgr "yun.tea/block/bright/contract/pkg/mgr"
 	endpointmgr "yun.tea/block/bright/endpoint/pkg/mgr"
@@ -18,17 +18,22 @@ import (
 )
 
 const (
-	RefreshTime   = time.Minute * 10
-	MaxUseAccount = 100
-	MinBalance    = 100000
+	RefreshTime             = time.Minute * 10
+	CheckAllAccountTaskTime = time.Minute * 5
+	MaxUseAccount           = 100
+	MinBalance              = 100000
+	CheckAllAccountTaskLock = "check_all_acc_lock"
 )
 
 func Maintain(ctx context.Context) {
-	CheckAllAccountState(ctx)
 	for {
+		locked, _ := ctredis.TryPubLock(CheckAllAccountTaskLock, CheckAllAccountTaskTime)
+		if locked {
+			CheckAllAccountState(ctx)
+		}
 		select {
 		case <-time.NewTicker(RefreshTime).C:
-			CheckAllAccountState(ctx)
+			continue
 		case <-ctx.Done():
 			return
 		}
@@ -46,54 +51,38 @@ func CheckAllAccountState(ctx context.Context) {
 		return
 	}
 
-	contractAddr, err := contractmgr.GetContract()
-	if err != nil {
-		logger.Sugar().Errorw("CheckAllAccountState", "Msg", "failed to check state of accounts", "Err", err)
-		return
-	}
-
-	from, err := getFromAccount(ctx)
-	if err != nil {
-		logger.Sugar().Errorw("CheckAllAccountState", "Msg", "failed to check state of accounts", "Err", err)
-		return
-	}
-
-	fmt.Println(contractAddr, from)
-	rootAccount, treeAccounts, err := GetAllEnableAdmin(ctx, contractAddr, from)
-	if err != nil {
-		logger.Sugar().Errorw("CheckAllAccountState", "Msg", "failed to check state of accounts", "Err", err)
-		return
-	}
-
 	var availableRootAcc *AccountKey
 	availableTreeAccs := []*AccountKey{}
 	for _, v := range rows {
-		state := basetype.AccountState_AccountUnkonwn
-		if _, ok := treeAccounts[v.Address]; ok && v.Address != rootAccount {
-			availableTreeAccs = append(availableTreeAccs, &AccountKey{Pub: v.Address, Pri: v.PriKey})
-			state = basetype.AccountState_AccountAvailable
-		} else {
-			state = basetype.AccountState_AccountError
+		acc, err := GetAccountReport(ctx, v.Address)
+		if err != nil {
+			logger.Sugar().Errorf("CheckAllAccountState", "Address", v.Address, "Err", err)
 		}
 
-		if v.Address == rootAccount {
+		if acc.IsRoot {
 			availableRootAcc = &AccountKey{
-				Pub: v.Address,
 				Pri: v.PriKey,
+				Pub: v.Address,
 			}
-			v.IsRoot = true
-			state = basetype.AccountState_AccountAvailable
-		} else {
-			v.IsRoot = false
 		}
+		if acc.State == basetype.AccountState_AccountAvailable {
+			availableTreeAccs = append(availableTreeAccs, &AccountKey{
+				Pri: v.PriKey,
+				Pub: v.Address,
+			})
+		}
+
 		id := v.ID.String()
 		_, err = crud.Update(ctx, &account.AccountReq{
-			ID:     &id,
-			IsRoot: &v.IsRoot,
-			State:  &state,
+			ID:      &id,
+			Balance: &acc.Balance,
+			Nonce:   &acc.Nonce,
+			State:   &acc.State,
+			IsRoot:  &acc.IsRoot,
+			Remark:  &acc.Remark,
 		})
 		if err != nil {
-			logger.Sugar().Warnw("CheckAllAccountState", "Err", err)
+			logger.Sugar().Errorf("CheckAllAccountState", "Address", v.Address, "Err", err)
 		}
 	}
 
@@ -107,12 +96,12 @@ func CheckAllAccountState(ctx context.Context) {
 		logger.Sugar().Errorf("CheckAllAccountState", "Err", err)
 	}
 
-	logger.Sugar().Infow("CheckAllAccountState", "contract", contractAddr.Hex(), "root account", rootAccount)
+	logger.Sugar().Infow("CheckAllAccountState", "root account", availableRootAcc.Pub)
 	treeAccList := []string{}
 	for _, v := range availableTreeAccs {
 		treeAccList = append(treeAccList, v.Pub)
 	}
-	logger.Sugar().Infow("CheckAllAccountState", "contract", contractAddr.Hex(), "tree accounts", treeAccList)
+	logger.Sugar().Infow("CheckAllAccountState", "tree accounts", treeAccList)
 }
 
 func GetAllEnableAdmin(ctx context.Context, contractAddr, from common.Address) (string, map[string]bool, error) {
@@ -154,31 +143,8 @@ func GetAllEnableAdmin(ctx context.Context, contractAddr, from common.Address) (
 	return rootAccount, treeAccounts, err
 }
 
-func getFromAccount(ctx context.Context) (common.Address, error) {
-	amgr := GetAccountMGR()
-	pubkey, err := amgr.GetRootAccountPub(ctx)
-	if err == nil {
-		return common.HexToAddress(pubkey), err
-	}
-	pubkeys, err := amgr.GetTreeAccountPub(ctx)
-	if err == nil && len(pubkeys) > 0 {
-		return common.HexToAddress(pubkeys[0]), err
-	}
-
-	rows, _, err := crud.Rows(ctx, &account.Conds{}, 0, 1)
-	if err != nil {
-		return common.HexToAddress(""), err
-	}
-
-	if len(rows) == 0 {
-		return common.HexToAddress(""), fmt.Errorf("have no available account")
-	}
-
-	return common.HexToAddress(rows[0].Address), nil
-}
-
 func WithWriteContract(ctx context.Context, needRoot bool, handle func(ctx context.Context, acc *AccountKey, contract *data_fin.DataFin) error) error {
-	contractAddr, err := contractmgr.GetContract()
+	contractAddr, err := contractmgr.GetContract(ctx)
 	if err != nil {
 		return err
 	}
@@ -198,7 +164,7 @@ func WithWriteContract(ctx context.Context, needRoot bool, handle func(ctx conte
 	defer unlock()
 
 	return endpointmgr.WithClient(ctx, func(ctx context.Context, cli *ethclient.Client) error {
-		contract, err := data_fin.NewDataFin(contractAddr, cli)
+		contract, err := data_fin.NewDataFin(*contractAddr, cli)
 		if err != nil {
 			return err
 		}

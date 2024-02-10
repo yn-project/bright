@@ -64,7 +64,7 @@ func create(t *testing.T) {
 
 func row(t *testing.T) {
 	var err error
-	info, err = Row(context.Background(), info.ID)
+	info, err = Row(context.Background())
 	if assert.Nil(t, err) {
 		assert.Equal(t, rowToObject(info), &entContract)
 	}

@@ -40,7 +40,7 @@ func (s *Server) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 		return &proto.CreateAccountResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
-	balance, isRoot, state, err := mgr.CheckStateAndBalance(ctx, pubKey)
+	accReport, err := mgr.GetAccountReport(ctx, pubKey)
 	if err != nil {
 		logger.Sugar().Warnw("CreateAccount", "error", err)
 	}
@@ -48,10 +48,11 @@ func (s *Server) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 	info := &proto.AccountReq{
 		Address: &pubKey,
 		PriKey:  &priKey,
-		Balance: &balance,
-		IsRoot:  &isRoot,
-		State:   &state,
-		Remark:  &in.Remark,
+		Balance: &accReport.Balance,
+		IsRoot:  &accReport.IsRoot,
+		State:   &accReport.State,
+		Nonce:   &accReport.Nonce,
+		Remark:  &accReport.Remark,
 	}
 
 	crudInfo, err := crud.Create(ctx, info)
@@ -73,8 +74,7 @@ func (s *Server) ImportAccount(ctx context.Context, in *proto.ImportAccountReque
 		return &proto.ImportAccountResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
-	nonce := uint64(0)
-	balance, isRoot, state, err := mgr.CheckStateAndBalance(ctx, pubKey)
+	accReport, err := mgr.GetAccountReport(ctx, pubKey)
 	if err != nil {
 		logger.Sugar().Warnw("ImportAccount", "error", err)
 	}
@@ -82,11 +82,11 @@ func (s *Server) ImportAccount(ctx context.Context, in *proto.ImportAccountReque
 	info := &proto.AccountReq{
 		Address: &pubKey,
 		PriKey:  &in.PriKey,
-		Balance: &balance,
-		Nonce:   &nonce,
-		IsRoot:  &isRoot,
-		State:   &state,
-		Remark:  &in.Remark,
+		Balance: &accReport.Balance,
+		IsRoot:  &accReport.IsRoot,
+		State:   &accReport.State,
+		Nonce:   &accReport.Nonce,
+		Remark:  &accReport.Remark,
 	}
 	crudInfo, err := crud.Create(ctx, info)
 	if err != nil {

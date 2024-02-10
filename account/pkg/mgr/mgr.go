@@ -121,6 +121,26 @@ func (aMGR *accountsMGR) GetTreeAccount(ctx context.Context) (address *AccountKe
 	}
 }
 
+func (aMGR *accountsMGR) GetAccount(ctx context.Context, address *AccountKey, retries int) (unlock func(), err error) {
+	for i := 0; i < retries; i++ {
+		lockKey, unlockID, err := aMGR.LockUsingAccount(address, aMGR.RedisExpireTime)
+		if err == nil {
+			return func() {
+				time.Sleep(SafeIntervalBlockTime)
+				ctredis.Unlock(lockKey, unlockID)
+			}, nil
+		}
+		select {
+		case <-time.NewTicker(BlockTime).C:
+			continue
+		case <-ctx.Done():
+			return nil, fmt.Errorf("failed to get account timeout")
+		}
+	}
+
+	return nil, fmt.Errorf("failed to get account,err: %v", err)
+}
+
 func (aMGR *accountsMGR) LockUsingAccount(address *AccountKey, expire time.Duration) (string, string, error) {
 	lockKey := fmt.Sprintf("%v:%v", accountLockKey, address)
 	unlockID, err := ctredis.TryLock(lockKey, aMGR.RedisExpireTime)

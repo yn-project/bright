@@ -2,9 +2,14 @@ package mgr
 
 import (
 	"context"
+	"fmt"
+	"math/big"
 
+	"github.com/Vigo-Tea/go-ethereum-ant/accounts/abi/bind"
 	"github.com/Vigo-Tea/go-ethereum-ant/common"
 	"github.com/Vigo-Tea/go-ethereum-ant/ethclient"
+	data_fin "yun.tea/block/bright/common/chains/eth/datafin"
+	"yun.tea/block/bright/common/utils"
 	contractmgr "yun.tea/block/bright/contract/pkg/mgr"
 	endpointmgr "yun.tea/block/bright/endpoint/pkg/mgr"
 	"yun.tea/block/bright/proto/bright/basetype"
@@ -12,46 +17,98 @@ import (
 
 const (
 	RightChainID = 16
+	// TODO:确定大数据量时最小的耗费
+	MinAccountBalance = 50000
+	TestContract      = "0x462A090B319ACE4A12a1FF2218aB5416C5e3445E"
 )
 
-func CheckStateAndBalance(ctx context.Context, address string) (balance string, isRoot bool, state basetype.AccountState, err error) {
-	pubAddr := common.HexToAddress(address)
-	balance = "0"
+type AccountReport struct {
+	Balance string
+	Nonce   uint64
+	IsRoot  bool
+	State   basetype.AccountState
+	Remark  string
+}
 
-	err = endpointmgr.WithClient(ctx, func(ctx context.Context, cli *ethclient.Client) error {
-		_balance, err := cli.BalanceAt(ctx, pubAddr, nil)
-		if err == nil {
-			balance = _balance.String()
+func GetAccountReport(ctx context.Context, address string) (acc AccountReport, err error) {
+	acc = AccountReport{
+		Balance: "0",
+		State:   basetype.AccountState_AccountAvailable,
+		IsRoot:  false,
+		Remark:  "可用",
+	}
+	fromAcc := common.HexToAddress(address)
+
+	defer func() {
+		if err != nil && acc.State == basetype.AccountState_AccountAvailable {
+			acc.State = basetype.AccountState_AccountUnkonwn
+			acc.Remark = "状态未知"
 		}
-		return err
+	}()
+
+	_ = endpointmgr.WithClient(ctx, func(ctx context.Context, cli *ethclient.Client) error {
+		df, err := data_fin.NewDataFin(common.HexToAddress(TestContract), cli)
+		if err != nil {
+			return err
+		}
+		_, err = df.IsAdminEnable(&bind.CallOpts{From: fromAcc}, common.HexToAddress(fromAcc.Hex()))
+		if err != nil {
+			acc.State = basetype.AccountState_AccountError
+			acc.Remark = "账户不可用"
+			return err
+		}
+		return nil
 	})
 
-	if err != nil {
-		return balance, false, basetype.AccountState_AccountUnkonwn, err
+	if err != nil || acc.State != basetype.AccountState_AccountAvailable {
+		return
 	}
 
-	contractAddr, err := contractmgr.GetContract()
-	if err != nil {
-		return balance, false, basetype.AccountState_AccountUnkonwn, err
+	err = endpointmgr.WithClient(ctx, func(ctx context.Context, cli *ethclient.Client) error {
+		_balance, err := cli.BalanceAt(ctx, fromAcc, nil)
+		if err != nil {
+			return err
+		}
+
+		acc.Balance = _balance.String()
+		if _balance.Cmp(big.NewInt(MinAccountBalance)) < 0 {
+			acc.State = basetype.AccountState_AccountLow
+			acc.Remark = "账户余额不足"
+		}
+
+		acc.Nonce, err = cli.NonceAt(ctx, fromAcc, nil)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	if err != nil || acc.State != basetype.AccountState_AccountAvailable {
+		return
 	}
 
-	fromAddr, err := getFromAccount(ctx)
-	if err != nil {
-		return balance, false, basetype.AccountState_AccountUnkonwn, err
+	contractAddr, err := contractmgr.GetContract(ctx)
+	if err != nil || len(contractAddr) == 0 {
+		acc.State = basetype.AccountState_AccountError
+		acc.Remark = "合约不可用"
+		return
 	}
 
-	rootAcc, treeAccs, err := GetAllEnableAdmin(ctx, contractAddr, fromAddr)
+	rootAcc, treeAccs, err := GetAllEnableAdmin(ctx, *contractAddr, fromAcc)
 	if err != nil {
-		return balance, false, basetype.AccountState_AccountUnkonwn, err
+		return
 	}
-
+	fmt.Println(rootAcc)
+	fmt.Println(utils.PrettyStruct(treeAccs))
 	if rootAcc == address {
-		return balance, true, basetype.AccountState_AccountAvailable, nil
+		acc.IsRoot = true
 	}
 
 	if _, ok := treeAccs[address]; ok {
-		return balance, false, basetype.AccountState_AccountAvailable, nil
+		acc.State = basetype.AccountState_AccountAvailable
+	} else {
+		acc.State = basetype.AccountState_AccountError
+		acc.Remark = "非合约管理员"
 	}
-
-	return balance, false, basetype.AccountState_AccountAvailable, nil
+	return
 }

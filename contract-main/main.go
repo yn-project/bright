@@ -21,18 +21,18 @@ func main() {
 		fmt.Println(err)
 		os.Exit(0)
 	}
-	// privateKeyStr := "9138747718925d94fb6f3ee732bb387dd779375119ce501e95c478c2ff0eeb2e"
+	privateKeyStr := "9138747718925d94fb6f3ee732bb387dd779375119ce501e95c478c2ff0eeb2e"
 
-	rec, err := cli.TransactionReceipt(context.Background(), common.HexToHash("0xf1f62e46fb3e3530cede697406b7baf88b8d1bc8085cbe56b7eb80535dac01da"))
-	fmt.Println(err)
-	fmt.Println(utils.PrettyStruct(rec))
+	// rec, err := cli.TransactionReceipt(context.Background(), common.HexToHash("0xf1f62e46fb3e3530cede697406b7baf88b8d1bc8085cbe56b7eb80535dac01da"))
+	// fmt.Println(err)
+	// fmt.Println(utils.PrettyStruct(rec))
 
-	// addr, err := DeployContract2(cli, privateKeyStr)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	os.Exit(0)
-	// }
-	// fmt.Println(addr)
+	addr, err := DeployContract2(cli, privateKeyStr)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
+	fmt.Println(addr)
 
 	// GetContractAddr(cli)
 
@@ -63,7 +63,7 @@ func DeployContract2(backend *ethclient.Client, priKey string) (common.Address, 
 	fmt.Println(err)
 	fmt.Println(utils.PrettyStruct(tx))
 
-	time.Sleep(time.Second * 20)
+	time.Sleep(time.Second * 1)
 
 	recp, err := backend.TransactionReceipt(context.Background(), tx.Hash())
 	fmt.Println(err)

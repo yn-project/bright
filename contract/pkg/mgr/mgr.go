@@ -1,8 +1,17 @@
 package mgr
 
-import "github.com/Vigo-Tea/go-ethereum-ant/common"
+import (
+	"context"
 
-func GetContract() (common.Address, error) {
+	"github.com/Vigo-Tea/go-ethereum-ant/common"
+	crud "yun.tea/block/bright/contract/pkg/crud/contract"
+)
 
-	return common.HexToAddress("0x462A090B319ACE4A12a1FF2218aB5416C5e3445E"), nil
+func GetContract(ctx context.Context) (*common.Address, error) {
+	row, err := crud.Row(ctx)
+	if err != nil {
+		return nil, err
+	}
+	addr := common.HexToAddress(row.Address)
+	return &addr, nil
 }

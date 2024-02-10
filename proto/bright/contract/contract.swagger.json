@@ -309,12 +309,7 @@
       }
     },
     "contractGetContractRequest": {
-      "type": "object",
-      "properties": {
-        "ID": {
-          "type": "string"
-        }
-      }
+      "type": "object"
     },
     "contractGetContractResponse": {
       "type": "object",

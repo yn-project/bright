@@ -93,7 +93,7 @@ message CreateContractWithAccountRequest {
 
 message CreateContractWithAccountResponse { Contract Info = 10; }
 
-message GetContractRequest { string ID = 10; }
+message GetContractRequest { }
 message GetContractResponse { Contract Info = 10; }
 
 message DeleteContractRequest { string ID = 10; }
