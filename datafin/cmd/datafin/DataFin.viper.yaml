@@ -1,0 +1,7 @@
+---
+config:
+  hostname: "datafin.yn"
+  http_port: 30140
+  grpc_port: 30141
+  prometheus_port: 30142
+  logdir: "./"

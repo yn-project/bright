@@ -1,0 +1,50 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: kube-system
+  name: datafin-ingress
+  annotations:
+    kubernetes.io/ingress.class: "traefik-internet"
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares:
+      kube-system-strip-datafin-prefix@kubernetescrd,
+      kube-system-head-cors@kubernetescrd
+
+spec:
+  rules:
+    - host:
+      http:
+        paths:
+          - path: /api/datafin/
+            pathType: Prefix
+            backend:
+              service:
+                name: datafin
+                port:
+                  number: 30140
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: kube-system
+  name: datafin-ingress-
+  annotations:
+    kubernetes.io/ingress.class: "traefik-internet"
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares:
+      kube-system-strip-datafin-prefix@kubernetescrd,
+      kube-system-head-cors@kubernetescrd
+
+spec:
+  rules:
+    - host:
+      http:
+        paths:
+          - path: /api/datafin/
+            pathType: Prefix
+            backend:
+              service:
+                name: datafin
+                port:
+                  number: 30140

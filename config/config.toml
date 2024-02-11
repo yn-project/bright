@@ -18,6 +18,12 @@ http-port=30130
 grpc-port=30131
 log-file="/var/log/account.log"
 
+[datafin]
+domain="datafin"
+http-port=30140
+grpc-port=30141
+log-file="/var/log/datafin.log"
+
 [mysql]
 domain="mysql-headless"
 port=3306

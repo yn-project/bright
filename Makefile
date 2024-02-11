@@ -44,6 +44,7 @@ gen-ent:
 	go run entgo.io/ent/cmd/ent generate --feature entql,sql/lock,sql/execquery,sql/upsert,privacy,schema/snapshot,sql/modifier ./endpoint/pkg/db/ent/schema
 	go run entgo.io/ent/cmd/ent generate --feature entql,sql/lock,sql/execquery,sql/upsert,privacy,schema/snapshot,sql/modifier ./account/pkg/db/ent/schema
 	go run entgo.io/ent/cmd/ent generate --feature entql,sql/lock,sql/execquery,sql/upsert,privacy,schema/snapshot,sql/modifier ./contract/pkg/db/ent/schema
+	go run entgo.io/ent/cmd/ent generate --feature entql,sql/lock,sql/execquery,sql/upsert,privacy,schema/snapshot,sql/modifier ./datafin/pkg/db/ent/schema
 
 ifdef AIMPROJECT
 PROJECTS= $(AIMPROJECT)

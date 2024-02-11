@@ -177,16 +177,16 @@
     "topicCreateTopicRequest": {
       "type": "object",
       "properties": {
-        "name": {
+        "Name": {
           "type": "string"
         },
-        "type": {
+        "Type": {
           "$ref": "#/definitions/topicTopicType"
         },
-        "changeAble": {
+        "ChangeAble": {
           "type": "boolean"
         },
-        "remark": {
+        "Remark": {
           "type": "string"
         }
       }
@@ -194,22 +194,22 @@
     "topicCreateTopicResponse": {
       "type": "object",
       "properties": {
-        "topicID": {
+        "TopicID": {
           "type": "string"
         },
-        "name": {
+        "Name": {
           "type": "string"
         },
-        "type": {
+        "Type": {
           "$ref": "#/definitions/topicTopicType"
         },
-        "changeAble": {
+        "ChangeAble": {
           "type": "boolean"
         },
-        "remark": {
+        "Remark": {
           "type": "string"
         },
-        "createdAt": {
+        "CreatedAt": {
           "type": "integer",
           "format": "int64"
         }
@@ -218,7 +218,7 @@
     "topicDeleteTopicRequest": {
       "type": "object",
       "properties": {
-        "topicID": {
+        "TopicID": {
           "type": "string"
         }
       }
@@ -226,22 +226,22 @@
     "topicDeleteTopicResponse": {
       "type": "object",
       "properties": {
-        "topicID": {
+        "TopicID": {
           "type": "string"
         },
-        "name": {
+        "Name": {
           "type": "string"
         },
-        "type": {
+        "Type": {
           "$ref": "#/definitions/topicTopicType"
         },
-        "changeAble": {
+        "ChangeAble": {
           "type": "boolean"
         },
-        "remark": {
+        "Remark": {
           "type": "string"
         },
-        "createdAt": {
+        "CreatedAt": {
           "type": "integer",
           "format": "int64"
         }
@@ -250,7 +250,7 @@
     "topicGetTopicRequest": {
       "type": "object",
       "properties": {
-        "topicID": {
+        "TopicID": {
           "type": "string"
         }
       }
@@ -258,22 +258,22 @@
     "topicGetTopicResponse": {
       "type": "object",
       "properties": {
-        "topicID": {
+        "TopicID": {
           "type": "string"
         },
-        "name": {
+        "Name": {
           "type": "string"
         },
-        "type": {
+        "Type": {
           "$ref": "#/definitions/topicTopicType"
         },
-        "changeAble": {
+        "ChangeAble": {
           "type": "boolean"
         },
-        "remark": {
+        "Remark": {
           "type": "string"
         },
-        "createdAt": {
+        "CreatedAt": {
           "type": "integer",
           "format": "int64"
         }
@@ -282,11 +282,11 @@
     "topicGetTopicsRequest": {
       "type": "object",
       "properties": {
-        "offset": {
+        "Offset": {
           "type": "integer",
           "format": "int64"
         },
-        "limit": {
+        "Limit": {
           "type": "integer",
           "format": "int64"
         }
@@ -295,11 +295,11 @@
     "topicGetTopicsResponse": {
       "type": "object",
       "properties": {
-        "total": {
+        "Total": {
           "type": "integer",
           "format": "int64"
         },
-        "infos": {
+        "Infos": {
           "type": "array",
           "items": {
             "type": "object",
@@ -311,22 +311,22 @@
     "topicTopicInfo": {
       "type": "object",
       "properties": {
-        "topicID": {
+        "TopicID": {
           "type": "string"
         },
-        "name": {
+        "Name": {
           "type": "string"
         },
-        "type": {
+        "Type": {
           "$ref": "#/definitions/topicTopicType"
         },
-        "changeAble": {
+        "ChangeAble": {
           "type": "boolean"
         },
-        "remark": {
+        "Remark": {
           "type": "string"
         },
-        "createdAt": {
+        "CreatedAt": {
           "type": "integer",
           "format": "int64"
         }
@@ -335,11 +335,11 @@
     "topicTopicType": {
       "type": "string",
       "enum": [
-        "topicTypeDefault",
-        "iDType",
-        "originalType"
+        "TopicTypeDefault",
+        "IdType",
+        "OriginalType"
       ],
-      "default": "topicTypeDefault"
+      "default": "TopicTypeDefault"
     }
   }
 }

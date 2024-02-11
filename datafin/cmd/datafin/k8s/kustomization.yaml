@@ -1,0 +1,5 @@
+resources:
+  - 01-datafin.viper.yaml
+  - 02-datafin.yaml
+  - 03-middleware.yaml
+  - 04-ingress.yaml

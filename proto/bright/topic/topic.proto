@@ -38,64 +38,74 @@ service Manager {
 }
 
 enum TopicType {
-  topicTypeDefault = 0;
-  iDType = 10;
-  originalType = 20;
+  TopicTypeDefault = 0;
+  IdType = 10;
+  OriginalType = 20;
 }
 
 message CreateTopicRequest{
-  string    name  = 10;
-  TopicType type = 20;
-  bool      changeAble  = 30;
-  string    remark  = 40;
+  string    Name  = 10 [json_name="name"];
+  TopicType Type = 20 [json_name="type"];
+  bool      ChangeAble  = 30 [json_name="changeAble"];
+  string    Remark  = 40 [json_name="remark"];
 }
 
 message CreateTopicResponse{
-  string    topicID = 10;
-  string    name = 20;
-  TopicType type = 30;
-  bool      changeAble = 40;
-  string    remark = 50;
-  uint32    createdAt = 60;
+  string    TopicID = 10 [json_name="topicID"];
+  string    Name = 20 [json_name="name"];
+  TopicType Type = 30 [json_name="type"];
+  bool      ChangeAble = 40 [json_name="changeAble"];
+  string    Remark = 50 [json_name="remark"];
+  uint32    CreatedAt = 60 [json_name="createdAt"];
+}
+
+message TopicReq {
+  optional string    ID = 10;
+  optional string    TopicID = 20;
+  optional string    Name = 30;
+  optional TopicType Type = 40;
+  optional bool      ChangeAble = 50;
+  optional string    Contract = 60;
+  optional string    Remark = 70;
 }
 
 message TopicInfo {
-  string    topicID = 10;
-  string    name = 20;
-  TopicType type = 30;
-  bool      changeAble = 40;
-  string    remark = 50;
-  uint32    createdAt = 60;
+  string    TopicID = 10 [json_name="topicID"];
+  string    Name = 20 [json_name="name"];
+  TopicType Type = 30 [json_name="type"];
+  bool      ChangeAble = 40 [json_name="changeAble"];
+  string    Remark = 50 [json_name="remark"];
+  uint32    CreatedAt = 60 [json_name="createdAt"];
 }
 
 message GetTopicRequest { 
-  string topicID = 10;
+  string TopicID = 10 [json_name="topicID"];
  }
 message GetTopicResponse { 
-  string    topicID = 10;
-  string    name = 20;
-  TopicType type = 30;
-  bool      changeAble = 40;
-  string    remark = 50;
-  uint32    createdAt = 60;
+  string    TopicID = 10 [json_name="topicID"];
+  string    Name = 20 [json_name="name"];
+  TopicType Type = 30 [json_name="type"];
+  bool      ChangeAble = 40 [json_name="changeAble"];
+  string    Remark = 50 [json_name="remark"];
+  uint32    CreatedAt = 60 [json_name="createdAt"];
 }
 
 message GetTopicsRequest { 
-  uint32 offset = 10;
-  uint32 limit = 20;
+  uint32 Offset = 10 [json_name="offset"];
+  uint32 Limit = 20 [json_name="limit"];
 }
 
 message GetTopicsResponse {
-  uint32 total = 10; 
-  repeated TopicInfo  infos = 20; 
+  uint32 Total = 10 [json_name="total"]; 
+  repeated TopicInfo  Infos = 20 [json_name="infos"]; 
 }
 
-message DeleteTopicRequest { string topicID = 10; }
+message DeleteTopicRequest { string TopicID = 10 [json_name="topicID"]; }
 message DeleteTopicResponse {
-  string    topicID = 10;
-  string    name = 20;
-  TopicType type = 30;
-  bool      changeAble = 40;
-  string    remark = 50;
-  uint32    createdAt = 60;
+  string    TopicID = 10 [json_name="topicID"];
+  string    Name = 20 [json_name="name"];
+  TopicType Type = 30 [json_name="type"];
+  bool      ChangeAble = 40 [json_name="changeAble"];
+  string    Remark = 50 [json_name="remark"];
+  uint32    CreatedAt = 60 [json_name="createdAt"];
 }
