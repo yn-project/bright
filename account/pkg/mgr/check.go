@@ -9,6 +9,7 @@ import (
 	"github.com/Vigo-Tea/go-ethereum-ant/common"
 	"github.com/Vigo-Tea/go-ethereum-ant/ethclient"
 	data_fin "yun.tea/block/bright/common/chains/eth/datafin"
+	"yun.tea/block/bright/common/logger"
 	"yun.tea/block/bright/common/utils"
 	contractmgr "yun.tea/block/bright/contract/pkg/mgr"
 	endpointmgr "yun.tea/block/bright/endpoint/pkg/mgr"
@@ -87,6 +88,8 @@ func GetAccountReport(ctx context.Context, address string) (acc AccountReport, e
 	}
 
 	contractAddr, err := contractmgr.GetContract(ctx)
+	logger.Sugar().Info(utils.PrettyStruct(contractAddr))
+	logger.Sugar().Info(utils.PrettyStruct(err))
 	if err != nil || len(contractAddr) == 0 {
 		acc.State = basetype.AccountState_AccountError
 		acc.Remark = "合约不可用"

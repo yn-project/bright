@@ -18,8 +18,8 @@ import (
 )
 
 const (
-	RefreshTime             = time.Minute * 10
-	CheckAllAccountTaskTime = time.Minute * 5
+	RefreshTime             = time.Minute
+	CheckAllAccountTaskTime = time.Minute
 	MaxUseAccount           = 100
 	MinBalance              = 100000
 	CheckAllAccountTaskLock = "check_all_acc_lock"

@@ -48,38 +48,6 @@
         ]
       }
     },
-    "/delete/topic": {
-      "post": {
-        "operationId": "Manager_DeleteTopic",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/topicDeleteTopicResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/topicDeleteTopicRequest"
-            }
-          }
-        ],
-        "tags": [
-          "Manager"
-        ]
-      }
-    },
     "/get/topic": {
       "post": {
         "operationId": "Manager_GetTopic",
@@ -192,38 +160,6 @@
       }
     },
     "topicCreateTopicResponse": {
-      "type": "object",
-      "properties": {
-        "TopicID": {
-          "type": "string"
-        },
-        "Name": {
-          "type": "string"
-        },
-        "Type": {
-          "$ref": "#/definitions/topicTopicType"
-        },
-        "ChangeAble": {
-          "type": "boolean"
-        },
-        "Remark": {
-          "type": "string"
-        },
-        "CreatedAt": {
-          "type": "integer",
-          "format": "int64"
-        }
-      }
-    },
-    "topicDeleteTopicRequest": {
-      "type": "object",
-      "properties": {
-        "TopicID": {
-          "type": "string"
-        }
-      }
-    },
-    "topicDeleteTopicResponse": {
       "type": "object",
       "properties": {
         "TopicID": {

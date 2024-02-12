@@ -25,7 +25,6 @@ type ManagerClient interface {
 	CreateTopic(ctx context.Context, in *CreateTopicRequest, opts ...grpc.CallOption) (*CreateTopicResponse, error)
 	GetTopic(ctx context.Context, in *GetTopicRequest, opts ...grpc.CallOption) (*GetTopicResponse, error)
 	GetTopics(ctx context.Context, in *GetTopicsRequest, opts ...grpc.CallOption) (*GetTopicsResponse, error)
-	DeleteTopic(ctx context.Context, in *DeleteTopicRequest, opts ...grpc.CallOption) (*DeleteTopicResponse, error)
 }
 
 type managerClient struct {
@@ -63,15 +62,6 @@ func (c *managerClient) GetTopics(ctx context.Context, in *GetTopicsRequest, opt
 	return out, nil
 }
 
-func (c *managerClient) DeleteTopic(ctx context.Context, in *DeleteTopicRequest, opts ...grpc.CallOption) (*DeleteTopicResponse, error) {
-	out := new(DeleteTopicResponse)
-	err := c.cc.Invoke(ctx, "/bright.topic.Manager/DeleteTopic", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // ManagerServer is the server API for Manager service.
 // All implementations must embed UnimplementedManagerServer
 // for forward compatibility
@@ -79,7 +69,6 @@ type ManagerServer interface {
 	CreateTopic(context.Context, *CreateTopicRequest) (*CreateTopicResponse, error)
 	GetTopic(context.Context, *GetTopicRequest) (*GetTopicResponse, error)
 	GetTopics(context.Context, *GetTopicsRequest) (*GetTopicsResponse, error)
-	DeleteTopic(context.Context, *DeleteTopicRequest) (*DeleteTopicResponse, error)
 	mustEmbedUnimplementedManagerServer()
 }
 
@@ -95,9 +84,6 @@ func (UnimplementedManagerServer) GetTopic(context.Context, *GetTopicRequest) (*
 }
 func (UnimplementedManagerServer) GetTopics(context.Context, *GetTopicsRequest) (*GetTopicsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTopics not implemented")
-}
-func (UnimplementedManagerServer) DeleteTopic(context.Context, *DeleteTopicRequest) (*DeleteTopicResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteTopic not implemented")
 }
 func (UnimplementedManagerServer) mustEmbedUnimplementedManagerServer() {}
 
@@ -166,24 +152,6 @@ func _Manager_GetTopics_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Manager_DeleteTopic_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteTopicRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ManagerServer).DeleteTopic(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/bright.topic.Manager/DeleteTopic",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ManagerServer).DeleteTopic(ctx, req.(*DeleteTopicRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // Manager_ServiceDesc is the grpc.ServiceDesc for Manager service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -202,10 +170,6 @@ var Manager_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetTopics",
 			Handler:    _Manager_GetTopics_Handler,
-		},
-		{
-			MethodName: "DeleteTopic",
-			Handler:    _Manager_DeleteTopic_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

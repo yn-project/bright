@@ -65,12 +65,12 @@ func CreateSet(c *ent.TopicCreate, in *proto.TopicReq) *ent.TopicCreate {
 	return c
 }
 
-func Row(ctx context.Context, id uuid.UUID) (*ent.Topic, error) {
+func Row(ctx context.Context, topicID, contractAddr string) (*ent.Topic, error) {
 	var info *ent.Topic
 	var err error
 
 	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		info, err = cli.Topic.Query().Where(topic.ID(id)).Only(_ctx)
+		info, err = cli.Topic.Query().Where(topic.TopicID(topicID), topic.Contract(contractAddr)).Only(_ctx)
 		return err
 	})
 	if err != nil {
@@ -80,13 +80,13 @@ func Row(ctx context.Context, id uuid.UUID) (*ent.Topic, error) {
 	return info, nil
 }
 
-func Rows(ctx context.Context, offset, limit int) ([]*ent.Topic, int, error) {
+func Rows(ctx context.Context, offset, limit int, contractAddr string) ([]*ent.Topic, int, error) {
 	var err error
 	rows := []*ent.Topic{}
 	var total int
 
 	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		stm := cli.Topic.Query()
+		stm := cli.Topic.Query().Where(topic.Contract(contractAddr))
 		total, err = stm.Count(_ctx)
 		if err != nil {
 			return err
@@ -109,14 +109,17 @@ func Rows(ctx context.Context, offset, limit int) ([]*ent.Topic, int, error) {
 	return rows, total, nil
 }
 
-func Delete(ctx context.Context, id uuid.UUID) (*ent.Topic, error) {
+func Delete(ctx context.Context, topicID string) (*ent.Topic, error) {
 	var info *ent.Topic
 	var err error
 
 	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		info, err = cli.Topic.UpdateOneID(id).
-			SetDeletedAt(uint32(time.Now().Unix())).
-			Save(_ctx)
+		info, err = cli.Topic.Query().Where(topic.TopicID(topicID)).Only(ctx)
+		if err != nil {
+			return err
+		}
+
+		info, err = cli.Topic.UpdateOne(info).SetDeletedAt(uint32(time.Now().Unix())).Save(ctx)
 		return err
 	})
 	if err != nil {

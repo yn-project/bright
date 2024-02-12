@@ -28,13 +28,6 @@ service Manager {
       body:"*"
     };
   }
-
-  rpc DeleteTopic(DeleteTopicRequest) returns (DeleteTopicResponse) {
-    option (google.api.http) = {
-      post:"/delete/topic"
-      body:"*"
-    };
-  }
 }
 
 enum TopicType {
@@ -80,7 +73,7 @@ message TopicInfo {
 
 message GetTopicRequest { 
   string TopicID = 10 [json_name="topicID"];
- }
+}
 message GetTopicResponse { 
   string    TopicID = 10 [json_name="topicID"];
   string    Name = 20 [json_name="name"];
@@ -94,18 +87,7 @@ message GetTopicsRequest {
   uint32 Offset = 10 [json_name="offset"];
   uint32 Limit = 20 [json_name="limit"];
 }
-
 message GetTopicsResponse {
   uint32 Total = 10 [json_name="total"]; 
   repeated TopicInfo  Infos = 20 [json_name="infos"]; 
-}
-
-message DeleteTopicRequest { string TopicID = 10 [json_name="topicID"]; }
-message DeleteTopicResponse {
-  string    TopicID = 10 [json_name="topicID"];
-  string    Name = 20 [json_name="name"];
-  TopicType Type = 30 [json_name="type"];
-  bool      ChangeAble = 40 [json_name="changeAble"];
-  string    Remark = 50 [json_name="remark"];
-  uint32    CreatedAt = 60 [json_name="createdAt"];
 }

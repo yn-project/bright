@@ -26,6 +26,13 @@ var (
 		Name:       "topics",
 		Columns:    TopicsColumns,
 		PrimaryKey: []*schema.Column{TopicsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "topic_topic_id_contract",
+				Unique:  true,
+				Columns: []*schema.Column{TopicsColumns[4], TopicsColumns[6]},
+			},
+		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{

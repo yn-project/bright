@@ -16,6 +16,7 @@ import (
 	"yun.tea/block/bright/account/pkg/db"
 	"yun.tea/block/bright/account/pkg/mgr"
 	"yun.tea/block/bright/config"
+	contractdb "yun.tea/block/bright/contract/pkg/db"
 
 	api "yun.tea/block/bright/account/api"
 	"yun.tea/block/bright/common/logger"
@@ -39,6 +40,10 @@ var runCmd = &cli.Command{
 	},
 	Before: func(ctx *cli.Context) error {
 		err := db.Init()
+		if err != nil {
+			return err
+		}
+		err = contractdb.Init()
 		if err != nil {
 			return err
 		}

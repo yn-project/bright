@@ -91,12 +91,12 @@ func (aMGR *accountsMGR) GetTreeAccount(ctx context.Context) (address *AccountKe
 	for {
 		select {
 		case <-time.NewTicker(BlockTime).C:
-			addresses := AccountKeyList{}
-			err = ctredis.Get(treeAccountsStoreKey, addresses)
+			_addresses := &AccountKeyList{}
+			err = ctredis.Get(treeAccountsStoreKey, _addresses)
 			if err != nil {
 				return nil, nil, fmt.Errorf("have no available tree accounts,err: %v", err)
 			}
-
+			addresses := *_addresses
 			if len(addresses) == 0 {
 				return nil, nil, fmt.Errorf("have no available tree accounts")
 			}
