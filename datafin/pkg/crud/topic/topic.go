@@ -9,7 +9,6 @@ import (
 	"yun.tea/block/bright/datafin/pkg/db"
 	"yun.tea/block/bright/datafin/pkg/db/ent"
 	"yun.tea/block/bright/datafin/pkg/db/ent/topic"
-	"yun.tea/block/bright/endpoint/pkg/db/ent/endpoint"
 	proto "yun.tea/block/bright/proto/bright/topic"
 )
 
@@ -94,7 +93,7 @@ func Rows(ctx context.Context, offset, limit int) ([]*ent.Topic, int, error) {
 		}
 		rows, err = stm.
 			Offset(offset).
-			Order(ent.Desc(endpoint.FieldUpdatedAt)).
+			Order(ent.Desc(topic.FieldUpdatedAt)).
 			Limit(limit).
 			All(_ctx)
 		if err != nil {

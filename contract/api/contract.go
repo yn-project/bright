@@ -15,6 +15,7 @@ import (
 	acconutcrud "yun.tea/block/bright/account/pkg/crud/account"
 	accountmgr "yun.tea/block/bright/account/pkg/mgr"
 	data_fin "yun.tea/block/bright/common/chains/eth/datafin"
+	"yun.tea/block/bright/common/constant"
 	"yun.tea/block/bright/common/logger"
 	"yun.tea/block/bright/common/solc"
 	converter "yun.tea/block/bright/contract/pkg/converter/contract"
@@ -85,11 +86,8 @@ func (s *Server) CreateContractWithAccount(ctx context.Context, in *proto.Create
 		if err != nil {
 			return err
 		}
-		chainID, err := cli.ChainID(context.Background())
-		if err != nil {
-			return fmt.Errorf("get eth chainID err: %v", err)
-		}
-		keyedTransctor, err := bind.NewKeyedTransactorWithChainID(privateKey, chainID)
+
+		keyedTransctor, err := bind.NewKeyedTransactorWithChainID(privateKey, constant.ChainID)
 		if err != nil {
 			return fmt.Errorf("get eth chainID err: %v", err)
 		}

@@ -18,7 +18,7 @@ type Config struct {
 	Contract Contract `toml:"contract" env:"contract"`
 	Endpoint Endpoint `toml:"endpoint" env:"endpoint"`
 	Account  Account  `toml:"account" env:"account"`
-	DataFin  Account  `toml:"data_fin" env:"data_fin"`
+	DataFin  Account  `toml:"datafin" env:"datafin"`
 	MySQL    MySQL    `toml:"mysql" env:"mysql"`
 	Pulsar   Pulsar   `toml:"pulsar" env:"pulsar"`
 	Redis    Redis    `toml:"redis" env:"redis"`

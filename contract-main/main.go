@@ -68,6 +68,11 @@ func DeployContract2(backend *ethclient.Client, priKey string) (common.Address, 
 	recp, err := backend.TransactionReceipt(context.Background(), tx.Hash())
 	fmt.Println(err)
 	fmt.Println(utils.PrettyStruct(recp))
+	fmt.Println("----------------------------")
+	tx, ispending, err := backend.TransactionByHash(context.Background(), common.HexToHash(recp.TxHash.Hex()))
+	fmt.Println(utils.PrettyStruct(tx))
+	fmt.Println(utils.PrettyStruct(ispending))
+	fmt.Println(err)
 	return recp.ContractAddress, nil
 }
 
@@ -76,6 +81,7 @@ func GetContractAddr(backend *ethclient.Client) {
 	rec, err := backend.TransactionReceipt(context.Background(), common.HexToHash("0x2102f8637f5dbaff62bbf0382929f8134aeb9ccc0abdd584f928fce7f6ce3632"))
 	fmt.Println(utils.PrettyStruct(rec))
 	fmt.Println(err)
+
 }
 
 func AddAdmin(priKey string, backend *ethclient.Client) {

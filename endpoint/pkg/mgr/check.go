@@ -5,10 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Vigo-Tea/go-ethereum-ant/ethclient"
-)
-
-const (
-	RightChainID = 16
+	"yun.tea/block/bright/common/constant"
 )
 
 func CheckStateAndChainID(ctx context.Context, url string) error {
@@ -22,8 +19,8 @@ func CheckStateAndChainID(ctx context.Context, url string) error {
 		return err
 	}
 
-	if chainID.Int64() != RightChainID {
-		return fmt.Errorf("wrong chainid: %v , want: %v", chainID.String(), RightChainID)
+	if chainID.Int64() != constant.ChainID.Int64() {
+		return fmt.Errorf("wrong chainid: %v , want: %v", chainID.String(), constant.ChainID)
 	}
 	return nil
 }

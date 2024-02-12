@@ -16,7 +16,6 @@ import (
 )
 
 const (
-	RightChainID = 16
 	// TODO:确定大数据量时最小的耗费
 	MinAccountBalance = 50000
 	TestContract      = "0x462A090B319ACE4A12a1FF2218aB5416C5e3445E"

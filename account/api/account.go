@@ -3,7 +3,6 @@ package account
 
 import (
 	"context"
-	"math/big"
 	"time"
 
 	converter "yun.tea/block/bright/account/pkg/converter/account"
@@ -15,6 +14,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	data_fin "yun.tea/block/bright/common/chains/eth/datafin"
+	"yun.tea/block/bright/common/constant"
 	"yun.tea/block/bright/common/logger"
 	proto "yun.tea/block/bright/proto/bright/account"
 	"yun.tea/block/bright/proto/bright/basetype"
@@ -22,15 +22,12 @@ import (
 	"github.com/Vigo-Tea/go-ethereum-ant/accounts/abi/bind"
 	"github.com/Vigo-Tea/go-ethereum-ant/common"
 	"github.com/Vigo-Tea/go-ethereum-ant/crypto"
+	"github.com/Vigo-Tea/go-ethereum-ant/ethclient"
 	"github.com/google/uuid"
 )
 
 const (
 	LongRequestTimeout = time.Second * 24
-)
-
-var (
-	ChainID = big.NewInt(16)
 )
 
 func (s *Server) CreateAccount(ctx context.Context, in *proto.CreateAccountRequest) (*proto.CreateAccountResponse, error) {
@@ -189,12 +186,12 @@ func (s *Server) SetRootAccount(ctx context.Context, in *proto.SetRootAccountReq
 		}, nil
 	}
 
-	err = mgr.WithWriteContract(ctx, true, func(ctx context.Context, acc *mgr.AccountKey, contract *data_fin.DataFin) error {
+	err = mgr.WithWriteContract(ctx, true, func(ctx context.Context, acc *mgr.AccountKey, contract *data_fin.DataFin, cli *ethclient.Client) error {
 		priKey, err := crypto.HexToECDSA(acc.Pri)
 		if err != nil {
 			return err
 		}
-		opts, err := bind.NewKeyedTransactorWithChainID(priKey, ChainID)
+		opts, err := bind.NewKeyedTransactorWithChainID(priKey, constant.ChainID)
 		if err != nil {
 			return err
 		}
@@ -252,12 +249,12 @@ func (s *Server) SetAdminAccount(ctx context.Context, in *proto.SetAdminAccountR
 		}, nil
 	}
 
-	err = mgr.WithWriteContract(ctx, true, func(ctx context.Context, acc *mgr.AccountKey, contract *data_fin.DataFin) error {
+	err = mgr.WithWriteContract(ctx, true, func(ctx context.Context, acc *mgr.AccountKey, contract *data_fin.DataFin, cli *ethclient.Client) error {
 		priKey, err := crypto.HexToECDSA(acc.Pri)
 		if err != nil {
 			return err
 		}
-		opts, err := bind.NewKeyedTransactorWithChainID(priKey, ChainID)
+		opts, err := bind.NewKeyedTransactorWithChainID(priKey, constant.ChainID)
 		if err != nil {
 			return err
 		}

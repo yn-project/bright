@@ -143,7 +143,7 @@ func GetAllEnableAdmin(ctx context.Context, contractAddr, from common.Address) (
 	return rootAccount, treeAccounts, err
 }
 
-func WithWriteContract(ctx context.Context, needRoot bool, handle func(ctx context.Context, acc *AccountKey, contract *data_fin.DataFin) error) error {
+func WithWriteContract(ctx context.Context, needRoot bool, handle func(ctx context.Context, acc *AccountKey, contract *data_fin.DataFin, cli *ethclient.Client) error) error {
 	contractAddr, err := contractmgr.GetContract(ctx)
 	if err != nil {
 		return err
@@ -168,6 +168,6 @@ func WithWriteContract(ctx context.Context, needRoot bool, handle func(ctx conte
 		if err != nil {
 			return err
 		}
-		return handle(ctx, acc, contract)
+		return handle(ctx, acc, contract, cli)
 	})
 }
