@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 	"yun.tea/block/bright/datafin/pkg/db/ent/migrate"
 
+	"yun.tea/block/bright/datafin/pkg/db/ent/datafin"
 	"yun.tea/block/bright/datafin/pkg/db/ent/topic"
 
 	"entgo.io/ent/dialect"
@@ -22,6 +23,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// DataFin is the client for interacting with the DataFin builders.
+	DataFin *DataFinClient
 	// Topic is the client for interacting with the Topic builders.
 	Topic *TopicClient
 }
@@ -37,6 +40,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.DataFin = NewDataFinClient(c.config)
 	c.Topic = NewTopicClient(c.config)
 }
 
@@ -69,9 +73,10 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Topic:  NewTopicClient(cfg),
+		ctx:     ctx,
+		config:  cfg,
+		DataFin: NewDataFinClient(cfg),
+		Topic:   NewTopicClient(cfg),
 	}, nil
 }
 
@@ -89,16 +94,17 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Topic:  NewTopicClient(cfg),
+		ctx:     ctx,
+		config:  cfg,
+		DataFin: NewDataFinClient(cfg),
+		Topic:   NewTopicClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Topic.
+//		DataFin.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -120,7 +126,99 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.DataFin.Use(hooks...)
 	c.Topic.Use(hooks...)
+}
+
+// DataFinClient is a client for the DataFin schema.
+type DataFinClient struct {
+	config
+}
+
+// NewDataFinClient returns a client for the DataFin from the given config.
+func NewDataFinClient(c config) *DataFinClient {
+	return &DataFinClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `datafin.Hooks(f(g(h())))`.
+func (c *DataFinClient) Use(hooks ...Hook) {
+	c.hooks.DataFin = append(c.hooks.DataFin, hooks...)
+}
+
+// Create returns a builder for creating a DataFin entity.
+func (c *DataFinClient) Create() *DataFinCreate {
+	mutation := newDataFinMutation(c.config, OpCreate)
+	return &DataFinCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of DataFin entities.
+func (c *DataFinClient) CreateBulk(builders ...*DataFinCreate) *DataFinCreateBulk {
+	return &DataFinCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for DataFin.
+func (c *DataFinClient) Update() *DataFinUpdate {
+	mutation := newDataFinMutation(c.config, OpUpdate)
+	return &DataFinUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *DataFinClient) UpdateOne(df *DataFin) *DataFinUpdateOne {
+	mutation := newDataFinMutation(c.config, OpUpdateOne, withDataFin(df))
+	return &DataFinUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *DataFinClient) UpdateOneID(id uuid.UUID) *DataFinUpdateOne {
+	mutation := newDataFinMutation(c.config, OpUpdateOne, withDataFinID(id))
+	return &DataFinUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for DataFin.
+func (c *DataFinClient) Delete() *DataFinDelete {
+	mutation := newDataFinMutation(c.config, OpDelete)
+	return &DataFinDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *DataFinClient) DeleteOne(df *DataFin) *DataFinDeleteOne {
+	return c.DeleteOneID(df.ID)
+}
+
+// DeleteOne returns a builder for deleting the given entity by its id.
+func (c *DataFinClient) DeleteOneID(id uuid.UUID) *DataFinDeleteOne {
+	builder := c.Delete().Where(datafin.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &DataFinDeleteOne{builder}
+}
+
+// Query returns a query builder for DataFin.
+func (c *DataFinClient) Query() *DataFinQuery {
+	return &DataFinQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a DataFin entity by its id.
+func (c *DataFinClient) Get(ctx context.Context, id uuid.UUID) (*DataFin, error) {
+	return c.Query().Where(datafin.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *DataFinClient) GetX(ctx context.Context, id uuid.UUID) *DataFin {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *DataFinClient) Hooks() []Hook {
+	hooks := c.hooks.DataFin
+	return append(hooks[:len(hooks):len(hooks)], datafin.Hooks[:]...)
 }
 
 // TopicClient is a client for the Topic schema.

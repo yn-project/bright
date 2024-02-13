@@ -220,34 +220,12 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/datafinDataItemResp"
+            "$ref": "#/definitions/datafinDataFinInfo"
           }
         }
       }
     },
-    "datafinDataFinState": {
-      "type": "string",
-      "enum": [
-        "DataFinStateDefault",
-        "DataFinStateProcessing",
-        "DataFinStateSeccess",
-        "DataFinStateFailed"
-      ],
-      "default": "DataFinStateDefault"
-    },
-    "datafinDataItemReq": {
-      "type": "object",
-      "properties": {
-        "DataID": {
-          "type": "string"
-        },
-        "Data": {
-          "type": "string",
-          "format": "byte"
-        }
-      }
-    },
-    "datafinDataItemResp": {
+    "datafinDataFinInfo": {
       "type": "object",
       "properties": {
         "DataID": {
@@ -286,6 +264,28 @@
         }
       }
     },
+    "datafinDataFinState": {
+      "type": "string",
+      "enum": [
+        "DataFinStateDefault",
+        "DataFinStateProcessing",
+        "DataFinStateSeccess",
+        "DataFinStateFailed"
+      ],
+      "default": "DataFinStateDefault"
+    },
+    "datafinDataItemReq": {
+      "type": "object",
+      "properties": {
+        "DataID": {
+          "type": "string"
+        },
+        "Data": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
     "datafinDataType": {
       "type": "string",
       "enum": [
@@ -316,7 +316,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/datafinDataItemResp"
+            "$ref": "#/definitions/datafinDataFinInfo"
           }
         }
       }

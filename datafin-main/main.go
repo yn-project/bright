@@ -1,36 +1,94 @@
 package main
 
 import (
-	"context"
+	"crypto/sha256"
+	"encoding/base64"
+	"encoding/hex"
 	"fmt"
-	"os"
-
-	"github.com/Vigo-Tea/go-ethereum-ant/common"
-	"github.com/Vigo-Tea/go-ethereum-ant/ethclient"
-	"yun.tea/block/bright/common/utils"
+	"math/big"
 )
 
 func main() {
-	cli, err := ethclient.Dial("https://rest.baas.alipay.com/w3/api/a00e36c5/35N604248fA9u3IfW8BeR2RcQ4ZbMfXb")
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(0)
-	}
-	privateKeyStr := "9138747718925d94fb6f3ee732bb387dd779375119ce501e95c478c2ff0eeb2e"
+	// baseURL := "https://api.f2pool.com"
 
-	err = TestTx(cli, privateKeyStr)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(0)
-	}
+	// accessToken := "wyrhuvsac5iaej9s3q1qx3l2lwvuoso1sdxvxzx1rju6tr27bqiujey9sj5ng546"
+
+	// cli := client.NewClient(baseURL, accessToken)
+	// resp, err := cli.MiningUserGet(context.Background(), &types.MiningUserGetReq{
+	// MiningUserName: "cococonut3",
+	// })
+
+	// fmt.Println(utils.PrettyStruct(resp))
+	// fmt.Println(err)
+
+	data := []byte("asdfasdfasdf")
+	h := sha256.New()
+	fmt.Println(h.Write(data))
+	sum := h.Sum([]byte{})
+	fmt.Println(string(sum))
+	fmt.Println(len(sum))
+	fmt.Println(base64.RawStdEncoding.EncodeToString(sum))
+
+	u, err := From32Bytes(sum[:])
+	fmt.Println(err)
+	fmt.Println(u.ToHexString())
+	fmt.Println(u.ToBigInt().String())
 }
 
-func TestTx(backend *ethclient.Client, priKey string) error {
-	tx, ispending, err := backend.TransactionByHash(context.Background(), common.HexToHash("0xef1d804b2ca3251e433ae6c442fe65f326df4812180784c881c0ab7fb18bf7c3"))
-	if err != nil {
-		return err
+type Fin256Hash struct {
+	data [32]byte
+}
+
+func SumSha256Bytes(data []byte) *Fin256Hash {
+	h := sha256.New()
+	h.Write(data)
+	dst := h.Sum([]byte{})
+	ss := [32]byte{}
+	copy(ss[:], dst)
+	return &Fin256Hash{data: ss}
+}
+
+func From32Bytes(dst []byte) (*Fin256Hash, error) {
+	if len(dst) != 32 {
+		return nil, fmt.Errorf("failed to parse to [32]bytes,wrong length hexstring")
 	}
-	fmt.Println(utils.PrettyStruct(tx))
-	fmt.Println(utils.PrettyStruct(ispending))
-	return nil
+	ss := [32]byte{}
+	copy(ss[:], dst)
+	return &Fin256Hash{data: ss}, nil
+}
+
+func FromHexString(data string) (*Fin256Hash, error) {
+	dst, err := hex.DecodeString(data)
+	if err != nil {
+		return nil, err
+	}
+	if len(dst) != 32 {
+		return nil, fmt.Errorf("failed to parse to [32]bytes,wrong length hexstring")
+	}
+	ss := [32]byte{}
+	copy(ss[:], dst)
+	return &Fin256Hash{data: ss}, nil
+}
+
+// from uint256
+func FromBigInt(src *big.Int) (*Fin256Hash, error) {
+	dst := src.Bytes()
+	if len(dst) != 32 {
+		return nil, fmt.Errorf("failed to parse to [32]bytes,wrong length hexstring")
+	}
+	ss := [32]byte{}
+	copy(ss[:], dst)
+	return &Fin256Hash{data: ss}, nil
+}
+
+func (u *Fin256Hash) ToHexString() string {
+	return fmt.Sprintf("0x%v", hex.EncodeToString(u.data[:]))
+}
+
+func (u *Fin256Hash) ToBigInt() *big.Int {
+	return big.NewInt(0).SetBytes(u.data[:])
+}
+
+func (u *Fin256Hash) To32Bytes() [32]byte {
+	return u.data
 }

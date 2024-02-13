@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
+	"yun.tea/block/bright/datafin/pkg/db/ent/datafin"
 	"yun.tea/block/bright/datafin/pkg/db/ent/predicate"
 	"yun.tea/block/bright/datafin/pkg/db/ent/topic"
 
@@ -24,8 +25,1202 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeTopic = "Topic"
+	TypeDataFin = "DataFin"
+	TypeTopic   = "Topic"
 )
+
+// DataFinMutation represents an operation that mutates the DataFin nodes in the graph.
+type DataFinMutation struct {
+	config
+	op              Op
+	typ             string
+	id              *uuid.UUID
+	created_at      *uint32
+	addcreated_at   *int32
+	updated_at      *uint32
+	addupdated_at   *int32
+	deleted_at      *uint32
+	adddeleted_at   *int32
+	topic_id        *string
+	data_id         *string
+	datafin         *string
+	tx_time         *uint32
+	addtx_time      *int32
+	tx_hash         *string
+	block_height    *uint64
+	addblock_height *int64
+	state           *string
+	retries         *uint32
+	addretries      *int32
+	remark          *string
+	clearedFields   map[string]struct{}
+	done            bool
+	oldValue        func(context.Context) (*DataFin, error)
+	predicates      []predicate.DataFin
+}
+
+var _ ent.Mutation = (*DataFinMutation)(nil)
+
+// datafinOption allows management of the mutation configuration using functional options.
+type datafinOption func(*DataFinMutation)
+
+// newDataFinMutation creates new mutation for the DataFin entity.
+func newDataFinMutation(c config, op Op, opts ...datafinOption) *DataFinMutation {
+	m := &DataFinMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeDataFin,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withDataFinID sets the ID field of the mutation.
+func withDataFinID(id uuid.UUID) datafinOption {
+	return func(m *DataFinMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *DataFin
+		)
+		m.oldValue = func(ctx context.Context) (*DataFin, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().DataFin.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withDataFin sets the old DataFin of the mutation.
+func withDataFin(node *DataFin) datafinOption {
+	return func(m *DataFinMutation) {
+		m.oldValue = func(context.Context) (*DataFin, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m DataFinMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m DataFinMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of DataFin entities.
+func (m *DataFinMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *DataFinMutation) ID() (id uuid.UUID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *DataFinMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uuid.UUID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().DataFin.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *DataFinMutation) SetCreatedAt(u uint32) {
+	m.created_at = &u
+	m.addcreated_at = nil
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *DataFinMutation) CreatedAt() (r uint32, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the DataFin entity.
+// If the DataFin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DataFinMutation) OldCreatedAt(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// AddCreatedAt adds u to the "created_at" field.
+func (m *DataFinMutation) AddCreatedAt(u int32) {
+	if m.addcreated_at != nil {
+		*m.addcreated_at += u
+	} else {
+		m.addcreated_at = &u
+	}
+}
+
+// AddedCreatedAt returns the value that was added to the "created_at" field in this mutation.
+func (m *DataFinMutation) AddedCreatedAt() (r int32, exists bool) {
+	v := m.addcreated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *DataFinMutation) ResetCreatedAt() {
+	m.created_at = nil
+	m.addcreated_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *DataFinMutation) SetUpdatedAt(u uint32) {
+	m.updated_at = &u
+	m.addupdated_at = nil
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *DataFinMutation) UpdatedAt() (r uint32, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the DataFin entity.
+// If the DataFin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DataFinMutation) OldUpdatedAt(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// AddUpdatedAt adds u to the "updated_at" field.
+func (m *DataFinMutation) AddUpdatedAt(u int32) {
+	if m.addupdated_at != nil {
+		*m.addupdated_at += u
+	} else {
+		m.addupdated_at = &u
+	}
+}
+
+// AddedUpdatedAt returns the value that was added to the "updated_at" field in this mutation.
+func (m *DataFinMutation) AddedUpdatedAt() (r int32, exists bool) {
+	v := m.addupdated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *DataFinMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+	m.addupdated_at = nil
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *DataFinMutation) SetDeletedAt(u uint32) {
+	m.deleted_at = &u
+	m.adddeleted_at = nil
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *DataFinMutation) DeletedAt() (r uint32, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the DataFin entity.
+// If the DataFin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DataFinMutation) OldDeletedAt(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// AddDeletedAt adds u to the "deleted_at" field.
+func (m *DataFinMutation) AddDeletedAt(u int32) {
+	if m.adddeleted_at != nil {
+		*m.adddeleted_at += u
+	} else {
+		m.adddeleted_at = &u
+	}
+}
+
+// AddedDeletedAt returns the value that was added to the "deleted_at" field in this mutation.
+func (m *DataFinMutation) AddedDeletedAt() (r int32, exists bool) {
+	v := m.adddeleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *DataFinMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	m.adddeleted_at = nil
+}
+
+// SetTopicID sets the "topic_id" field.
+func (m *DataFinMutation) SetTopicID(s string) {
+	m.topic_id = &s
+}
+
+// TopicID returns the value of the "topic_id" field in the mutation.
+func (m *DataFinMutation) TopicID() (r string, exists bool) {
+	v := m.topic_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTopicID returns the old "topic_id" field's value of the DataFin entity.
+// If the DataFin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DataFinMutation) OldTopicID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTopicID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTopicID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTopicID: %w", err)
+	}
+	return oldValue.TopicID, nil
+}
+
+// ResetTopicID resets all changes to the "topic_id" field.
+func (m *DataFinMutation) ResetTopicID() {
+	m.topic_id = nil
+}
+
+// SetDataID sets the "data_id" field.
+func (m *DataFinMutation) SetDataID(s string) {
+	m.data_id = &s
+}
+
+// DataID returns the value of the "data_id" field in the mutation.
+func (m *DataFinMutation) DataID() (r string, exists bool) {
+	v := m.data_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDataID returns the old "data_id" field's value of the DataFin entity.
+// If the DataFin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DataFinMutation) OldDataID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDataID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDataID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDataID: %w", err)
+	}
+	return oldValue.DataID, nil
+}
+
+// ResetDataID resets all changes to the "data_id" field.
+func (m *DataFinMutation) ResetDataID() {
+	m.data_id = nil
+}
+
+// SetDatafin sets the "datafin" field.
+func (m *DataFinMutation) SetDatafin(s string) {
+	m.datafin = &s
+}
+
+// Datafin returns the value of the "datafin" field in the mutation.
+func (m *DataFinMutation) Datafin() (r string, exists bool) {
+	v := m.datafin
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDatafin returns the old "datafin" field's value of the DataFin entity.
+// If the DataFin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DataFinMutation) OldDatafin(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDatafin is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDatafin requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDatafin: %w", err)
+	}
+	return oldValue.Datafin, nil
+}
+
+// ResetDatafin resets all changes to the "datafin" field.
+func (m *DataFinMutation) ResetDatafin() {
+	m.datafin = nil
+}
+
+// SetTxTime sets the "tx_time" field.
+func (m *DataFinMutation) SetTxTime(u uint32) {
+	m.tx_time = &u
+	m.addtx_time = nil
+}
+
+// TxTime returns the value of the "tx_time" field in the mutation.
+func (m *DataFinMutation) TxTime() (r uint32, exists bool) {
+	v := m.tx_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTxTime returns the old "tx_time" field's value of the DataFin entity.
+// If the DataFin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DataFinMutation) OldTxTime(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTxTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTxTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTxTime: %w", err)
+	}
+	return oldValue.TxTime, nil
+}
+
+// AddTxTime adds u to the "tx_time" field.
+func (m *DataFinMutation) AddTxTime(u int32) {
+	if m.addtx_time != nil {
+		*m.addtx_time += u
+	} else {
+		m.addtx_time = &u
+	}
+}
+
+// AddedTxTime returns the value that was added to the "tx_time" field in this mutation.
+func (m *DataFinMutation) AddedTxTime() (r int32, exists bool) {
+	v := m.addtx_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearTxTime clears the value of the "tx_time" field.
+func (m *DataFinMutation) ClearTxTime() {
+	m.tx_time = nil
+	m.addtx_time = nil
+	m.clearedFields[datafin.FieldTxTime] = struct{}{}
+}
+
+// TxTimeCleared returns if the "tx_time" field was cleared in this mutation.
+func (m *DataFinMutation) TxTimeCleared() bool {
+	_, ok := m.clearedFields[datafin.FieldTxTime]
+	return ok
+}
+
+// ResetTxTime resets all changes to the "tx_time" field.
+func (m *DataFinMutation) ResetTxTime() {
+	m.tx_time = nil
+	m.addtx_time = nil
+	delete(m.clearedFields, datafin.FieldTxTime)
+}
+
+// SetTxHash sets the "tx_hash" field.
+func (m *DataFinMutation) SetTxHash(s string) {
+	m.tx_hash = &s
+}
+
+// TxHash returns the value of the "tx_hash" field in the mutation.
+func (m *DataFinMutation) TxHash() (r string, exists bool) {
+	v := m.tx_hash
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTxHash returns the old "tx_hash" field's value of the DataFin entity.
+// If the DataFin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DataFinMutation) OldTxHash(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTxHash is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTxHash requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTxHash: %w", err)
+	}
+	return oldValue.TxHash, nil
+}
+
+// ClearTxHash clears the value of the "tx_hash" field.
+func (m *DataFinMutation) ClearTxHash() {
+	m.tx_hash = nil
+	m.clearedFields[datafin.FieldTxHash] = struct{}{}
+}
+
+// TxHashCleared returns if the "tx_hash" field was cleared in this mutation.
+func (m *DataFinMutation) TxHashCleared() bool {
+	_, ok := m.clearedFields[datafin.FieldTxHash]
+	return ok
+}
+
+// ResetTxHash resets all changes to the "tx_hash" field.
+func (m *DataFinMutation) ResetTxHash() {
+	m.tx_hash = nil
+	delete(m.clearedFields, datafin.FieldTxHash)
+}
+
+// SetBlockHeight sets the "block_height" field.
+func (m *DataFinMutation) SetBlockHeight(u uint64) {
+	m.block_height = &u
+	m.addblock_height = nil
+}
+
+// BlockHeight returns the value of the "block_height" field in the mutation.
+func (m *DataFinMutation) BlockHeight() (r uint64, exists bool) {
+	v := m.block_height
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBlockHeight returns the old "block_height" field's value of the DataFin entity.
+// If the DataFin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DataFinMutation) OldBlockHeight(ctx context.Context) (v uint64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBlockHeight is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBlockHeight requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBlockHeight: %w", err)
+	}
+	return oldValue.BlockHeight, nil
+}
+
+// AddBlockHeight adds u to the "block_height" field.
+func (m *DataFinMutation) AddBlockHeight(u int64) {
+	if m.addblock_height != nil {
+		*m.addblock_height += u
+	} else {
+		m.addblock_height = &u
+	}
+}
+
+// AddedBlockHeight returns the value that was added to the "block_height" field in this mutation.
+func (m *DataFinMutation) AddedBlockHeight() (r int64, exists bool) {
+	v := m.addblock_height
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearBlockHeight clears the value of the "block_height" field.
+func (m *DataFinMutation) ClearBlockHeight() {
+	m.block_height = nil
+	m.addblock_height = nil
+	m.clearedFields[datafin.FieldBlockHeight] = struct{}{}
+}
+
+// BlockHeightCleared returns if the "block_height" field was cleared in this mutation.
+func (m *DataFinMutation) BlockHeightCleared() bool {
+	_, ok := m.clearedFields[datafin.FieldBlockHeight]
+	return ok
+}
+
+// ResetBlockHeight resets all changes to the "block_height" field.
+func (m *DataFinMutation) ResetBlockHeight() {
+	m.block_height = nil
+	m.addblock_height = nil
+	delete(m.clearedFields, datafin.FieldBlockHeight)
+}
+
+// SetState sets the "state" field.
+func (m *DataFinMutation) SetState(s string) {
+	m.state = &s
+}
+
+// State returns the value of the "state" field in the mutation.
+func (m *DataFinMutation) State() (r string, exists bool) {
+	v := m.state
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldState returns the old "state" field's value of the DataFin entity.
+// If the DataFin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DataFinMutation) OldState(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldState is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldState requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldState: %w", err)
+	}
+	return oldValue.State, nil
+}
+
+// ResetState resets all changes to the "state" field.
+func (m *DataFinMutation) ResetState() {
+	m.state = nil
+}
+
+// SetRetries sets the "retries" field.
+func (m *DataFinMutation) SetRetries(u uint32) {
+	m.retries = &u
+	m.addretries = nil
+}
+
+// Retries returns the value of the "retries" field in the mutation.
+func (m *DataFinMutation) Retries() (r uint32, exists bool) {
+	v := m.retries
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRetries returns the old "retries" field's value of the DataFin entity.
+// If the DataFin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DataFinMutation) OldRetries(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRetries is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRetries requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRetries: %w", err)
+	}
+	return oldValue.Retries, nil
+}
+
+// AddRetries adds u to the "retries" field.
+func (m *DataFinMutation) AddRetries(u int32) {
+	if m.addretries != nil {
+		*m.addretries += u
+	} else {
+		m.addretries = &u
+	}
+}
+
+// AddedRetries returns the value that was added to the "retries" field in this mutation.
+func (m *DataFinMutation) AddedRetries() (r int32, exists bool) {
+	v := m.addretries
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetRetries resets all changes to the "retries" field.
+func (m *DataFinMutation) ResetRetries() {
+	m.retries = nil
+	m.addretries = nil
+}
+
+// SetRemark sets the "remark" field.
+func (m *DataFinMutation) SetRemark(s string) {
+	m.remark = &s
+}
+
+// Remark returns the value of the "remark" field in the mutation.
+func (m *DataFinMutation) Remark() (r string, exists bool) {
+	v := m.remark
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRemark returns the old "remark" field's value of the DataFin entity.
+// If the DataFin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DataFinMutation) OldRemark(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRemark is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRemark requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRemark: %w", err)
+	}
+	return oldValue.Remark, nil
+}
+
+// ClearRemark clears the value of the "remark" field.
+func (m *DataFinMutation) ClearRemark() {
+	m.remark = nil
+	m.clearedFields[datafin.FieldRemark] = struct{}{}
+}
+
+// RemarkCleared returns if the "remark" field was cleared in this mutation.
+func (m *DataFinMutation) RemarkCleared() bool {
+	_, ok := m.clearedFields[datafin.FieldRemark]
+	return ok
+}
+
+// ResetRemark resets all changes to the "remark" field.
+func (m *DataFinMutation) ResetRemark() {
+	m.remark = nil
+	delete(m.clearedFields, datafin.FieldRemark)
+}
+
+// Where appends a list predicates to the DataFinMutation builder.
+func (m *DataFinMutation) Where(ps ...predicate.DataFin) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *DataFinMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (DataFin).
+func (m *DataFinMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *DataFinMutation) Fields() []string {
+	fields := make([]string, 0, 12)
+	if m.created_at != nil {
+		fields = append(fields, datafin.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, datafin.FieldUpdatedAt)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, datafin.FieldDeletedAt)
+	}
+	if m.topic_id != nil {
+		fields = append(fields, datafin.FieldTopicID)
+	}
+	if m.data_id != nil {
+		fields = append(fields, datafin.FieldDataID)
+	}
+	if m.datafin != nil {
+		fields = append(fields, datafin.FieldDatafin)
+	}
+	if m.tx_time != nil {
+		fields = append(fields, datafin.FieldTxTime)
+	}
+	if m.tx_hash != nil {
+		fields = append(fields, datafin.FieldTxHash)
+	}
+	if m.block_height != nil {
+		fields = append(fields, datafin.FieldBlockHeight)
+	}
+	if m.state != nil {
+		fields = append(fields, datafin.FieldState)
+	}
+	if m.retries != nil {
+		fields = append(fields, datafin.FieldRetries)
+	}
+	if m.remark != nil {
+		fields = append(fields, datafin.FieldRemark)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *DataFinMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case datafin.FieldCreatedAt:
+		return m.CreatedAt()
+	case datafin.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case datafin.FieldDeletedAt:
+		return m.DeletedAt()
+	case datafin.FieldTopicID:
+		return m.TopicID()
+	case datafin.FieldDataID:
+		return m.DataID()
+	case datafin.FieldDatafin:
+		return m.Datafin()
+	case datafin.FieldTxTime:
+		return m.TxTime()
+	case datafin.FieldTxHash:
+		return m.TxHash()
+	case datafin.FieldBlockHeight:
+		return m.BlockHeight()
+	case datafin.FieldState:
+		return m.State()
+	case datafin.FieldRetries:
+		return m.Retries()
+	case datafin.FieldRemark:
+		return m.Remark()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *DataFinMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case datafin.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case datafin.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case datafin.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case datafin.FieldTopicID:
+		return m.OldTopicID(ctx)
+	case datafin.FieldDataID:
+		return m.OldDataID(ctx)
+	case datafin.FieldDatafin:
+		return m.OldDatafin(ctx)
+	case datafin.FieldTxTime:
+		return m.OldTxTime(ctx)
+	case datafin.FieldTxHash:
+		return m.OldTxHash(ctx)
+	case datafin.FieldBlockHeight:
+		return m.OldBlockHeight(ctx)
+	case datafin.FieldState:
+		return m.OldState(ctx)
+	case datafin.FieldRetries:
+		return m.OldRetries(ctx)
+	case datafin.FieldRemark:
+		return m.OldRemark(ctx)
+	}
+	return nil, fmt.Errorf("unknown DataFin field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *DataFinMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case datafin.FieldCreatedAt:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case datafin.FieldUpdatedAt:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case datafin.FieldDeletedAt:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case datafin.FieldTopicID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTopicID(v)
+		return nil
+	case datafin.FieldDataID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDataID(v)
+		return nil
+	case datafin.FieldDatafin:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDatafin(v)
+		return nil
+	case datafin.FieldTxTime:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTxTime(v)
+		return nil
+	case datafin.FieldTxHash:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTxHash(v)
+		return nil
+	case datafin.FieldBlockHeight:
+		v, ok := value.(uint64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBlockHeight(v)
+		return nil
+	case datafin.FieldState:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetState(v)
+		return nil
+	case datafin.FieldRetries:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRetries(v)
+		return nil
+	case datafin.FieldRemark:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRemark(v)
+		return nil
+	}
+	return fmt.Errorf("unknown DataFin field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *DataFinMutation) AddedFields() []string {
+	var fields []string
+	if m.addcreated_at != nil {
+		fields = append(fields, datafin.FieldCreatedAt)
+	}
+	if m.addupdated_at != nil {
+		fields = append(fields, datafin.FieldUpdatedAt)
+	}
+	if m.adddeleted_at != nil {
+		fields = append(fields, datafin.FieldDeletedAt)
+	}
+	if m.addtx_time != nil {
+		fields = append(fields, datafin.FieldTxTime)
+	}
+	if m.addblock_height != nil {
+		fields = append(fields, datafin.FieldBlockHeight)
+	}
+	if m.addretries != nil {
+		fields = append(fields, datafin.FieldRetries)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *DataFinMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case datafin.FieldCreatedAt:
+		return m.AddedCreatedAt()
+	case datafin.FieldUpdatedAt:
+		return m.AddedUpdatedAt()
+	case datafin.FieldDeletedAt:
+		return m.AddedDeletedAt()
+	case datafin.FieldTxTime:
+		return m.AddedTxTime()
+	case datafin.FieldBlockHeight:
+		return m.AddedBlockHeight()
+	case datafin.FieldRetries:
+		return m.AddedRetries()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *DataFinMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case datafin.FieldCreatedAt:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCreatedAt(v)
+		return nil
+	case datafin.FieldUpdatedAt:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUpdatedAt(v)
+		return nil
+	case datafin.FieldDeletedAt:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDeletedAt(v)
+		return nil
+	case datafin.FieldTxTime:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTxTime(v)
+		return nil
+	case datafin.FieldBlockHeight:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddBlockHeight(v)
+		return nil
+	case datafin.FieldRetries:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRetries(v)
+		return nil
+	}
+	return fmt.Errorf("unknown DataFin numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *DataFinMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(datafin.FieldTxTime) {
+		fields = append(fields, datafin.FieldTxTime)
+	}
+	if m.FieldCleared(datafin.FieldTxHash) {
+		fields = append(fields, datafin.FieldTxHash)
+	}
+	if m.FieldCleared(datafin.FieldBlockHeight) {
+		fields = append(fields, datafin.FieldBlockHeight)
+	}
+	if m.FieldCleared(datafin.FieldRemark) {
+		fields = append(fields, datafin.FieldRemark)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *DataFinMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *DataFinMutation) ClearField(name string) error {
+	switch name {
+	case datafin.FieldTxTime:
+		m.ClearTxTime()
+		return nil
+	case datafin.FieldTxHash:
+		m.ClearTxHash()
+		return nil
+	case datafin.FieldBlockHeight:
+		m.ClearBlockHeight()
+		return nil
+	case datafin.FieldRemark:
+		m.ClearRemark()
+		return nil
+	}
+	return fmt.Errorf("unknown DataFin nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *DataFinMutation) ResetField(name string) error {
+	switch name {
+	case datafin.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case datafin.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case datafin.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case datafin.FieldTopicID:
+		m.ResetTopicID()
+		return nil
+	case datafin.FieldDataID:
+		m.ResetDataID()
+		return nil
+	case datafin.FieldDatafin:
+		m.ResetDatafin()
+		return nil
+	case datafin.FieldTxTime:
+		m.ResetTxTime()
+		return nil
+	case datafin.FieldTxHash:
+		m.ResetTxHash()
+		return nil
+	case datafin.FieldBlockHeight:
+		m.ResetBlockHeight()
+		return nil
+	case datafin.FieldState:
+		m.ResetState()
+		return nil
+	case datafin.FieldRetries:
+		m.ResetRetries()
+		return nil
+	case datafin.FieldRemark:
+		m.ResetRemark()
+		return nil
+	}
+	return fmt.Errorf("unknown DataFin field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *DataFinMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *DataFinMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *DataFinMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *DataFinMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *DataFinMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *DataFinMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *DataFinMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown DataFin unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *DataFinMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown DataFin edge %s", name)
+}
 
 // TopicMutation represents an operation that mutates the Topic nodes in the graph.
 type TopicMutation struct {

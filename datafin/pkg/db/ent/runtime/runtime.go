@@ -6,6 +6,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"yun.tea/block/bright/datafin/pkg/db/ent/datafin"
 	"yun.tea/block/bright/datafin/pkg/db/ent/schema"
 	"yun.tea/block/bright/datafin/pkg/db/ent/topic"
 
@@ -17,6 +18,38 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	datafinMixin := schema.DataFin{}.Mixin()
+	datafin.Policy = privacy.NewPolicies(datafinMixin[0], schema.DataFin{})
+	datafin.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := datafin.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	datafinMixinFields0 := datafinMixin[0].Fields()
+	_ = datafinMixinFields0
+	datafinFields := schema.DataFin{}.Fields()
+	_ = datafinFields
+	// datafinDescCreatedAt is the schema descriptor for created_at field.
+	datafinDescCreatedAt := datafinMixinFields0[0].Descriptor()
+	// datafin.DefaultCreatedAt holds the default value on creation for the created_at field.
+	datafin.DefaultCreatedAt = datafinDescCreatedAt.Default.(func() uint32)
+	// datafinDescUpdatedAt is the schema descriptor for updated_at field.
+	datafinDescUpdatedAt := datafinMixinFields0[1].Descriptor()
+	// datafin.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	datafin.DefaultUpdatedAt = datafinDescUpdatedAt.Default.(func() uint32)
+	// datafin.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	datafin.UpdateDefaultUpdatedAt = datafinDescUpdatedAt.UpdateDefault.(func() uint32)
+	// datafinDescDeletedAt is the schema descriptor for deleted_at field.
+	datafinDescDeletedAt := datafinMixinFields0[2].Descriptor()
+	// datafin.DefaultDeletedAt holds the default value on creation for the deleted_at field.
+	datafin.DefaultDeletedAt = datafinDescDeletedAt.Default.(func() uint32)
+	// datafinDescID is the schema descriptor for id field.
+	datafinDescID := datafinFields[0].Descriptor()
+	// datafin.DefaultID holds the default value on creation for the id field.
+	datafin.DefaultID = datafinDescID.Default.(func() uuid.UUID)
 	topicMixin := schema.Topic{}.Mixin()
 	topic.Policy = privacy.NewPolicies(topicMixin[0], schema.Topic{})
 	topic.Hooks[0] = func(next ent.Mutator) ent.Mutator {

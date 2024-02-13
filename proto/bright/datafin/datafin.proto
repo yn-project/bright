@@ -35,32 +35,57 @@ service Manager {
   }
 }
 
+message DataFinReq{
+  optional string       DataID = 10  [json_name="dataID"]; 
+  optional string       DataFinID = 20  [json_name="dataFinID"]; 
+  optional string       TopicID = 30  [json_name="topicID"]; 
+  optional string       DataFin = 40  [json_name="dataFin"];    
+  optional uint32       TxTime = 50  [json_name="txTime"];      
+  optional string       TxHash = 60  [json_name="txHash"];       
+  optional uint64       BlockHeight = 70  [json_name="blockHeight"];  
+  optional uint32       Retries = 80  [json_name="retries"];  
+  optional DataFinState State = 90  [json_name="state"];
+}
+
+message Conds {
+  bright.StringVal DataID = 10;
+  bright.StringVal DataFinID = 20;
+  bright.StringVal TopicID = 30;
+  bright.StringVal DataFin = 40;
+  bright.Uint32Val TxTime = 50;
+  bright.StringVal TxHash = 60;
+  bright.Uint64Val BlockHeight = 70;
+  bright.Uint32Val Retries = 80;
+  bright.StringVal State = 90;
+  bright.StringSliceVal IDs = 100;
+}
+
 message CreateDataFinRequest{
-  string        TopicID = 10;
-  DataType      Type = 20;
-  repeated DataItemReq Infos = 30;
+  string        TopicID = 10 [json_name="topicID"];
+  DataType      Type = 20 [json_name="type"];
+  repeated DataItemReq Infos = 30 [json_name="infos"];
 }
 
 message CreateDataFinResponse{
-  repeated DataItemResp Infos = 10;
+  repeated DataFinInfo Infos = 10 [json_name="infos"];
 }
 
 message DataItemReq{
-  string DataID = 10;
-  bytes  Data = 20;
+  string DataID = 10 [json_name="dataID"];
+  bytes  Data = 20 [json_name="data"];
 }
 
-message DataItemResp{
-  string       DataID = 10; 
-  string       DataFinID = 20; 
-  string       TopicID = 30; 
-  string       DataFin = 40;    
-  uint32       TxTime = 50;      
-  string       TxHash = 60;       
-  uint64       BlockHeight = 70;  
-  DataFinState State = 80;       
-  uint32       CreatedAt = 90; 
-  uint32       UpdatedAt = 100; 
+message DataFinInfo{
+  string       DataID = 10  [json_name="dataID"]; 
+  string       DataFinID = 20  [json_name="dataFinID"]; 
+  string       TopicID = 30  [json_name="topicID"]; 
+  string       DataFin = 40  [json_name="dataFin"];    
+  uint32       TxTime = 50  [json_name="txTime"];      
+  string       TxHash = 60  [json_name="txHash"];       
+  uint64       BlockHeight = 70  [json_name="blockHeight"];  
+  DataFinState State = 80  [json_name="state"];       
+  uint32       CreatedAt = 90  [json_name="createdAt"]; 
+  uint32       UpdatedAt = 100  [json_name="updatedAt"]; 
 }
 
 enum DataType{
@@ -77,31 +102,31 @@ enum DataFinState{
 }
 
 message GetDataFinsRequest{
-  string   TopicID = 10; 
-  repeated string DataFinIDs = 20; 
+  string   TopicID = 10 [json_name="topicID"]; 
+  repeated string DataFinIDs = 20 [json_name="dataFinIDs"]; 
 }
 
 message GetDataFinsResponse{
-  repeated DataItemResp Infos = 10; 
+  repeated DataFinInfo Infos = 10 [json_name="infos"]; 
 }
 
 
 message CheckDataFinRequest{
-  string TopicID = 10; 
-  optional string DataID = 20;  
-  optional string DataFin = 30;   
+  string TopicID = 10  [json_name="topicID"]; 
+  optional string DataID = 20  [json_name="dataID"];  
+  optional string DataFin = 30  [json_name="dataFin"];   
 }
 
 message CheckDataFinResponse{
-  string TopicID = 10; 
-  string OnChainDataFin = 20;  
-  string TxTime = 30;   
-  bool   Passed = 40;   
+  string TopicID = 10 [json_name="topicID"]; 
+  string OnChainDataFin = 20 [json_name="onChainDataFin"];  
+  string TxTime = 30 [json_name="txTime"];   
+  bool   Passed = 40 [json_name="passed"];   
 }
 
 message CheckDataFinWithDataRequest{
-  string   TopicID = 10; 
-  string   DataID = 20;  
-  DataType Type = 30;   
-  bytes    Data = 40;   
+  string   TopicID = 10  [json_name="topicID"]; 
+  string   DataID = 20  [json_name="dataID"];  
+  DataType Type = 30  [json_name="type"];   
+  bytes    Data = 40  [json_name="data"];   
 }

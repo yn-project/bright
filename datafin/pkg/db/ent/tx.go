@@ -14,6 +14,8 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// DataFin is the client for interacting with the DataFin builders.
+	DataFin *DataFinClient
 	// Topic is the client for interacting with the Topic builders.
 	Topic *TopicClient
 
@@ -151,6 +153,7 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.DataFin = NewDataFinClient(tx.config)
 	tx.Topic = NewTopicClient(tx.config)
 }
 
@@ -161,7 +164,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Topic.QueryXXX(), the query will be executed
+// applies a query, for example: DataFin.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

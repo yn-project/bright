@@ -8,6 +8,35 @@ import (
 )
 
 var (
+	// DataFinsColumns holds the columns for the "data_fins" table.
+	DataFinsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "created_at", Type: field.TypeUint32},
+		{Name: "updated_at", Type: field.TypeUint32},
+		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "topic_id", Type: field.TypeString},
+		{Name: "data_id", Type: field.TypeString},
+		{Name: "datafin", Type: field.TypeString},
+		{Name: "tx_time", Type: field.TypeUint32, Nullable: true},
+		{Name: "tx_hash", Type: field.TypeString, Nullable: true},
+		{Name: "block_height", Type: field.TypeUint64, Nullable: true},
+		{Name: "state", Type: field.TypeString},
+		{Name: "retries", Type: field.TypeUint32},
+		{Name: "remark", Type: field.TypeString, Nullable: true},
+	}
+	// DataFinsTable holds the schema information for the "data_fins" table.
+	DataFinsTable = &schema.Table{
+		Name:       "data_fins",
+		Columns:    DataFinsColumns,
+		PrimaryKey: []*schema.Column{DataFinsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "datafin_topic_id_data_id",
+				Unique:  false,
+				Columns: []*schema.Column{DataFinsColumns[4], DataFinsColumns[5]},
+			},
+		},
+	}
 	// TopicsColumns holds the columns for the "topics" table.
 	TopicsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
@@ -36,6 +65,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		DataFinsTable,
 		TopicsTable,
 	}
 )

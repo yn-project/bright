@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"yun.tea/block/bright/datafin/pkg/db/ent/datafin"
 	"yun.tea/block/bright/datafin/pkg/db/ent/topic"
 
 	"entgo.io/ent/dialect/sql"
@@ -13,8 +14,33 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 1)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 2)}
 	graph.Nodes[0] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   datafin.Table,
+			Columns: datafin.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeUUID,
+				Column: datafin.FieldID,
+			},
+		},
+		Type: "DataFin",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			datafin.FieldCreatedAt:   {Type: field.TypeUint32, Column: datafin.FieldCreatedAt},
+			datafin.FieldUpdatedAt:   {Type: field.TypeUint32, Column: datafin.FieldUpdatedAt},
+			datafin.FieldDeletedAt:   {Type: field.TypeUint32, Column: datafin.FieldDeletedAt},
+			datafin.FieldTopicID:     {Type: field.TypeString, Column: datafin.FieldTopicID},
+			datafin.FieldDataID:      {Type: field.TypeString, Column: datafin.FieldDataID},
+			datafin.FieldDatafin:     {Type: field.TypeString, Column: datafin.FieldDatafin},
+			datafin.FieldTxTime:      {Type: field.TypeUint32, Column: datafin.FieldTxTime},
+			datafin.FieldTxHash:      {Type: field.TypeString, Column: datafin.FieldTxHash},
+			datafin.FieldBlockHeight: {Type: field.TypeUint64, Column: datafin.FieldBlockHeight},
+			datafin.FieldState:       {Type: field.TypeString, Column: datafin.FieldState},
+			datafin.FieldRetries:     {Type: field.TypeUint32, Column: datafin.FieldRetries},
+			datafin.FieldRemark:      {Type: field.TypeString, Column: datafin.FieldRemark},
+		},
+	}
+	graph.Nodes[1] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   topic.Table,
 			Columns: topic.Columns,
@@ -46,6 +72,106 @@ type predicateAdder interface {
 }
 
 // addPredicate implements the predicateAdder interface.
+func (dfq *DataFinQuery) addPredicate(pred func(s *sql.Selector)) {
+	dfq.predicates = append(dfq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the DataFinQuery builder.
+func (dfq *DataFinQuery) Filter() *DataFinFilter {
+	return &DataFinFilter{config: dfq.config, predicateAdder: dfq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *DataFinMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the DataFinMutation builder.
+func (m *DataFinMutation) Filter() *DataFinFilter {
+	return &DataFinFilter{config: m.config, predicateAdder: m}
+}
+
+// DataFinFilter provides a generic filtering capability at runtime for DataFinQuery.
+type DataFinFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *DataFinFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[0].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql [16]byte predicate on the id field.
+func (f *DataFinFilter) WhereID(p entql.ValueP) {
+	f.Where(p.Field(datafin.FieldID))
+}
+
+// WhereCreatedAt applies the entql uint32 predicate on the created_at field.
+func (f *DataFinFilter) WhereCreatedAt(p entql.Uint32P) {
+	f.Where(p.Field(datafin.FieldCreatedAt))
+}
+
+// WhereUpdatedAt applies the entql uint32 predicate on the updated_at field.
+func (f *DataFinFilter) WhereUpdatedAt(p entql.Uint32P) {
+	f.Where(p.Field(datafin.FieldUpdatedAt))
+}
+
+// WhereDeletedAt applies the entql uint32 predicate on the deleted_at field.
+func (f *DataFinFilter) WhereDeletedAt(p entql.Uint32P) {
+	f.Where(p.Field(datafin.FieldDeletedAt))
+}
+
+// WhereTopicID applies the entql string predicate on the topic_id field.
+func (f *DataFinFilter) WhereTopicID(p entql.StringP) {
+	f.Where(p.Field(datafin.FieldTopicID))
+}
+
+// WhereDataID applies the entql string predicate on the data_id field.
+func (f *DataFinFilter) WhereDataID(p entql.StringP) {
+	f.Where(p.Field(datafin.FieldDataID))
+}
+
+// WhereDatafin applies the entql string predicate on the datafin field.
+func (f *DataFinFilter) WhereDatafin(p entql.StringP) {
+	f.Where(p.Field(datafin.FieldDatafin))
+}
+
+// WhereTxTime applies the entql uint32 predicate on the tx_time field.
+func (f *DataFinFilter) WhereTxTime(p entql.Uint32P) {
+	f.Where(p.Field(datafin.FieldTxTime))
+}
+
+// WhereTxHash applies the entql string predicate on the tx_hash field.
+func (f *DataFinFilter) WhereTxHash(p entql.StringP) {
+	f.Where(p.Field(datafin.FieldTxHash))
+}
+
+// WhereBlockHeight applies the entql uint64 predicate on the block_height field.
+func (f *DataFinFilter) WhereBlockHeight(p entql.Uint64P) {
+	f.Where(p.Field(datafin.FieldBlockHeight))
+}
+
+// WhereState applies the entql string predicate on the state field.
+func (f *DataFinFilter) WhereState(p entql.StringP) {
+	f.Where(p.Field(datafin.FieldState))
+}
+
+// WhereRetries applies the entql uint32 predicate on the retries field.
+func (f *DataFinFilter) WhereRetries(p entql.Uint32P) {
+	f.Where(p.Field(datafin.FieldRetries))
+}
+
+// WhereRemark applies the entql string predicate on the remark field.
+func (f *DataFinFilter) WhereRemark(p entql.StringP) {
+	f.Where(p.Field(datafin.FieldRemark))
+}
+
+// addPredicate implements the predicateAdder interface.
 func (tq *TopicQuery) addPredicate(pred func(s *sql.Selector)) {
 	tq.predicates = append(tq.predicates, pred)
 }
@@ -74,7 +200,7 @@ type TopicFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *TopicFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[0].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[1].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})

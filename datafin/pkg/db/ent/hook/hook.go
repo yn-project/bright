@@ -9,6 +9,19 @@ import (
 	"yun.tea/block/bright/datafin/pkg/db/ent"
 )
 
+// The DataFinFunc type is an adapter to allow the use of ordinary
+// function as DataFin mutator.
+type DataFinFunc func(context.Context, *ent.DataFinMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DataFinFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.DataFinMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DataFinMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The TopicFunc type is an adapter to allow the use of ordinary
 // function as Topic mutator.
 type TopicFunc func(context.Context, *ent.TopicMutation) (ent.Value, error)

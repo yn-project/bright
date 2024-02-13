@@ -150,6 +150,30 @@ func DenyMutationOperationRule(op ent.Op) MutationRule {
 	return OnMutationOperation(rule, op)
 }
 
+// The DataFinQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type DataFinQueryRuleFunc func(context.Context, *ent.DataFinQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f DataFinQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.DataFinQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.DataFinQuery", q)
+}
+
+// The DataFinMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type DataFinMutationRuleFunc func(context.Context, *ent.DataFinMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f DataFinMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.DataFinMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.DataFinMutation", m)
+}
+
 // The TopicQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type TopicQueryRuleFunc func(context.Context, *ent.TopicQuery) error
@@ -209,6 +233,8 @@ var _ QueryMutationRule = FilterFunc(nil)
 
 func queryFilter(q ent.Query) (Filter, error) {
 	switch q := q.(type) {
+	case *ent.DataFinQuery:
+		return q.Filter(), nil
 	case *ent.TopicQuery:
 		return q.Filter(), nil
 	default:
@@ -218,6 +244,8 @@ func queryFilter(q ent.Query) (Filter, error) {
 
 func mutationFilter(m ent.Mutation) (Filter, error) {
 	switch m := m.(type) {
+	case *ent.DataFinMutation:
+		return m.Filter(), nil
 	case *ent.TopicMutation:
 		return m.Filter(), nil
 	default:

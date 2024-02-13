@@ -6,5 +6,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// DataFin is the predicate function for datafin builders.
+type DataFin func(*sql.Selector)
+
 // Topic is the predicate function for topic builders.
 type Topic func(*sql.Selector)
