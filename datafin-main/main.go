@@ -31,6 +31,10 @@ type Fin256Hash struct {
 	data [32]byte
 }
 
+func SumSha256JsonString() *Fin256Hash {
+
+}
+
 func SumSha256Bytes(data []byte) *Fin256Hash {
 	h := sha256.New()
 	h.Write(data)
