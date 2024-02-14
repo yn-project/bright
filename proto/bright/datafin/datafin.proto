@@ -45,6 +45,7 @@ message DataFinReq{
   optional uint64       BlockHeight = 70  [json_name="blockHeight"];  
   optional uint32       Retries = 80  [json_name="retries"];  
   optional DataFinState State = 90  [json_name="state"];
+  optional string       Remark = 100  [json_name="remark"];
 }
 
 message Conds {
@@ -72,7 +73,7 @@ message CreateDataFinResponse{
 
 message DataItemReq{
   string DataID = 10 [json_name="dataID"];
-  bytes  Data = 20 [json_name="data"];
+  string Data = 20 [json_name="data"];
 }
 
 message DataFinInfo{
@@ -84,8 +85,9 @@ message DataFinInfo{
   string       TxHash = 60  [json_name="txHash"];       
   uint64       BlockHeight = 70  [json_name="blockHeight"];  
   DataFinState State = 80  [json_name="state"];       
-  uint32       CreatedAt = 90  [json_name="createdAt"]; 
-  uint32       UpdatedAt = 100  [json_name="updatedAt"]; 
+  string       Remark = 90  [json_name="remark"];       
+  uint32       CreatedAt = 100  [json_name="createdAt"]; 
+  uint32       UpdatedAt = 110  [json_name="updatedAt"]; 
 }
 
 enum DataType{
@@ -128,5 +130,5 @@ message CheckDataFinWithDataRequest{
   string   TopicID = 10  [json_name="topicID"]; 
   string   DataID = 20  [json_name="dataID"];  
   DataType Type = 30  [json_name="type"];   
-  bytes    Data = 40  [json_name="data"];   
+  string    Data = 40  [json_name="data"];   
 }

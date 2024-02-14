@@ -10,7 +10,6 @@ import (
 	"google.golang.org/grpc/status"
 	accountmgr "yun.tea/block/bright/account/pkg/mgr"
 	data_fin "yun.tea/block/bright/common/chains/eth/datafin"
-	"yun.tea/block/bright/common/constant"
 	"yun.tea/block/bright/common/utils"
 	contractmgr "yun.tea/block/bright/contract/pkg/mgr"
 	topicconverter "yun.tea/block/bright/datafin/pkg/converter/topic"
@@ -21,35 +20,25 @@ import (
 
 	"github.com/Vigo-Tea/go-ethereum-ant/accounts/abi/bind"
 	"github.com/Vigo-Tea/go-ethereum-ant/core/types"
-	"github.com/Vigo-Tea/go-ethereum-ant/crypto"
 	"github.com/Vigo-Tea/go-ethereum-ant/ethclient"
 )
 
 func (s *TopicServer) CreateTopic(ctx context.Context, in *proto.CreateTopicRequest) (*proto.CreateTopicResponse, error) {
 	topicID := ""
 	contractAddr := ""
-	err := accountmgr.WithWriteContract(ctx, false, func(ctx context.Context, acc *accountmgr.AccountKey, contract *data_fin.DataFin, cli *ethclient.Client) error {
-		privateKey, err := crypto.HexToECDSA(acc.Pri)
-		if err != nil {
-			return err
-		}
-
+	err := accountmgr.WithWriteContract(ctx, false, func(ctx context.Context, txOpts *bind.TransactOpts, contract *data_fin.DataFin, cli *ethclient.Client) error {
 		var tx *types.Transaction
+		var err error
 		topicID = utils.RandomBase58(8)
-
-		keyedTransctor, err := bind.NewKeyedTransactorWithChainID(privateKey, constant.ChainID)
-		if err != nil {
-			return fmt.Errorf("get eth chainID err: %v", err)
-		}
 
 		switch in.Type {
 		case proto.TopicType_IdType:
 			topicID = fmt.Sprintf("id-%v", topicID)
-			tx, err = contract.CreateIDTopic(keyedTransctor, topicID, in.Name, in.Remark, in.ChangeAble)
+			tx, err = contract.CreateIDTopic(txOpts, topicID, in.Name, in.Remark, in.ChangeAble)
 		case proto.TopicType_OriginalType:
 			in.ChangeAble = false
 			topicID = fmt.Sprintf("or-%v", topicID)
-			tx, err = contract.CreateTopic(keyedTransctor, topicID, in.Name, in.Remark)
+			tx, err = contract.CreateTopic(txOpts, topicID, in.Name, in.Remark)
 		default:
 			return fmt.Errorf("please select a exact topic type")
 		}

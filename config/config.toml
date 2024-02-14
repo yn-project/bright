@@ -36,7 +36,7 @@ address="redis-cluster-headless:6379"
 password=""
 
 [pulsar]
-domain="milvus-pulsar-proxy"
+domain="pulsar-proxy"
 port=6650
 operation-timeout=30
 connection-timeout=30

@@ -14,14 +14,12 @@ import (
 	"google.golang.org/grpc/status"
 
 	data_fin "yun.tea/block/bright/common/chains/eth/datafin"
-	"yun.tea/block/bright/common/constant"
 	"yun.tea/block/bright/common/logger"
 	proto "yun.tea/block/bright/proto/bright/account"
 	"yun.tea/block/bright/proto/bright/basetype"
 
 	"github.com/Vigo-Tea/go-ethereum-ant/accounts/abi/bind"
 	"github.com/Vigo-Tea/go-ethereum-ant/common"
-	"github.com/Vigo-Tea/go-ethereum-ant/crypto"
 	"github.com/Vigo-Tea/go-ethereum-ant/ethclient"
 	"github.com/google/uuid"
 )
@@ -186,17 +184,8 @@ func (s *Server) SetRootAccount(ctx context.Context, in *proto.SetRootAccountReq
 		}, nil
 	}
 
-	err = mgr.WithWriteContract(ctx, true, func(ctx context.Context, acc *mgr.AccountKey, contract *data_fin.DataFin, cli *ethclient.Client) error {
-		priKey, err := crypto.HexToECDSA(acc.Pri)
-		if err != nil {
-			return err
-		}
-		opts, err := bind.NewKeyedTransactorWithChainID(priKey, constant.ChainID)
-		if err != nil {
-			return err
-		}
-
-		_, err = contract.ChangeOwner(opts, common.HexToAddress(info.Address))
+	err = mgr.WithWriteContract(ctx, true, func(ctx context.Context, txOpts *bind.TransactOpts, contract *data_fin.DataFin, cli *ethclient.Client) error {
+		_, err = contract.ChangeOwner(txOpts, common.HexToAddress(info.Address))
 		return err
 	})
 
@@ -249,17 +238,8 @@ func (s *Server) SetAdminAccount(ctx context.Context, in *proto.SetAdminAccountR
 		}, nil
 	}
 
-	err = mgr.WithWriteContract(ctx, true, func(ctx context.Context, acc *mgr.AccountKey, contract *data_fin.DataFin, cli *ethclient.Client) error {
-		priKey, err := crypto.HexToECDSA(acc.Pri)
-		if err != nil {
-			return err
-		}
-		opts, err := bind.NewKeyedTransactorWithChainID(priKey, constant.ChainID)
-		if err != nil {
-			return err
-		}
-
-		_, err = contract.AddAdmin(opts, common.HexToAddress(info.Address), info.Remark)
+	err = mgr.WithWriteContract(ctx, true, func(ctx context.Context, txOpts *bind.TransactOpts, contract *data_fin.DataFin, cli *ethclient.Client) error {
+		_, err = contract.AddAdmin(txOpts, common.HexToAddress(info.Address), info.Remark)
 		return err
 	})
 

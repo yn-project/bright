@@ -6,9 +6,11 @@ import (
 
 	"github.com/Vigo-Tea/go-ethereum-ant/accounts/abi/bind"
 	"github.com/Vigo-Tea/go-ethereum-ant/common"
+	"github.com/Vigo-Tea/go-ethereum-ant/crypto"
 	"github.com/Vigo-Tea/go-ethereum-ant/ethclient"
 	crud "yun.tea/block/bright/account/pkg/crud/account"
 	data_fin "yun.tea/block/bright/common/chains/eth/datafin"
+	"yun.tea/block/bright/common/constant"
 	"yun.tea/block/bright/common/ctredis"
 	"yun.tea/block/bright/common/logger"
 	contractmgr "yun.tea/block/bright/contract/pkg/mgr"
@@ -143,7 +145,7 @@ func GetAllEnableAdmin(ctx context.Context, contractAddr, from common.Address) (
 	return rootAccount, treeAccounts, err
 }
 
-func WithWriteContract(ctx context.Context, needRoot bool, handle func(ctx context.Context, acc *AccountKey, contract *data_fin.DataFin, cli *ethclient.Client) error) error {
+func WithWriteContract(ctx context.Context, needRoot bool, handle func(ctx context.Context, txOpts *bind.TransactOpts, contract *data_fin.DataFin, cli *ethclient.Client) error) error {
 	contractAddr, err := contractmgr.GetContract(ctx)
 	if err != nil {
 		return err
@@ -163,11 +165,21 @@ func WithWriteContract(ctx context.Context, needRoot bool, handle func(ctx conte
 	}
 	defer unlock()
 
+	priKey, err := crypto.HexToECDSA(acc.Pri)
+	if err != nil {
+		return err
+	}
+
+	txOpts, err := bind.NewKeyedTransactorWithChainID(priKey, constant.ChainID)
+	if err != nil {
+		return err
+	}
+
 	return endpointmgr.WithClient(ctx, func(ctx context.Context, cli *ethclient.Client) error {
 		contract, err := data_fin.NewDataFin(*contractAddr, cli)
 		if err != nil {
 			return err
 		}
-		return handle(ctx, acc, contract, cli)
+		return handle(ctx, txOpts, contract, cli)
 	})
 }

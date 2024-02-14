@@ -3,6 +3,7 @@ package datafin
 
 import (
 	"context"
+	"fmt"
 
 	converter "yun.tea/block/bright/datafin/pkg/converter/datafin"
 	crud "yun.tea/block/bright/datafin/pkg/crud/datafin"
@@ -11,6 +12,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"yun.tea/block/bright/common/logger"
+	"yun.tea/block/bright/common/utils"
 	proto "yun.tea/block/bright/proto/bright/datafin"
 	"yun.tea/block/bright/proto/bright/topic"
 
@@ -26,19 +28,35 @@ func (s *DataFinServer) CreateDataFin(ctx context.Context, in *proto.CreateDataF
 
 	reqList := []*proto.DataFinReq{}
 	retries := uint32(0)
+
+	needCompact := false
+	if in.Type == proto.DataType_JsonType {
+		needCompact = true
+	}
+
 	for _, v := range in.Infos {
-		reqList = append(reqList, &proto.DataFinReq{
+		reqItem := &proto.DataFinReq{
 			DataID:  &v.DataID,
 			TopicID: &in.TopicID,
 			Retries: &retries,
-			State:   proto.DataFinState_DataFinStateDefault.Enum(),
-		})
+			State:   proto.DataFinState_DataFinStateProcessing.Enum(),
+		}
+		dfhash, err := utils.SumSha256String(v.Data, needCompact)
+		if err != nil {
+			remark := fmt.Sprintf("parse json string failed, err: %v", err)
+			reqItem.State = proto.DataFinState_DataFinStateFailed.Enum()
+			reqItem.Remark = &remark
+		} else {
+			_dfhash := dfhash.ToHexString()
+			reqItem.DataFin = &_dfhash
+		}
+		reqList = append(reqList, reqItem)
 	}
 
-	crud.CreateBulk(ctx, reqList)
+	infos, err := crud.CreateBulk(ctx, reqList)
 	logger.Sugar().Infof("success to create datafin,name: %v,address: %v", info.Name, info.Address)
 	return &proto.CreateDataFinResponse{
-		Info: converter.Ent2Grpc(info),
+		Infos: converter.Ent2GrpcMany(infos),
 	}, nil
 }
 

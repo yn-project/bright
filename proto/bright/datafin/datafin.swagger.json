@@ -190,8 +190,7 @@
           "$ref": "#/definitions/datafinDataType"
         },
         "Data": {
-          "type": "string",
-          "format": "byte"
+          "type": "string"
         }
       }
     },
@@ -254,6 +253,9 @@
         "State": {
           "$ref": "#/definitions/datafinDataFinState"
         },
+        "Remark": {
+          "type": "string"
+        },
         "CreatedAt": {
           "type": "integer",
           "format": "int64"
@@ -281,8 +283,7 @@
           "type": "string"
         },
         "Data": {
-          "type": "string",
-          "format": "byte"
+          "type": "string"
         }
       }
     },
