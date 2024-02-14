@@ -219,3 +219,7 @@ mycli -uroot -hmysql
 # 外部API调用
 
 明确语意的错误提醒
+
+# json中的Bytes
+
+golang转成json时[]byte类型会用base64编码转换成string

@@ -76,7 +76,7 @@ contract Admin is IAdmin,Owner{
     }
 
     // 添加
-    function AddAdmin(address admin,string memory info)   external  isOwner{
+    function AddAdmin(address admin,string memory info) override external  isOwner{
         require(!adminMap[admin].enable,"cannot change info of admin in using");
         adminMap[admin] = AdminInfo(true,info,true);
         adminArr.push(admin);
@@ -84,13 +84,13 @@ contract Admin is IAdmin,Owner{
     }
 
     // 设置可用性
-    function SetEnableAdmin(address admin,bool enable)  external isOwner{
+    function SetEnableAdmin(address admin,bool enable) override external isOwner{
         require(adminMap[admin].isValid,"cannot change info of unkown admin");
         adminMap[admin].enable=enable;
     }
 
     // 查看可用性
-    function IsAdminEnable(address admin)  external view returns(bool){
+    function IsAdminEnable(address admin) override external view returns(bool){
         return adminMap[admin].enable;
     }
     
@@ -114,7 +114,7 @@ contract Admin is IAdmin,Owner{
     }
 
     // 删除管理员
-    function DeleteAdmin(address admin)  external isOwner{
+    function DeleteAdmin(address admin) override external isOwner{
         require(adminMap[admin].isValid,"cannot delete admin not used");
         delete adminMap[admin];
         adminTotal--;
@@ -156,12 +156,12 @@ contract DataFin is Admin{
 
     // finInfo.id => (sha256=>uinx)
     // mapping(string => mapping(uint256=>uint64)) finKeys;
-    mapping(string => mapping(uint256=>uint256)) finKeys;
+    mapping(string => mapping(uint256=>uint32)) finKeys;
    
     // finInfo.id => ((info.id)=>sha224+uinx32)
     // mapping(string => mapping(uint128=>uint256)) idFinKeys;
     mapping(string => mapping(uint64=>uint256)) idFinKeys;
-    mapping(string => mapping(uint64=>uint256)) idFinKeysTime;
+    mapping(string => mapping(uint64=>uint32)) idFinKeysTime;
 
     string version="DataFin-v1.2.0-with-Admin-Owner";
     
@@ -187,7 +187,7 @@ contract DataFin is Admin{
         idFinInfoArr.push(topicID);
     }
 
-    function AddItems(string memory topicID,uint256[] memory vals)public isAdmin() returns (bool[] memory){
+    function AddItems(string memory topicID,uint32 timestamp,uint256[] memory vals)public isAdmin() returns (bool[] memory){
         require(finInfoMap[topicID].isValid,"topic is not exist");
 
         bool [] memory rets=new bool[](vals.length);
@@ -196,13 +196,13 @@ contract DataFin is Admin{
                 rets[i]=false;
             }else{
                 rets[i]=true;
-                finKeys[topicID][vals[i]]=block.timestamp;
+                finKeys[topicID][vals[i]]=timestamp;
             }
         }
         return rets;
     }
 
-    function AddIDsItems(string memory topicID,uint64[] memory ids,uint256[] memory vals)public isAdmin() returns (bool[] memory){
+    function AddIDsItems(string memory topicID,uint32 timestamp,uint64[] memory ids,uint256[] memory vals)public isAdmin() returns (bool[] memory){
         require(idFinInfoMap[topicID].isValid,"topic is not exist");
         require(ids.length==vals.length,"the lengths of the two are different");
         bool [] memory rets=new bool[](ids.length);
@@ -210,7 +210,7 @@ contract DataFin is Admin{
             if (idFinInfoMap[topicID].ChangeAble){
                 rets[i]=true;
                 idFinKeys[topicID][ids[i]]=vals[i];
-                idFinKeysTime[topicID][ids[i]]=block.timestamp;
+                idFinKeysTime[topicID][ids[i]]=timestamp;
                 continue ;
             }
             if (idFinKeys[topicID][ids[i]] > 0){
@@ -218,7 +218,7 @@ contract DataFin is Admin{
             }else{
                 rets[i]=true;
                 idFinKeys[topicID][ids[i]]=vals[i];
-                idFinKeysTime[topicID][ids[i]]=block.timestamp;
+                idFinKeysTime[topicID][ids[i]]=timestamp;
             }
         }
         return rets;
@@ -258,7 +258,7 @@ contract DataFin is Admin{
         }
     }
 
-    function GetTopics() public returns (FinInfo[] memory) {
+    function GetTopics() view public returns (FinInfo[] memory) {
         FinInfo[] memory rets=new FinInfo[](finInfoArr.length);
         for(uint i=0 ; i< finInfoArr.length; i++){
             rets[i]=finInfoMap[finInfoArr[i]];
@@ -266,7 +266,7 @@ contract DataFin is Admin{
         return rets;
     }
 
-    function GetIDTopics()view public returns (IDFinInfo[] memory) {
+    function GetIDTopics() view public returns (IDFinInfo[] memory) {
         IDFinInfo[] memory rets=new IDFinInfo[](idFinInfoArr.length);
         for(uint i=0 ; i< idFinInfoArr.length; i++){
             rets[i]=idFinInfoMap[idFinInfoArr[i]];

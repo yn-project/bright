@@ -2,10 +2,12 @@ package main
 
 import (
 	"crypto/sha256"
-	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"math/big"
+
+	"github.com/golang/protobuf/jsonpb"
+	"yun.tea/block/bright/proto/bright/datafin"
 )
 
 func main() {
@@ -21,18 +23,8 @@ func main() {
 	// fmt.Println(utils.PrettyStruct(resp))
 	// fmt.Println(err)
 
-	data := []byte("asdfasdfasdf")
-	h := sha256.New()
-	fmt.Println(h.Write(data))
-	sum := h.Sum([]byte{})
-	fmt.Println(string(sum))
-	fmt.Println(len(sum))
-	fmt.Println(base64.RawStdEncoding.EncodeToString(sum))
-
-	u, err := From32Bytes(sum[:])
-	fmt.Println(err)
-	fmt.Println(u.ToHexString())
-	fmt.Println(u.ToBigInt().String())
+	pbM := jsonpb.Marshaler{}
+	fmt.Println(pbM.MarshalToString(&datafin.DataItemReq{DataID: "ssss", Data: []byte("Adfasdf")}))
 }
 
 type Fin256Hash struct {
