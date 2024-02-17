@@ -246,12 +246,12 @@
         "TxHash": {
           "type": "string"
         },
-        "BlockHeight": {
-          "type": "string",
-          "format": "uint64"
-        },
         "State": {
           "$ref": "#/definitions/datafinDataFinState"
+        },
+        "Retries": {
+          "type": "integer",
+          "format": "int64"
         },
         "Remark": {
           "type": "string"
@@ -270,6 +270,7 @@
       "type": "string",
       "enum": [
         "DataFinStateDefault",
+        "DataFinStateOnQueue",
         "DataFinStateProcessing",
         "DataFinStateSeccess",
         "DataFinStateFailed"

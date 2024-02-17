@@ -111,20 +111,6 @@ func (dfc *DataFinCreate) SetNillableTxHash(s *string) *DataFinCreate {
 	return dfc
 }
 
-// SetBlockHeight sets the "block_height" field.
-func (dfc *DataFinCreate) SetBlockHeight(u uint64) *DataFinCreate {
-	dfc.mutation.SetBlockHeight(u)
-	return dfc
-}
-
-// SetNillableBlockHeight sets the "block_height" field if the given value is not nil.
-func (dfc *DataFinCreate) SetNillableBlockHeight(u *uint64) *DataFinCreate {
-	if u != nil {
-		dfc.SetBlockHeight(*u)
-	}
-	return dfc
-}
-
 // SetState sets the "state" field.
 func (dfc *DataFinCreate) SetState(s string) *DataFinCreate {
 	dfc.mutation.SetState(s)
@@ -402,14 +388,6 @@ func (dfc *DataFinCreate) createSpec() (*DataFin, *sqlgraph.CreateSpec) {
 		})
 		_node.TxHash = value
 	}
-	if value, ok := dfc.mutation.BlockHeight(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint64,
-			Value:  value,
-			Column: datafin.FieldBlockHeight,
-		})
-		_node.BlockHeight = value
-	}
 	if value, ok := dfc.mutation.State(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -615,30 +593,6 @@ func (u *DataFinUpsert) UpdateTxHash() *DataFinUpsert {
 // ClearTxHash clears the value of the "tx_hash" field.
 func (u *DataFinUpsert) ClearTxHash() *DataFinUpsert {
 	u.SetNull(datafin.FieldTxHash)
-	return u
-}
-
-// SetBlockHeight sets the "block_height" field.
-func (u *DataFinUpsert) SetBlockHeight(v uint64) *DataFinUpsert {
-	u.Set(datafin.FieldBlockHeight, v)
-	return u
-}
-
-// UpdateBlockHeight sets the "block_height" field to the value that was provided on create.
-func (u *DataFinUpsert) UpdateBlockHeight() *DataFinUpsert {
-	u.SetExcluded(datafin.FieldBlockHeight)
-	return u
-}
-
-// AddBlockHeight adds v to the "block_height" field.
-func (u *DataFinUpsert) AddBlockHeight(v uint64) *DataFinUpsert {
-	u.Add(datafin.FieldBlockHeight, v)
-	return u
-}
-
-// ClearBlockHeight clears the value of the "block_height" field.
-func (u *DataFinUpsert) ClearBlockHeight() *DataFinUpsert {
-	u.SetNull(datafin.FieldBlockHeight)
 	return u
 }
 
@@ -889,34 +843,6 @@ func (u *DataFinUpsertOne) UpdateTxHash() *DataFinUpsertOne {
 func (u *DataFinUpsertOne) ClearTxHash() *DataFinUpsertOne {
 	return u.Update(func(s *DataFinUpsert) {
 		s.ClearTxHash()
-	})
-}
-
-// SetBlockHeight sets the "block_height" field.
-func (u *DataFinUpsertOne) SetBlockHeight(v uint64) *DataFinUpsertOne {
-	return u.Update(func(s *DataFinUpsert) {
-		s.SetBlockHeight(v)
-	})
-}
-
-// AddBlockHeight adds v to the "block_height" field.
-func (u *DataFinUpsertOne) AddBlockHeight(v uint64) *DataFinUpsertOne {
-	return u.Update(func(s *DataFinUpsert) {
-		s.AddBlockHeight(v)
-	})
-}
-
-// UpdateBlockHeight sets the "block_height" field to the value that was provided on create.
-func (u *DataFinUpsertOne) UpdateBlockHeight() *DataFinUpsertOne {
-	return u.Update(func(s *DataFinUpsert) {
-		s.UpdateBlockHeight()
-	})
-}
-
-// ClearBlockHeight clears the value of the "block_height" field.
-func (u *DataFinUpsertOne) ClearBlockHeight() *DataFinUpsertOne {
-	return u.Update(func(s *DataFinUpsert) {
-		s.ClearBlockHeight()
 	})
 }
 
@@ -1339,34 +1265,6 @@ func (u *DataFinUpsertBulk) UpdateTxHash() *DataFinUpsertBulk {
 func (u *DataFinUpsertBulk) ClearTxHash() *DataFinUpsertBulk {
 	return u.Update(func(s *DataFinUpsert) {
 		s.ClearTxHash()
-	})
-}
-
-// SetBlockHeight sets the "block_height" field.
-func (u *DataFinUpsertBulk) SetBlockHeight(v uint64) *DataFinUpsertBulk {
-	return u.Update(func(s *DataFinUpsert) {
-		s.SetBlockHeight(v)
-	})
-}
-
-// AddBlockHeight adds v to the "block_height" field.
-func (u *DataFinUpsertBulk) AddBlockHeight(v uint64) *DataFinUpsertBulk {
-	return u.Update(func(s *DataFinUpsert) {
-		s.AddBlockHeight(v)
-	})
-}
-
-// UpdateBlockHeight sets the "block_height" field to the value that was provided on create.
-func (u *DataFinUpsertBulk) UpdateBlockHeight() *DataFinUpsertBulk {
-	return u.Update(func(s *DataFinUpsert) {
-		s.UpdateBlockHeight()
-	})
-}
-
-// ClearBlockHeight clears the value of the "block_height" field.
-func (u *DataFinUpsertBulk) ClearBlockHeight() *DataFinUpsertBulk {
-	return u.Update(func(s *DataFinUpsert) {
-		s.ClearBlockHeight()
 	})
 }
 

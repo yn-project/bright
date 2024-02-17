@@ -53,9 +53,6 @@ func CreateSet(c *ent.DataFinCreate, in *proto.DataFinReq) *ent.DataFinCreate {
 	if in.TxHash != nil {
 		c.SetTxHash(in.GetTxHash())
 	}
-	if in.BlockHeight != nil {
-		c.SetBlockHeight(in.GetBlockHeight())
-	}
 	if in.Retries != nil {
 		c.SetRetries(in.GetRetries())
 	}
@@ -119,9 +116,6 @@ func UpdateSet(u *ent.DataFinUpdateOne, in *proto.DataFinReq) *ent.DataFinUpdate
 	}
 	if in.TxHash != nil {
 		u.SetTxHash(in.GetTxHash())
-	}
-	if in.BlockHeight != nil {
-		u.SetBlockHeight(in.GetBlockHeight())
 	}
 	if in.Retries != nil {
 		u.SetRetries(in.GetRetries())
@@ -213,14 +207,6 @@ func setQueryConds(conds *proto.Conds, cli *ent.Client) (*ent.DataFinQuery, erro
 			stm.Where(datafin.TxHash(conds.GetTxHash().GetValue()))
 		default:
 			return nil, fmt.Errorf("invalid datafin txhash field")
-		}
-	}
-	if conds.BlockHeight != nil {
-		switch conds.GetBlockHeight().GetOp() {
-		case cruder.EQ:
-			stm.Where(datafin.BlockHeight(conds.GetBlockHeight().GetValue()))
-		default:
-			return nil, fmt.Errorf("invalid datafin blockheight field")
 		}
 	}
 	if conds.Retries != nil {

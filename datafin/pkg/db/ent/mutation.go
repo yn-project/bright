@@ -32,31 +32,29 @@ const (
 // DataFinMutation represents an operation that mutates the DataFin nodes in the graph.
 type DataFinMutation struct {
 	config
-	op              Op
-	typ             string
-	id              *uuid.UUID
-	created_at      *uint32
-	addcreated_at   *int32
-	updated_at      *uint32
-	addupdated_at   *int32
-	deleted_at      *uint32
-	adddeleted_at   *int32
-	topic_id        *string
-	data_id         *string
-	datafin         *string
-	tx_time         *uint32
-	addtx_time      *int32
-	tx_hash         *string
-	block_height    *uint64
-	addblock_height *int64
-	state           *string
-	retries         *uint32
-	addretries      *int32
-	remark          *string
-	clearedFields   map[string]struct{}
-	done            bool
-	oldValue        func(context.Context) (*DataFin, error)
-	predicates      []predicate.DataFin
+	op            Op
+	typ           string
+	id            *uuid.UUID
+	created_at    *uint32
+	addcreated_at *int32
+	updated_at    *uint32
+	addupdated_at *int32
+	deleted_at    *uint32
+	adddeleted_at *int32
+	topic_id      *string
+	data_id       *string
+	datafin       *string
+	tx_time       *uint32
+	addtx_time    *int32
+	tx_hash       *string
+	state         *string
+	retries       *uint32
+	addretries    *int32
+	remark        *string
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*DataFin, error)
+	predicates    []predicate.DataFin
 }
 
 var _ ent.Mutation = (*DataFinMutation)(nil)
@@ -558,76 +556,6 @@ func (m *DataFinMutation) ResetTxHash() {
 	delete(m.clearedFields, datafin.FieldTxHash)
 }
 
-// SetBlockHeight sets the "block_height" field.
-func (m *DataFinMutation) SetBlockHeight(u uint64) {
-	m.block_height = &u
-	m.addblock_height = nil
-}
-
-// BlockHeight returns the value of the "block_height" field in the mutation.
-func (m *DataFinMutation) BlockHeight() (r uint64, exists bool) {
-	v := m.block_height
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldBlockHeight returns the old "block_height" field's value of the DataFin entity.
-// If the DataFin object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DataFinMutation) OldBlockHeight(ctx context.Context) (v uint64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldBlockHeight is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldBlockHeight requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldBlockHeight: %w", err)
-	}
-	return oldValue.BlockHeight, nil
-}
-
-// AddBlockHeight adds u to the "block_height" field.
-func (m *DataFinMutation) AddBlockHeight(u int64) {
-	if m.addblock_height != nil {
-		*m.addblock_height += u
-	} else {
-		m.addblock_height = &u
-	}
-}
-
-// AddedBlockHeight returns the value that was added to the "block_height" field in this mutation.
-func (m *DataFinMutation) AddedBlockHeight() (r int64, exists bool) {
-	v := m.addblock_height
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearBlockHeight clears the value of the "block_height" field.
-func (m *DataFinMutation) ClearBlockHeight() {
-	m.block_height = nil
-	m.addblock_height = nil
-	m.clearedFields[datafin.FieldBlockHeight] = struct{}{}
-}
-
-// BlockHeightCleared returns if the "block_height" field was cleared in this mutation.
-func (m *DataFinMutation) BlockHeightCleared() bool {
-	_, ok := m.clearedFields[datafin.FieldBlockHeight]
-	return ok
-}
-
-// ResetBlockHeight resets all changes to the "block_height" field.
-func (m *DataFinMutation) ResetBlockHeight() {
-	m.block_height = nil
-	m.addblock_height = nil
-	delete(m.clearedFields, datafin.FieldBlockHeight)
-}
-
 // SetState sets the "state" field.
 func (m *DataFinMutation) SetState(s string) {
 	m.state = &s
@@ -788,7 +716,7 @@ func (m *DataFinMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *DataFinMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 11)
 	if m.created_at != nil {
 		fields = append(fields, datafin.FieldCreatedAt)
 	}
@@ -812,9 +740,6 @@ func (m *DataFinMutation) Fields() []string {
 	}
 	if m.tx_hash != nil {
 		fields = append(fields, datafin.FieldTxHash)
-	}
-	if m.block_height != nil {
-		fields = append(fields, datafin.FieldBlockHeight)
 	}
 	if m.state != nil {
 		fields = append(fields, datafin.FieldState)
@@ -849,8 +774,6 @@ func (m *DataFinMutation) Field(name string) (ent.Value, bool) {
 		return m.TxTime()
 	case datafin.FieldTxHash:
 		return m.TxHash()
-	case datafin.FieldBlockHeight:
-		return m.BlockHeight()
 	case datafin.FieldState:
 		return m.State()
 	case datafin.FieldRetries:
@@ -882,8 +805,6 @@ func (m *DataFinMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldTxTime(ctx)
 	case datafin.FieldTxHash:
 		return m.OldTxHash(ctx)
-	case datafin.FieldBlockHeight:
-		return m.OldBlockHeight(ctx)
 	case datafin.FieldState:
 		return m.OldState(ctx)
 	case datafin.FieldRetries:
@@ -955,13 +876,6 @@ func (m *DataFinMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetTxHash(v)
 		return nil
-	case datafin.FieldBlockHeight:
-		v, ok := value.(uint64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetBlockHeight(v)
-		return nil
 	case datafin.FieldState:
 		v, ok := value.(string)
 		if !ok {
@@ -1003,9 +917,6 @@ func (m *DataFinMutation) AddedFields() []string {
 	if m.addtx_time != nil {
 		fields = append(fields, datafin.FieldTxTime)
 	}
-	if m.addblock_height != nil {
-		fields = append(fields, datafin.FieldBlockHeight)
-	}
 	if m.addretries != nil {
 		fields = append(fields, datafin.FieldRetries)
 	}
@@ -1025,8 +936,6 @@ func (m *DataFinMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedDeletedAt()
 	case datafin.FieldTxTime:
 		return m.AddedTxTime()
-	case datafin.FieldBlockHeight:
-		return m.AddedBlockHeight()
 	case datafin.FieldRetries:
 		return m.AddedRetries()
 	}
@@ -1066,13 +975,6 @@ func (m *DataFinMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddTxTime(v)
 		return nil
-	case datafin.FieldBlockHeight:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddBlockHeight(v)
-		return nil
 	case datafin.FieldRetries:
 		v, ok := value.(int32)
 		if !ok {
@@ -1093,9 +995,6 @@ func (m *DataFinMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(datafin.FieldTxHash) {
 		fields = append(fields, datafin.FieldTxHash)
-	}
-	if m.FieldCleared(datafin.FieldBlockHeight) {
-		fields = append(fields, datafin.FieldBlockHeight)
 	}
 	if m.FieldCleared(datafin.FieldRemark) {
 		fields = append(fields, datafin.FieldRemark)
@@ -1119,9 +1018,6 @@ func (m *DataFinMutation) ClearField(name string) error {
 		return nil
 	case datafin.FieldTxHash:
 		m.ClearTxHash()
-		return nil
-	case datafin.FieldBlockHeight:
-		m.ClearBlockHeight()
 		return nil
 	case datafin.FieldRemark:
 		m.ClearRemark()
@@ -1157,9 +1053,6 @@ func (m *DataFinMutation) ResetField(name string) error {
 		return nil
 	case datafin.FieldTxHash:
 		m.ResetTxHash()
-		return nil
-	case datafin.FieldBlockHeight:
-		m.ResetBlockHeight()
 		return nil
 	case datafin.FieldState:
 		m.ResetState()

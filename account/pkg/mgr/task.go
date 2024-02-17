@@ -58,7 +58,7 @@ func CheckAllAccountState(ctx context.Context) {
 	for _, v := range rows {
 		acc, err := GetAccountReport(ctx, v.Address)
 		if err != nil {
-			logger.Sugar().Errorf("CheckAllAccountState", "Address", v.Address, "Err", err)
+			logger.Sugar().Errorw("CheckAllAccountState", "Address", v.Address, "Err", err)
 		}
 
 		if acc.IsRoot {
@@ -84,18 +84,18 @@ func CheckAllAccountState(ctx context.Context) {
 			Remark:  &acc.Remark,
 		})
 		if err != nil {
-			logger.Sugar().Errorf("CheckAllAccountState", "Address", v.Address, "Err", err)
+			logger.Sugar().Errorw("CheckAllAccountState", "Address", v.Address, "Err", err)
 		}
 	}
 
 	err = GetAccountMGR().SetRootAccount(availableRootAcc)
 	if err != nil {
-		logger.Sugar().Errorf("CheckAllAccountState", "Err", err)
+		logger.Sugar().Errorw("CheckAllAccountState", "Err", err)
 	}
 
 	err = GetAccountMGR().SetTreeAccounts(availableTreeAccs)
 	if err != nil {
-		logger.Sugar().Errorf("CheckAllAccountState", "Err", err)
+		logger.Sugar().Errorw("CheckAllAccountState", "Err", err)
 	}
 
 	logger.Sugar().Infow("CheckAllAccountState", "root account", availableRootAcc.Pub)

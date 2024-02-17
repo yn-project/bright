@@ -29,7 +29,6 @@ func (DataFin) Fields() []ent.Field {
 		field.String("datafin"),
 		field.Uint32("tx_time").Optional(),
 		field.String("tx_hash").Optional(),
-		field.Uint64("block_height").Optional(),
 		field.String("state"),
 		field.Uint32("retries"),
 		field.String("remark").Optional(),

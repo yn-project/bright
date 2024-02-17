@@ -135,13 +135,6 @@ func TxHash(v string) predicate.DataFin {
 	})
 }
 
-// BlockHeight applies equality check predicate on the "block_height" field. It's identical to BlockHeightEQ.
-func BlockHeight(v uint64) predicate.DataFin {
-	return predicate.DataFin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldBlockHeight), v))
-	})
-}
-
 // State applies equality check predicate on the "state" field. It's identical to StateEQ.
 func State(v string) predicate.DataFin {
 	return predicate.DataFin(func(s *sql.Selector) {
@@ -840,84 +833,6 @@ func TxHashEqualFold(v string) predicate.DataFin {
 func TxHashContainsFold(v string) predicate.DataFin {
 	return predicate.DataFin(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldTxHash), v))
-	})
-}
-
-// BlockHeightEQ applies the EQ predicate on the "block_height" field.
-func BlockHeightEQ(v uint64) predicate.DataFin {
-	return predicate.DataFin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldBlockHeight), v))
-	})
-}
-
-// BlockHeightNEQ applies the NEQ predicate on the "block_height" field.
-func BlockHeightNEQ(v uint64) predicate.DataFin {
-	return predicate.DataFin(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldBlockHeight), v))
-	})
-}
-
-// BlockHeightIn applies the In predicate on the "block_height" field.
-func BlockHeightIn(vs ...uint64) predicate.DataFin {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.DataFin(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldBlockHeight), v...))
-	})
-}
-
-// BlockHeightNotIn applies the NotIn predicate on the "block_height" field.
-func BlockHeightNotIn(vs ...uint64) predicate.DataFin {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.DataFin(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldBlockHeight), v...))
-	})
-}
-
-// BlockHeightGT applies the GT predicate on the "block_height" field.
-func BlockHeightGT(v uint64) predicate.DataFin {
-	return predicate.DataFin(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldBlockHeight), v))
-	})
-}
-
-// BlockHeightGTE applies the GTE predicate on the "block_height" field.
-func BlockHeightGTE(v uint64) predicate.DataFin {
-	return predicate.DataFin(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldBlockHeight), v))
-	})
-}
-
-// BlockHeightLT applies the LT predicate on the "block_height" field.
-func BlockHeightLT(v uint64) predicate.DataFin {
-	return predicate.DataFin(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldBlockHeight), v))
-	})
-}
-
-// BlockHeightLTE applies the LTE predicate on the "block_height" field.
-func BlockHeightLTE(v uint64) predicate.DataFin {
-	return predicate.DataFin(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldBlockHeight), v))
-	})
-}
-
-// BlockHeightIsNil applies the IsNil predicate on the "block_height" field.
-func BlockHeightIsNil() predicate.DataFin {
-	return predicate.DataFin(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldBlockHeight)))
-	})
-}
-
-// BlockHeightNotNil applies the NotNil predicate on the "block_height" field.
-func BlockHeightNotNil() predicate.DataFin {
-	return predicate.DataFin(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldBlockHeight)))
 	})
 }
 

@@ -26,18 +26,17 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "DataFin",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			datafin.FieldCreatedAt:   {Type: field.TypeUint32, Column: datafin.FieldCreatedAt},
-			datafin.FieldUpdatedAt:   {Type: field.TypeUint32, Column: datafin.FieldUpdatedAt},
-			datafin.FieldDeletedAt:   {Type: field.TypeUint32, Column: datafin.FieldDeletedAt},
-			datafin.FieldTopicID:     {Type: field.TypeString, Column: datafin.FieldTopicID},
-			datafin.FieldDataID:      {Type: field.TypeString, Column: datafin.FieldDataID},
-			datafin.FieldDatafin:     {Type: field.TypeString, Column: datafin.FieldDatafin},
-			datafin.FieldTxTime:      {Type: field.TypeUint32, Column: datafin.FieldTxTime},
-			datafin.FieldTxHash:      {Type: field.TypeString, Column: datafin.FieldTxHash},
-			datafin.FieldBlockHeight: {Type: field.TypeUint64, Column: datafin.FieldBlockHeight},
-			datafin.FieldState:       {Type: field.TypeString, Column: datafin.FieldState},
-			datafin.FieldRetries:     {Type: field.TypeUint32, Column: datafin.FieldRetries},
-			datafin.FieldRemark:      {Type: field.TypeString, Column: datafin.FieldRemark},
+			datafin.FieldCreatedAt: {Type: field.TypeUint32, Column: datafin.FieldCreatedAt},
+			datafin.FieldUpdatedAt: {Type: field.TypeUint32, Column: datafin.FieldUpdatedAt},
+			datafin.FieldDeletedAt: {Type: field.TypeUint32, Column: datafin.FieldDeletedAt},
+			datafin.FieldTopicID:   {Type: field.TypeString, Column: datafin.FieldTopicID},
+			datafin.FieldDataID:    {Type: field.TypeString, Column: datafin.FieldDataID},
+			datafin.FieldDatafin:   {Type: field.TypeString, Column: datafin.FieldDatafin},
+			datafin.FieldTxTime:    {Type: field.TypeUint32, Column: datafin.FieldTxTime},
+			datafin.FieldTxHash:    {Type: field.TypeString, Column: datafin.FieldTxHash},
+			datafin.FieldState:     {Type: field.TypeString, Column: datafin.FieldState},
+			datafin.FieldRetries:   {Type: field.TypeUint32, Column: datafin.FieldRetries},
+			datafin.FieldRemark:    {Type: field.TypeString, Column: datafin.FieldRemark},
 		},
 	}
 	graph.Nodes[1] = &sqlgraph.Node{
@@ -149,11 +148,6 @@ func (f *DataFinFilter) WhereTxTime(p entql.Uint32P) {
 // WhereTxHash applies the entql string predicate on the tx_hash field.
 func (f *DataFinFilter) WhereTxHash(p entql.StringP) {
 	f.Where(p.Field(datafin.FieldTxHash))
-}
-
-// WhereBlockHeight applies the entql uint64 predicate on the block_height field.
-func (f *DataFinFilter) WhereBlockHeight(p entql.Uint64P) {
-	f.Where(p.Field(datafin.FieldBlockHeight))
 }
 
 // WhereState applies the entql string predicate on the state field.

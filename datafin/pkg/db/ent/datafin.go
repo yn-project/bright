@@ -32,8 +32,6 @@ type DataFin struct {
 	TxTime uint32 `json:"tx_time,omitempty"`
 	// TxHash holds the value of the "tx_hash" field.
 	TxHash string `json:"tx_hash,omitempty"`
-	// BlockHeight holds the value of the "block_height" field.
-	BlockHeight uint64 `json:"block_height,omitempty"`
 	// State holds the value of the "state" field.
 	State string `json:"state,omitempty"`
 	// Retries holds the value of the "retries" field.
@@ -47,7 +45,7 @@ func (*DataFin) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case datafin.FieldCreatedAt, datafin.FieldUpdatedAt, datafin.FieldDeletedAt, datafin.FieldTxTime, datafin.FieldBlockHeight, datafin.FieldRetries:
+		case datafin.FieldCreatedAt, datafin.FieldUpdatedAt, datafin.FieldDeletedAt, datafin.FieldTxTime, datafin.FieldRetries:
 			values[i] = new(sql.NullInt64)
 		case datafin.FieldTopicID, datafin.FieldDataID, datafin.FieldDatafin, datafin.FieldTxHash, datafin.FieldState, datafin.FieldRemark:
 			values[i] = new(sql.NullString)
@@ -122,12 +120,6 @@ func (df *DataFin) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				df.TxHash = value.String
 			}
-		case datafin.FieldBlockHeight:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field block_height", values[i])
-			} else if value.Valid {
-				df.BlockHeight = uint64(value.Int64)
-			}
 		case datafin.FieldState:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field state", values[i])
@@ -197,9 +189,6 @@ func (df *DataFin) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("tx_hash=")
 	builder.WriteString(df.TxHash)
-	builder.WriteString(", ")
-	builder.WriteString("block_height=")
-	builder.WriteString(fmt.Sprintf("%v", df.BlockHeight))
 	builder.WriteString(", ")
 	builder.WriteString("state=")
 	builder.WriteString(df.State)

@@ -33,10 +33,11 @@ proto: $(PROTO_GO_FILE) $(PROTO_TS_FILE) $(PROTO_GO_GW_FILE) $(PROTO_OPENAPIV2_F
 		--openapiv2_opt logtostderr=true \
 		--openapiv2_opt json_names_for_fields=false $<
 
+.PHONY: docs
 docs:
 	$(PROTOC) $(PROTO_INCLUDE) \
-	--doc_out=./docs
-	--proto_path=./endpoint --doc_opt=markdown,./docs/proto.md ./endpoint/*.proto
+	--doc_out=./docs \
+	--proto_path=./bright/endpoint --doc_opt=markdown,./docs/proto.md ./bright/endpoint/*.proto
 
 clean:
 	find ./ -name "*.pb.go" | xargs rm -rf

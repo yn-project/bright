@@ -28,8 +28,6 @@ const (
 	FieldTxTime = "tx_time"
 	// FieldTxHash holds the string denoting the tx_hash field in the database.
 	FieldTxHash = "tx_hash"
-	// FieldBlockHeight holds the string denoting the block_height field in the database.
-	FieldBlockHeight = "block_height"
 	// FieldState holds the string denoting the state field in the database.
 	FieldState = "state"
 	// FieldRetries holds the string denoting the retries field in the database.
@@ -51,7 +49,6 @@ var Columns = []string{
 	FieldDatafin,
 	FieldTxTime,
 	FieldTxHash,
-	FieldBlockHeight,
 	FieldState,
 	FieldRetries,
 	FieldRemark,

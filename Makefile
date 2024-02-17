@@ -7,8 +7,8 @@ COLOR:=\\033[36m
 NOCOLOR:=\\033[0m
 GITREPO=$(shell git remote -v | grep fetch | awk '{print $$2}' | sed 's/\.git//g' | sed 's/https:\/\///g')
 
-PROJECTS= endpoint account contract
-GO_PROJECTS= endpoint account contract
+PROJECTS= endpoint account contract datafin
+GO_PROJECTS= endpoint account contract datafin
 
 ##@ init project
 init:

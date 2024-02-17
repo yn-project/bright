@@ -160,8 +160,8 @@ contract DataFin is Admin{
    
     // finInfo.id => ((info.id)=>sha224+uinx32)
     // mapping(string => mapping(uint128=>uint256)) idFinKeys;
-    mapping(string => mapping(uint64=>uint256)) idFinKeys;
-    mapping(string => mapping(uint64=>uint32)) idFinKeysTime;
+    mapping(string => mapping(string=>uint256)) idFinKeys;
+    mapping(string => mapping(string=>uint32)) idFinKeysTime;
 
     string version="DataFin-v1.2.0-with-Admin-Owner";
     
@@ -202,7 +202,7 @@ contract DataFin is Admin{
         return rets;
     }
 
-    function AddIDsItems(string memory topicID,uint32 timestamp,uint64[] memory ids,uint256[] memory vals)public isAdmin() returns (bool[] memory){
+    function AddIDsItems(string memory topicID,uint32 timestamp,string[] memory ids,uint256[] memory vals)public isAdmin() returns (bool[] memory){
         require(idFinInfoMap[topicID].isValid,"topic is not exist");
         require(ids.length==vals.length,"the lengths of the two are different");
         bool [] memory rets=new bool[](ids.length);
@@ -235,7 +235,7 @@ contract DataFin is Admin{
         return rets;
     }
 
-    function VerifyIDItems(string memory topicID,uint64[] memory ids,uint256[] memory vals) view public isAdmin() returns (uint[] memory){
+    function VerifyIDItems(string memory topicID,string[] memory ids,uint256[] memory vals) view public isAdmin() returns (uint[] memory){
         require(idFinInfoMap[topicID].isValid,"topic is not exist");
         require(ids.length==vals.length,"the lengths of the two are different");
         uint [] memory rets=new uint[](ids.length);

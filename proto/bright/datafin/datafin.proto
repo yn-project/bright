@@ -42,7 +42,6 @@ message DataFinReq{
   optional string       DataFin = 40  [json_name="dataFin"];    
   optional uint32       TxTime = 50  [json_name="txTime"];      
   optional string       TxHash = 60  [json_name="txHash"];       
-  optional uint64       BlockHeight = 70  [json_name="blockHeight"];  
   optional uint32       Retries = 80  [json_name="retries"];  
   optional DataFinState State = 90  [json_name="state"];
   optional string       Remark = 100  [json_name="remark"];
@@ -55,7 +54,6 @@ message Conds {
   bright.StringVal DataFin = 40;
   bright.Uint32Val TxTime = 50;
   bright.StringVal TxHash = 60;
-  bright.Uint64Val BlockHeight = 70;
   bright.Uint32Val Retries = 80;
   bright.StringVal State = 90;
   bright.StringSliceVal IDs = 100;
@@ -83,11 +81,11 @@ message DataFinInfo{
   string       DataFin = 40  [json_name="dataFin"];    
   uint32       TxTime = 50  [json_name="txTime"];      
   string       TxHash = 60  [json_name="txHash"];       
-  uint64       BlockHeight = 70  [json_name="blockHeight"];  
   DataFinState State = 80  [json_name="state"];       
-  string       Remark = 90  [json_name="remark"];       
-  uint32       CreatedAt = 100  [json_name="createdAt"]; 
-  uint32       UpdatedAt = 110  [json_name="updatedAt"]; 
+  uint32       Retries = 90   [json_name="retries"];       
+  string       Remark = 100  [json_name="remark"];       
+  uint32       CreatedAt = 110  [json_name="createdAt"]; 
+  uint32       UpdatedAt = 120  [json_name="updatedAt"]; 
 }
 
 enum DataType{
@@ -98,9 +96,10 @@ enum DataType{
 
 enum DataFinState{
   DataFinStateDefault = 0;   
-  DataFinStateProcessing = 10; 
-  DataFinStateSeccess = 20;    
-  DataFinStateFailed = 30;    
+  DataFinStateOnQueue = 10; 
+  DataFinStateProcessing = 20; 
+  DataFinStateSeccess = 30;    
+  DataFinStateFailed = 40;    
 }
 
 message GetDataFinsRequest{
@@ -130,5 +129,5 @@ message CheckDataFinWithDataRequest{
   string   TopicID = 10  [json_name="topicID"]; 
   string   DataID = 20  [json_name="dataID"];  
   DataType Type = 30  [json_name="type"];   
-  string    Data = 40  [json_name="data"];   
+  string   Data = 40  [json_name="data"];   
 }

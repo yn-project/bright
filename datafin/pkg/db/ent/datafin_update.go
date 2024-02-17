@@ -148,33 +148,6 @@ func (dfu *DataFinUpdate) ClearTxHash() *DataFinUpdate {
 	return dfu
 }
 
-// SetBlockHeight sets the "block_height" field.
-func (dfu *DataFinUpdate) SetBlockHeight(u uint64) *DataFinUpdate {
-	dfu.mutation.ResetBlockHeight()
-	dfu.mutation.SetBlockHeight(u)
-	return dfu
-}
-
-// SetNillableBlockHeight sets the "block_height" field if the given value is not nil.
-func (dfu *DataFinUpdate) SetNillableBlockHeight(u *uint64) *DataFinUpdate {
-	if u != nil {
-		dfu.SetBlockHeight(*u)
-	}
-	return dfu
-}
-
-// AddBlockHeight adds u to the "block_height" field.
-func (dfu *DataFinUpdate) AddBlockHeight(u int64) *DataFinUpdate {
-	dfu.mutation.AddBlockHeight(u)
-	return dfu
-}
-
-// ClearBlockHeight clears the value of the "block_height" field.
-func (dfu *DataFinUpdate) ClearBlockHeight() *DataFinUpdate {
-	dfu.mutation.ClearBlockHeight()
-	return dfu
-}
-
 // SetState sets the "state" field.
 func (dfu *DataFinUpdate) SetState(s string) *DataFinUpdate {
 	dfu.mutation.SetState(s)
@@ -408,26 +381,6 @@ func (dfu *DataFinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: datafin.FieldTxHash,
 		})
 	}
-	if value, ok := dfu.mutation.BlockHeight(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint64,
-			Value:  value,
-			Column: datafin.FieldBlockHeight,
-		})
-	}
-	if value, ok := dfu.mutation.AddedBlockHeight(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint64,
-			Value:  value,
-			Column: datafin.FieldBlockHeight,
-		})
-	}
-	if dfu.mutation.BlockHeightCleared() {
-		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint64,
-			Column: datafin.FieldBlockHeight,
-		})
-	}
 	if value, ok := dfu.mutation.State(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -600,33 +553,6 @@ func (dfuo *DataFinUpdateOne) SetNillableTxHash(s *string) *DataFinUpdateOne {
 // ClearTxHash clears the value of the "tx_hash" field.
 func (dfuo *DataFinUpdateOne) ClearTxHash() *DataFinUpdateOne {
 	dfuo.mutation.ClearTxHash()
-	return dfuo
-}
-
-// SetBlockHeight sets the "block_height" field.
-func (dfuo *DataFinUpdateOne) SetBlockHeight(u uint64) *DataFinUpdateOne {
-	dfuo.mutation.ResetBlockHeight()
-	dfuo.mutation.SetBlockHeight(u)
-	return dfuo
-}
-
-// SetNillableBlockHeight sets the "block_height" field if the given value is not nil.
-func (dfuo *DataFinUpdateOne) SetNillableBlockHeight(u *uint64) *DataFinUpdateOne {
-	if u != nil {
-		dfuo.SetBlockHeight(*u)
-	}
-	return dfuo
-}
-
-// AddBlockHeight adds u to the "block_height" field.
-func (dfuo *DataFinUpdateOne) AddBlockHeight(u int64) *DataFinUpdateOne {
-	dfuo.mutation.AddBlockHeight(u)
-	return dfuo
-}
-
-// ClearBlockHeight clears the value of the "block_height" field.
-func (dfuo *DataFinUpdateOne) ClearBlockHeight() *DataFinUpdateOne {
-	dfuo.mutation.ClearBlockHeight()
 	return dfuo
 }
 
@@ -891,26 +817,6 @@ func (dfuo *DataFinUpdateOne) sqlSave(ctx context.Context) (_node *DataFin, err 
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Column: datafin.FieldTxHash,
-		})
-	}
-	if value, ok := dfuo.mutation.BlockHeight(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint64,
-			Value:  value,
-			Column: datafin.FieldBlockHeight,
-		})
-	}
-	if value, ok := dfuo.mutation.AddedBlockHeight(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint64,
-			Value:  value,
-			Column: datafin.FieldBlockHeight,
-		})
-	}
-	if dfuo.mutation.BlockHeightCleared() {
-		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint64,
-			Column: datafin.FieldBlockHeight,
 		})
 	}
 	if value, ok := dfuo.mutation.State(); ok {

@@ -11,16 +11,16 @@ func Ent2Grpc(row *ent.DataFin) *proto.DataFinInfo {
 	}
 
 	return &proto.DataFinInfo{
-		DataID:      row.DataID,
-		DataFinID:   row.ID.String(),
-		TopicID:     row.TopicID,
-		DataFin:     row.Datafin,
-		TxTime:      row.TxTime,
-		TxHash:      row.TxHash,
-		BlockHeight: row.BlockHeight,
-		State:       proto.DataFinState(proto.DataFinState_value[row.State]),
-		CreatedAt:   row.CreatedAt,
-		UpdatedAt:   row.UpdatedAt,
+		DataID:    row.DataID,
+		DataFinID: row.ID.String(),
+		TopicID:   row.TopicID,
+		DataFin:   row.Datafin,
+		TxTime:    row.TxTime,
+		TxHash:    row.TxHash,
+		State:     proto.DataFinState(proto.DataFinState_value[row.State]),
+		Retries:   row.Retries,
+		CreatedAt: row.CreatedAt,
+		UpdatedAt: row.UpdatedAt,
 	}
 }
 

@@ -19,7 +19,6 @@ var (
 		{Name: "datafin", Type: field.TypeString},
 		{Name: "tx_time", Type: field.TypeUint32, Nullable: true},
 		{Name: "tx_hash", Type: field.TypeString, Nullable: true},
-		{Name: "block_height", Type: field.TypeUint64, Nullable: true},
 		{Name: "state", Type: field.TypeString},
 		{Name: "retries", Type: field.TypeUint32},
 		{Name: "remark", Type: field.TypeString, Nullable: true},
