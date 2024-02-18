@@ -9,6 +9,7 @@ import (
 	"github.com/Vigo-Tea/go-ethereum-ant/crypto"
 	"github.com/Vigo-Tea/go-ethereum-ant/ethclient"
 	crud "yun.tea/block/bright/account/pkg/crud/account"
+	accountdb "yun.tea/block/bright/account/pkg/db"
 	data_fin "yun.tea/block/bright/common/chains/eth/datafin"
 	"yun.tea/block/bright/common/constant"
 	"yun.tea/block/bright/common/ctredis"
@@ -26,6 +27,14 @@ const (
 	MinBalance              = 100000
 	CheckAllAccountTaskLock = "check_all_acc_lock"
 )
+
+func init() {
+	err := accountdb.Init()
+	if err != nil {
+		logger.Sugar().Error(err)
+	}
+
+}
 
 func Maintain(ctx context.Context) {
 	for {

@@ -272,7 +272,7 @@
       "type": "string",
       "enum": [
         "TopicTypeDefault",
-        "IdType",
+        "IDType",
         "OriginalType"
       ],
       "default": "TopicTypeDefault"

@@ -19,16 +19,6 @@ func Create(ctx context.Context, in *proto.TopicReq) (*ent.Topic, error) {
 		return nil, errors.New("input is nil")
 	}
 	db.WithTx(ctx, func(ctx context.Context, tx *ent.Tx) error {
-		rows, err := tx.Topic.Query().All(ctx)
-		if err != nil {
-			return err
-		}
-		for _, row := range rows {
-			_, err := tx.Topic.UpdateOneID(row.ID).SetDeletedAt(uint32(time.Now().Unix())).Save(ctx)
-			if err != nil {
-				return err
-			}
-		}
 		c := CreateSet(tx.Topic.Create(), in)
 		info, err = c.Save(ctx)
 		return err

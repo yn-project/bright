@@ -123,6 +123,9 @@ func UpdateSet(u *ent.DataFinUpdateOne, in *proto.DataFinReq) *ent.DataFinUpdate
 	if in.State != nil {
 		u.SetState(in.GetState().String())
 	}
+	if in.Remark != nil {
+		u.SetRemark(in.GetRemark())
+	}
 	return u
 }
 

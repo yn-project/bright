@@ -32,7 +32,7 @@ service Manager {
 
 enum TopicType {
   TopicTypeDefault = 0;
-  IdType = 10;
+  IDType = 10;
   OriginalType = 20;
 }
 

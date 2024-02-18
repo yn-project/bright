@@ -3,10 +3,11 @@ package utils
 import (
 	"bytes"
 	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"math/big"
+
+	"github.com/Vigo-Tea/go-ethereum-ant/common/hexutil"
 )
 
 type Fin256Hash struct {
@@ -45,7 +46,7 @@ func From32Bytes(dst []byte) (*Fin256Hash, error) {
 }
 
 func FromHexString(data string) (*Fin256Hash, error) {
-	dst, err := hex.DecodeString(data)
+	dst, err := hexutil.Decode(data)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +70,7 @@ func FromBigInt(src *big.Int) (*Fin256Hash, error) {
 }
 
 func (u *Fin256Hash) ToHexString() string {
-	return fmt.Sprintf("0x%v", hex.EncodeToString(u.data[:]))
+	return hexutil.Encode(u.data[:])
 }
 
 func (u *Fin256Hash) ToString() string {

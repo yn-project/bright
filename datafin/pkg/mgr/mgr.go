@@ -18,15 +18,23 @@ import (
 	"yun.tea/block/bright/common/utils"
 	topicclient "yun.tea/block/bright/datafin/pkg/client/topic"
 	"yun.tea/block/bright/datafin/pkg/crud/datafin"
+	"yun.tea/block/bright/datafin/pkg/db"
 	proto "yun.tea/block/bright/proto/bright/datafin"
 	"yun.tea/block/bright/proto/bright/topic"
 )
 
 const (
 	maxTxPackNum     = 1000
-	maxTxPackTimeout = time.Minute * 10
+	maxTxPackTimeout = time.Second * 10
 	maxTopicNum      = 1000
 )
+
+func init() {
+	err := db.Init()
+	if err != nil {
+		logger.Sugar().Error(err)
+	}
+}
 
 func dataFinProducer(topicID string) (pulsar.Producer, error) {
 	cli, err := ctpulsar.Client()
@@ -87,8 +95,9 @@ func Maintain(ctx context.Context) {
 		return
 	}
 	for _, item := range resp.Infos {
-		go func(item *topic.TopicInfo) {
-			DataFinTask(ctx, item.TopicID, item.Type == topic.TopicType_IdType)
+		func(item *topic.TopicInfo) {
+			fmt.Println(utils.PrettyStruct(item))
+			DataFinTask(ctx, item.TopicID, item.Type == topic.TopicType_IDType)
 		}(item)
 	}
 }
@@ -109,6 +118,7 @@ func DataFinTask(ctx context.Context, topicID string, isIDTopic bool) error {
 		case msg := <-consummer.Chan():
 			item := &proto.DataFinInfo{}
 			err := json.Unmarshal(msg.Payload(), item)
+			fmt.Println(utils.PrettyStruct(item))
 			dataFinID := msg.Key()
 			state := proto.DataFinState_DataFinStateProcessing
 			remark := ""
@@ -144,14 +154,11 @@ func DataFinTask(ctx context.Context, topicID string, isIDTopic bool) error {
 	for _, item := range items {
 		_val, err := utils.FromHexString(item.DataFin)
 		if err != nil {
+			fmt.Println(err)
 			_ = updateStateAndAck(ctx, item.DataFinID, proto.DataFinState_DataFinStateFailed, err.Error(), nil)
+			continue
 		}
-		var val *big.Int
-		if err != nil {
-			val = big.NewInt(0)
-		} else {
-			val = _val.ToBigInt()
-		}
+		val := _val.ToBigInt()
 		vals = append(vals, val)
 		ids = append(ids, item.DataID)
 	}
@@ -159,7 +166,10 @@ func DataFinTask(ctx context.Context, topicID string, isIDTopic bool) error {
 	var tx *types.Transaction
 	txTime := uint32(time.Now().Unix())
 	err = mgr.WithWriteContract(ctx, false, func(ctx context.Context, txOpts *bind.TransactOpts, contract *data_fin.DataFin, cli *ethclient.Client) error {
+		fmt.Println(ids)
+		fmt.Println(utils.PrettyStruct(vals))
 		if isIDTopic {
+			fmt.Println(txOpts.From)
 			tx, err = contract.AddIDsItems(txOpts, topicID, txTime, ids, vals)
 		} else {
 			tx, err = contract.AddItems(txOpts, topicID, txTime, vals)

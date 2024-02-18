@@ -32,7 +32,7 @@ func (s *TopicServer) CreateTopic(ctx context.Context, in *proto.CreateTopicRequ
 		topicID = utils.RandomBase58(8)
 
 		switch in.Type {
-		case proto.TopicType_IdType:
+		case proto.TopicType_IDType:
 			topicID = fmt.Sprintf("id-%v", topicID)
 			tx, err = contract.CreateIDTopic(txOpts, topicID, in.Name, in.Remark, in.ChangeAble)
 		case proto.TopicType_OriginalType:
@@ -100,7 +100,7 @@ func (s *TopicServer) GetTopic(ctx context.Context, in *proto.GetTopicRequest) (
 
 	info, err := crud.Row(ctx, in.TopicID, contractAddr.Hex())
 	if err != nil {
-		logger.Sugar().Errorw("GetTopic", "TopicID", info.TopicID, "error", err)
+		logger.Sugar().Errorw("GetTopic", "TopicID", in.TopicID, "error", err)
 		return &proto.GetTopicResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
