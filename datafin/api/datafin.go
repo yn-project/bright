@@ -4,13 +4,21 @@ package datafin
 import (
 	"context"
 	"fmt"
+	"math/big"
 
+	"github.com/Vigo-Tea/go-ethereum-ant/accounts/abi/bind"
+	"github.com/Vigo-Tea/go-ethereum-ant/common"
+	"github.com/Vigo-Tea/go-ethereum-ant/ethclient"
+	accountmgr "yun.tea/block/bright/account/pkg/mgr"
 	converter "yun.tea/block/bright/datafin/pkg/converter/datafin"
 	crud "yun.tea/block/bright/datafin/pkg/crud/datafin"
 	"yun.tea/block/bright/datafin/pkg/mgr"
 
+	data_fin "yun.tea/block/bright/common/chains/eth/datafin"
+	"yun.tea/block/bright/common/cruder"
 	"yun.tea/block/bright/common/logger"
 	"yun.tea/block/bright/common/utils"
+	"yun.tea/block/bright/proto/bright"
 	proto "yun.tea/block/bright/proto/bright/datafin"
 	"yun.tea/block/bright/proto/bright/topic"
 )
@@ -68,60 +76,196 @@ func (s *DataFinServer) CreateDataFin(ctx context.Context, in *proto.CreateDataF
 	}, nil
 }
 
-// func (s *DataFinServer) GetDataFin(ctx context.Context, in *proto.GetDataFinRequest) (*proto.GetDataFinResponse, error) {
-// 	var err error
+func (s *DataFinServer) GetDataFins(ctx context.Context, in *proto.GetDataFinsRequest) (*proto.GetDataFinsResponse, error) {
+	topicServer := &TopicServer{}
+	_, err := topicServer.GetTopic(ctx, &topic.GetTopicRequest{TopicID: in.TopicID})
+	if err != nil {
+		return &proto.GetDataFinsResponse{}, err
+	}
 
-// 	id, err := uuid.Parse(in.GetID())
-// 	if err != nil {
-// 		logger.Sugar().Errorw("GetDataFin", "ID", in.GetID(), "error", err)
-// 		return &proto.GetDataFinResponse{}, status.Error(codes.InvalidArgument, err.Error())
-// 	}
+	conds := &proto.Conds{
+		IDs: &bright.StringSliceVal{
+			Op:    cruder.IN,
+			Value: in.DataFinIDs,
+		},
+	}
+	rows, total, err := crud.Rows(ctx, conds, 0, 0)
+	if err != nil {
+		return &proto.GetDataFinsResponse{}, err
+	}
 
-// 	info, err := crud.Row(ctx, id)
-// 	if err != nil {
-// 		logger.Sugar().Errorw("GetDataFin", "ID", in.GetID(), "error", err)
-// 		return &proto.GetDataFinResponse{}, status.Error(codes.Internal, err.Error())
-// 	}
+	return &proto.GetDataFinsResponse{Infos: converter.Ent2GrpcMany(rows), Total: uint32(total)}, nil
+}
 
-// 	logger.Sugar().Infof("success to get datafin,name: %v,address: %v", info.Name, info.Address)
-// 	return &proto.GetDataFinResponse{
-// 		Info: converter.Ent2Grpc(info),
-// 	}, nil
-// }
+func (s *DataFinServer) CheckDataFin(ctx context.Context, in *proto.CheckDataFinRequest) (*proto.CheckDataFinResponse, error) {
+	topicServer := &TopicServer{}
+	_, err := topicServer.GetTopic(ctx, &topic.GetTopicRequest{TopicID: in.TopicID})
+	if err != nil || len(in.DataFins) == 0 {
+		return &proto.CheckDataFinResponse{TopicID: in.TopicID}, err
+	}
 
-// func (s *DataFinServer) GetDataFins(ctx context.Context, in *proto.GetDataFinsRequest) (*proto.GetDataFinsResponse, error) {
-// 	var err error
+	vals := []*big.Int{}
+	for _, v := range in.DataFins {
+		fin256, err := utils.FromHexString(v)
+		if err != nil {
+			vals = append(vals, &big.Int{})
+		} else {
+			vals = append(vals, fin256.ToBigInt())
+		}
 
-// 	rows, total, err := crud.Rows(ctx, in.GetConds(), int(in.GetOffset()), int(in.GetLimit()))
-// 	if err != nil {
-// 		logger.Sugar().Errorw("GetDataFins", "error", err)
-// 		return &proto.GetDataFinsResponse{}, status.Error(codes.Internal, err.Error())
-// 	}
+	}
 
-// 	logger.Sugar().Infof("success to get datafins,offset-limit: %v-%v,total: %v", in.GetOffset(), in.GetLimit(), total)
-// 	return &proto.GetDataFinsResponse{
-// 		Infos: converter.Ent2GrpcMany(rows),
-// 		Total: uint32(total),
-// 	}, nil
-// }
+	rets := []*big.Int{}
+	accountmgr.WithReadContract(ctx, false, func(ctx context.Context, from common.Address, contract *data_fin.DataFin, cli *ethclient.Client) error {
+		rets, err = contract.VerifyItems(&bind.CallOpts{Pending: true, From: from, Context: ctx}, in.TopicID, vals)
+		return err
+	})
 
-// func (s *DataFinServer) DeleteDataFin(ctx context.Context, in *proto.DeleteDataFinRequest) (*proto.DeleteDataFinResponse, error) {
-// 	var err error
+	infos := []*proto.CheckDataFinResp{}
+	for i, v := range in.DataFins {
+		infos = append(infos, &proto.CheckDataFinResp{
+			DataFin: v,
+			TxTime:  uint32(rets[i].Uint64()),
+			Passed:  rets[i].Uint64() > 0,
+		})
+	}
 
-// 	id, err := uuid.Parse(in.GetID())
-// 	if err != nil {
-// 		logger.Sugar().Errorw("DeleteDataFin", "ID", in.GetID(), "error", err)
-// 		return &proto.DeleteDataFinResponse{}, status.Error(codes.InvalidArgument, err.Error())
-// 	}
+	return &proto.CheckDataFinResponse{
+		TopicID: in.TopicID,
+		Infos:   infos,
+	}, nil
+}
 
-// 	info, err := crud.Delete(ctx, id)
-// 	if err != nil {
-// 		logger.Sugar().Errorw("DeleteDataFin", "ID", in.GetID(), "error", err)
-// 		return &proto.DeleteDataFinResponse{}, status.Error(codes.Internal, err.Error())
-// 	}
+func (s *DataFinServer) CheckIDDataFin(ctx context.Context, in *proto.CheckIDDataFinRequest) (*proto.CheckIDDataFinResponse, error) {
+	topicServer := &TopicServer{}
+	_, err := topicServer.GetTopic(ctx, &topic.GetTopicRequest{TopicID: in.TopicID})
+	if err != nil || len(in.Infos) == 0 {
+		return &proto.CheckIDDataFinResponse{TopicID: in.TopicID}, err
+	}
 
-// 	logger.Sugar().Infof("success to delete datafin,name: %v,address: %v", info.Name, info.Address)
-// 	return &proto.DeleteDataFinResponse{
-// 		Info: converter.Ent2Grpc(info),
-// 	}, nil
-// }
+	vals := []*big.Int{}
+	ids := []string{}
+	for _, v := range in.Infos {
+		fin256, err := utils.FromHexString(*v.DataFin)
+		if err != nil {
+			vals = append(vals, &big.Int{})
+		} else {
+			vals = append(vals, fin256.ToBigInt())
+		}
+		ids = append(ids, v.DataID)
+	}
+
+	rets := []*big.Int{}
+	accountmgr.WithReadContract(ctx, false, func(ctx context.Context, from common.Address, contract *data_fin.DataFin, cli *ethclient.Client) error {
+		rets, err = contract.VerifyIDItems(&bind.CallOpts{Pending: true, From: from, Context: ctx}, in.TopicID, ids, vals)
+		return err
+	})
+
+	infos := []*proto.CheckIDDataFinResp{}
+	for i, v := range in.Infos {
+		infos = append(infos, &proto.CheckIDDataFinResp{
+			DataID:  v.DataID,
+			DataFin: *v.DataFin,
+			TxTime:  uint32(rets[i].Uint64()),
+			Passed:  rets[i].Uint64() > 0,
+		})
+	}
+
+	return &proto.CheckIDDataFinResponse{
+		TopicID: in.TopicID,
+		Infos:   infos,
+	}, nil
+}
+
+func (s *DataFinServer) CheckDataFinWithData(ctx context.Context, in *proto.CheckDataFinWithDataRequest) (*proto.CheckDataFinResponse, error) {
+	topicServer := &TopicServer{}
+	_, err := topicServer.GetTopic(ctx, &topic.GetTopicRequest{TopicID: in.TopicID})
+	if err != nil || len(in.Datas) == 0 {
+		return &proto.CheckDataFinResponse{TopicID: in.TopicID}, err
+	}
+
+	needCompact := false
+	if in.Type == proto.DataType_JsonType {
+		needCompact = true
+	}
+
+	vals := []*big.Int{}
+	dfhash := []string{}
+	for _, v := range in.Datas {
+		fin256, err := utils.SumSha256String(v, needCompact)
+		if err != nil {
+			vals = append(vals, &big.Int{})
+		} else {
+			vals = append(vals, fin256.ToBigInt())
+		}
+		dfhash = append(dfhash, fin256.ToHexString())
+	}
+
+	rets := []*big.Int{}
+	accountmgr.WithReadContract(ctx, false, func(ctx context.Context, from common.Address, contract *data_fin.DataFin, cli *ethclient.Client) error {
+		rets, err = contract.VerifyItems(&bind.CallOpts{Pending: true, From: from, Context: ctx}, in.TopicID, vals)
+		return err
+	})
+
+	infos := []*proto.CheckDataFinResp{}
+	for i, v := range dfhash {
+		infos = append(infos, &proto.CheckDataFinResp{
+			DataFin: v,
+			TxTime:  uint32(rets[i].Uint64()),
+			Passed:  rets[i].Uint64() > 0,
+		})
+	}
+
+	return &proto.CheckDataFinResponse{
+		TopicID: in.TopicID,
+		Infos:   infos,
+	}, nil
+}
+
+func (s *DataFinServer) CheckIDDataFinWithData(ctx context.Context, in *proto.CheckIDDataFinWithDataRequest) (*proto.CheckIDDataFinResponse, error) {
+	topicServer := &TopicServer{}
+	_, err := topicServer.GetTopic(ctx, &topic.GetTopicRequest{TopicID: in.TopicID})
+	if err != nil || len(in.Infos) == 0 {
+		return &proto.CheckIDDataFinResponse{TopicID: in.TopicID}, err
+	}
+
+	needCompact := false
+	if in.Type == proto.DataType_JsonType {
+		needCompact = true
+	}
+
+	vals := []*big.Int{}
+	ids := []string{}
+	dfhash := []string{}
+
+	for _, v := range in.Infos {
+		fin256, err := utils.SumSha256String(*v.Data, needCompact)
+		if err != nil {
+			vals = append(vals, &big.Int{})
+		} else {
+			vals = append(vals, fin256.ToBigInt())
+		}
+		ids = append(ids, v.DataID)
+		dfhash = append(dfhash, fin256.ToHexString())
+	}
+
+	rets := []*big.Int{}
+	accountmgr.WithReadContract(ctx, false, func(ctx context.Context, from common.Address, contract *data_fin.DataFin, cli *ethclient.Client) error {
+		rets, err = contract.VerifyIDItems(&bind.CallOpts{Pending: true, From: from, Context: ctx}, in.TopicID, ids, vals)
+		return err
+	})
+
+	infos := []*proto.CheckIDDataFinResp{}
+	for i, v := range in.Infos {
+		infos = append(infos, &proto.CheckIDDataFinResp{
+			DataID:  v.DataID,
+			DataFin: dfhash[i],
+			TxTime:  uint32(rets[i].Uint64()),
+			Passed:  rets[i].Uint64() > 0,
+		})
+	}
+	return &proto.CheckIDDataFinResponse{
+		TopicID: in.TopicID,
+		Infos:   infos,
+	}, nil
+}

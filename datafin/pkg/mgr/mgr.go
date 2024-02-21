@@ -13,20 +13,30 @@ import (
 	"github.com/apache/pulsar-client-go/pulsar"
 	"yun.tea/block/bright/account/pkg/mgr"
 	data_fin "yun.tea/block/bright/common/chains/eth/datafin"
+	"yun.tea/block/bright/common/cruder"
 	"yun.tea/block/bright/common/ctpulsar"
 	"yun.tea/block/bright/common/logger"
 	"yun.tea/block/bright/common/utils"
 	topicclient "yun.tea/block/bright/datafin/pkg/client/topic"
+	converter "yun.tea/block/bright/datafin/pkg/converter/datafin"
 	"yun.tea/block/bright/datafin/pkg/crud/datafin"
 	"yun.tea/block/bright/datafin/pkg/db"
+	"yun.tea/block/bright/proto/bright"
 	proto "yun.tea/block/bright/proto/bright/datafin"
 	"yun.tea/block/bright/proto/bright/topic"
 )
 
 const (
 	maxTxPackNum     = 1000
-	maxTxPackTimeout = time.Second * 10
+	maxTxPackTimeout = time.Minute
+	maxTaskInterval  = time.Minute
+	taskGapTime      = time.Second * 8
 	maxTopicNum      = 1000
+	maxRetries       = 5
+)
+
+var (
+	taskMap = make(map[string]bool)
 )
 
 func init() {
@@ -43,6 +53,7 @@ func dataFinProducer(topicID string) (pulsar.Producer, error) {
 	}
 	producer, err := cli.CreateProducer(pulsar.ProducerOptions{
 		Topic: topicID,
+		Name:  "datafin-producer",
 	})
 	return producer, err
 }
@@ -57,6 +68,7 @@ func dataFinConsummer(topic string, name string) (pulsar.Consumer, error) {
 		Topic:            topic,
 		SubscriptionName: name,
 		Type:             pulsar.Shared,
+		RetryEnable:      true,
 	})
 
 	return consumer, err
@@ -86,39 +98,60 @@ func PutDataFinInfos(ctx context.Context, topicID string, infos []*proto.DataFin
 }
 
 func Maintain(ctx context.Context) {
-	resp, err := topicclient.GetTopics(ctx, &topic.GetTopicsRequest{
-		Offset: 0,
-		Limit:  maxTopicNum,
-	})
-	if err != nil {
-		logger.Sugar().Errorf("failed to get topics,err %v", err)
-		return
+	for i := uint32(1); i <= maxRetries; i++ {
+		go retry(ctx, i, maxTxPackTimeout)
 	}
-	for _, item := range resp.Infos {
-		func(item *topic.TopicInfo) {
-			fmt.Println(utils.PrettyStruct(item))
-			DataFinTask(ctx, item.TopicID, item.Type == topic.TopicType_IDType)
-		}(item)
+
+	for {
+		select {
+		case <-time.NewTicker(maxTaskInterval).C:
+			resp, err := topicclient.GetTopics(ctx, &topic.GetTopicsRequest{
+				Offset: 0,
+				Limit:  maxTopicNum,
+			})
+			if err != nil {
+				logger.Sugar().Errorf("failed to get topics,err %v", err)
+				return
+			}
+			for _, item := range resp.Infos {
+				func(item *topic.TopicInfo) {
+					if _, ok := taskMap[item.TopicID]; !ok {
+						taskMap[item.TopicID] = false
+					}
+					if taskMap[item.TopicID] {
+						return
+					}
+					taskMap[item.TopicID] = true
+					go dataFinTask(ctx, item.TopicID, item.Type == topic.TopicType_IDType)
+				}(item)
+				time.Sleep(taskGapTime)
+			}
+		case <-ctx.Done():
+			return
+		}
 	}
 }
 
-func DataFinTask(ctx context.Context, topicID string, isIDTopic bool) error {
+func dataFinTask(ctx context.Context, topicID string, isIDTopic bool) error {
 	consummerName := fmt.Sprintf("consummer-%v", topicID)
 	consummer, err := dataFinConsummer(topicID, consummerName)
 	if err != nil {
 		return err
 	}
-
 	updateTimeout := time.After(maxTxPackTimeout)
 	items := []*proto.DataFinInfo{}
 	fulled := false
 
+	logger.Sugar().Infof("start %v %v", topicID, time.Now().String())
+	defer func() {
+		taskMap[topicID] = false
+		logger.Sugar().Infof("end %v %v", topicID, time.Now().String())
+	}()
 	for {
 		select {
 		case msg := <-consummer.Chan():
 			item := &proto.DataFinInfo{}
 			err := json.Unmarshal(msg.Payload(), item)
-			fmt.Println(utils.PrettyStruct(item))
 			dataFinID := msg.Key()
 			state := proto.DataFinState_DataFinStateProcessing
 			remark := ""
@@ -128,7 +161,11 @@ func DataFinTask(ctx context.Context, topicID string, isIDTopic bool) error {
 				remark = err.Error()
 			}
 
-			_ = updateStateAndAck(ctx, dataFinID, state, remark, &msg)
+			_ = updateStateAndAck(ctx, &proto.DataFinReq{
+				DataFinID: &dataFinID,
+				State:     &state,
+				Remark:    &remark,
+			}, &msg)
 			if err = msg.AckID(msg.ID()); err != nil {
 				logger.Sugar().Errorf("failed to ack datafin id to pulsar,err: %v", err)
 			}
@@ -154,8 +191,12 @@ func DataFinTask(ctx context.Context, topicID string, isIDTopic bool) error {
 	for _, item := range items {
 		_val, err := utils.FromHexString(item.DataFin)
 		if err != nil {
-			fmt.Println(err)
-			_ = updateStateAndAck(ctx, item.DataFinID, proto.DataFinState_DataFinStateFailed, err.Error(), nil)
+			remark := err.Error()
+			_ = updateStateAndAck(ctx, &proto.DataFinReq{
+				DataFinID: &item.DataFinID,
+				State:     proto.DataFinState_DataFinStateFailed.Enum(),
+				Remark:    &remark,
+			}, nil)
 			continue
 		}
 		val := _val.ToBigInt()
@@ -166,10 +207,7 @@ func DataFinTask(ctx context.Context, topicID string, isIDTopic bool) error {
 	var tx *types.Transaction
 	txTime := uint32(time.Now().Unix())
 	err = mgr.WithWriteContract(ctx, false, func(ctx context.Context, txOpts *bind.TransactOpts, contract *data_fin.DataFin, cli *ethclient.Client) error {
-		fmt.Println(ids)
-		fmt.Println(utils.PrettyStruct(vals))
 		if isIDTopic {
-			fmt.Println(txOpts.From)
 			tx, err = contract.AddIDsItems(txOpts, topicID, txTime, ids, vals)
 		} else {
 			tx, err = contract.AddItems(txOpts, topicID, txTime, vals)
@@ -178,17 +216,28 @@ func DataFinTask(ctx context.Context, topicID string, isIDTopic bool) error {
 			return err
 		}
 
-		time.Sleep(3 * time.Second)
+		time.Sleep(5 * time.Second)
 		_, _, err = cli.TransactionByHash(ctx, tx.Hash())
 		return err
 	})
+
+	if err != nil {
+		logger.Sugar().Error(err)
+	}
 
 	for _, item := range items {
 		id := item.DataFinID
 		state := proto.DataFinState_DataFinStateSeccess
 
 		if err != nil {
-			_ = updateStateAndAck(ctx, item.DataFinID, proto.DataFinState_DataFinStateDefault, err.Error(), nil)
+			item.Retries++
+			remark := err.Error()
+			_ = updateStateAndAck(ctx, &proto.DataFinReq{
+				DataFinID: &id,
+				State:     proto.DataFinState_DataFinStateDefault.Enum(),
+				Retries:   &item.Retries,
+				Remark:    &remark,
+			}, nil)
 		} else {
 			_, err = datafin.Update(ctx, &proto.DataFinReq{
 				DataFinID: &id,
@@ -205,12 +254,64 @@ func DataFinTask(ctx context.Context, topicID string, isIDTopic bool) error {
 	return nil
 }
 
-func updateStateAndAck(ctx context.Context, id string, state proto.DataFinState, remark string, msg *pulsar.ConsumerMessage) error {
-	_, err := datafin.Update(ctx, &proto.DataFinReq{
-		DataFinID: &id,
-		State:     &state,
-		Remark:    &remark,
-	})
+func retry(ctx context.Context, retries uint32, minInterval time.Duration) {
+	conds := &proto.Conds{
+		Retries: &bright.Uint32Val{
+			Op:    cruder.EQ,
+			Value: retries,
+		},
+		State: &bright.StringVal{
+			Op:    cruder.EQ,
+			Value: proto.DataFinState_DataFinStateDefault.String(),
+		},
+	}
+	for {
+		select {
+		case <-time.NewTicker(minInterval << time.Duration(retries-1)).C:
+			resp, err := topicclient.GetTopics(ctx, &topic.GetTopicsRequest{
+				Offset: 0,
+				Limit:  maxTopicNum,
+			})
+			if err != nil {
+				logger.Sugar().Errorf("failed to get topics,err %v", err)
+				return
+			}
+
+			for _, item := range resp.Infos {
+				conds.TopicID = &bright.StringVal{
+					Op:    cruder.EQ,
+					Value: item.TopicID,
+				}
+
+				rows, _, err := datafin.Rows(ctx, conds, 0, maxTxPackNum)
+				if err != nil {
+					logger.Sugar().Error(err)
+				}
+				if len(rows) == 0 {
+					continue
+				}
+				if retries >= maxRetries {
+					for _, row := range rows {
+						id := row.ID.String()
+						remark := "exhausted the maximum number of retries"
+						datafin.Update(ctx, &proto.DataFinReq{
+							DataFinID: &id,
+							State:     proto.DataFinState_DataFinStateFailed.Enum(),
+							Remark:    &remark,
+						})
+					}
+					continue
+				}
+				_ = PutDataFinInfos(ctx, item.TopicID, converter.Ent2GrpcMany(rows))
+			}
+		case <-ctx.Done():
+			return
+		}
+	}
+}
+
+func updateStateAndAck(ctx context.Context, in *proto.DataFinReq, msg *pulsar.ConsumerMessage) error {
+	_, err := datafin.Update(ctx, in)
 	if err == nil && msg != nil {
 		err = msg.AckID(msg.ID())
 	}

@@ -80,6 +80,70 @@
         ]
       }
     },
+    "/check/id/datafin": {
+      "post": {
+        "operationId": "Manager_CheckIDDataFin",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/datafinCheckIDDataFinResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/datafinCheckIDDataFinRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Manager"
+        ]
+      }
+    },
+    "/check/id/datafin/with/data": {
+      "post": {
+        "operationId": "Manager_CheckIDDataFinWithData",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/datafinCheckIDDataFinResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/datafinCheckIDDataFinWithDataRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Manager"
+        ]
+      }
+    },
     "/create/datafin": {
       "post": {
         "operationId": "Manager_CreateDataFin",
@@ -152,11 +216,26 @@
         "TopicID": {
           "type": "string"
         },
-        "DataID": {
-          "type": "string"
-        },
+        "DataFins": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "datafinCheckDataFinResp": {
+      "type": "object",
+      "properties": {
         "DataFin": {
           "type": "string"
+        },
+        "TxTime": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "Passed": {
+          "type": "boolean"
         }
       }
     },
@@ -166,14 +245,12 @@
         "TopicID": {
           "type": "string"
         },
-        "OnChainDataFin": {
-          "type": "string"
-        },
-        "TxTime": {
-          "type": "string"
-        },
-        "Passed": {
-          "type": "boolean"
+        "Infos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/datafinCheckDataFinResp"
+          }
         }
       }
     },
@@ -183,14 +260,102 @@
         "TopicID": {
           "type": "string"
         },
+        "Type": {
+          "$ref": "#/definitions/datafinDataType"
+        },
+        "Datas": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "datafinCheckIDDataFinItem": {
+      "type": "object",
+      "properties": {
         "DataID": {
+          "type": "string"
+        },
+        "DataFin": {
+          "type": "string"
+        }
+      }
+    },
+    "datafinCheckIDDataFinRequest": {
+      "type": "object",
+      "properties": {
+        "TopicID": {
+          "type": "string"
+        },
+        "Infos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/datafinCheckIDDataFinItem"
+          }
+        }
+      }
+    },
+    "datafinCheckIDDataFinResp": {
+      "type": "object",
+      "properties": {
+        "DataID": {
+          "type": "string"
+        },
+        "DataFin": {
+          "type": "string"
+        },
+        "TxTime": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "Passed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "datafinCheckIDDataFinResponse": {
+      "type": "object",
+      "properties": {
+        "TopicID": {
+          "type": "string"
+        },
+        "Infos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/datafinCheckIDDataFinResp"
+          }
+        }
+      }
+    },
+    "datafinCheckIDDataFinWithDataItem": {
+      "type": "object",
+      "properties": {
+        "DataID": {
+          "type": "string"
+        },
+        "Data": {
+          "type": "string"
+        }
+      }
+    },
+    "datafinCheckIDDataFinWithDataRequest": {
+      "type": "object",
+      "properties": {
+        "TopicID": {
           "type": "string"
         },
         "Type": {
           "$ref": "#/definitions/datafinDataType"
         },
-        "Data": {
-          "type": "string"
+        "Infos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/datafinCheckIDDataFinWithDataItem"
+          }
         }
       }
     },
@@ -291,11 +456,10 @@
     "datafinDataType": {
       "type": "string",
       "enum": [
-        "DataTypeDefault",
         "RawType",
         "JsonType"
       ],
-      "default": "DataTypeDefault"
+      "default": "RawType"
     },
     "datafinGetDataFinsRequest": {
       "type": "object",
@@ -320,6 +484,10 @@
             "type": "object",
             "$ref": "#/definitions/datafinDataFinInfo"
           }
+        },
+        "Total": {
+          "type": "integer",
+          "format": "int64"
         }
       }
     },

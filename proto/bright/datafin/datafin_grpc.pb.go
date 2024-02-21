@@ -24,7 +24,9 @@ const _ = grpc.SupportPackageIsVersion7
 type ManagerClient interface {
 	CreateDataFin(ctx context.Context, in *CreateDataFinRequest, opts ...grpc.CallOption) (*CreateDataFinResponse, error)
 	GetDataFins(ctx context.Context, in *GetDataFinsRequest, opts ...grpc.CallOption) (*GetDataFinsResponse, error)
+	CheckIDDataFin(ctx context.Context, in *CheckIDDataFinRequest, opts ...grpc.CallOption) (*CheckIDDataFinResponse, error)
 	CheckDataFin(ctx context.Context, in *CheckDataFinRequest, opts ...grpc.CallOption) (*CheckDataFinResponse, error)
+	CheckIDDataFinWithData(ctx context.Context, in *CheckIDDataFinWithDataRequest, opts ...grpc.CallOption) (*CheckIDDataFinResponse, error)
 	CheckDataFinWithData(ctx context.Context, in *CheckDataFinWithDataRequest, opts ...grpc.CallOption) (*CheckDataFinResponse, error)
 }
 
@@ -54,9 +56,27 @@ func (c *managerClient) GetDataFins(ctx context.Context, in *GetDataFinsRequest,
 	return out, nil
 }
 
+func (c *managerClient) CheckIDDataFin(ctx context.Context, in *CheckIDDataFinRequest, opts ...grpc.CallOption) (*CheckIDDataFinResponse, error) {
+	out := new(CheckIDDataFinResponse)
+	err := c.cc.Invoke(ctx, "/bright.datafin.Manager/CheckIDDataFin", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *managerClient) CheckDataFin(ctx context.Context, in *CheckDataFinRequest, opts ...grpc.CallOption) (*CheckDataFinResponse, error) {
 	out := new(CheckDataFinResponse)
 	err := c.cc.Invoke(ctx, "/bright.datafin.Manager/CheckDataFin", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *managerClient) CheckIDDataFinWithData(ctx context.Context, in *CheckIDDataFinWithDataRequest, opts ...grpc.CallOption) (*CheckIDDataFinResponse, error) {
+	out := new(CheckIDDataFinResponse)
+	err := c.cc.Invoke(ctx, "/bright.datafin.Manager/CheckIDDataFinWithData", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +98,9 @@ func (c *managerClient) CheckDataFinWithData(ctx context.Context, in *CheckDataF
 type ManagerServer interface {
 	CreateDataFin(context.Context, *CreateDataFinRequest) (*CreateDataFinResponse, error)
 	GetDataFins(context.Context, *GetDataFinsRequest) (*GetDataFinsResponse, error)
+	CheckIDDataFin(context.Context, *CheckIDDataFinRequest) (*CheckIDDataFinResponse, error)
 	CheckDataFin(context.Context, *CheckDataFinRequest) (*CheckDataFinResponse, error)
+	CheckIDDataFinWithData(context.Context, *CheckIDDataFinWithDataRequest) (*CheckIDDataFinResponse, error)
 	CheckDataFinWithData(context.Context, *CheckDataFinWithDataRequest) (*CheckDataFinResponse, error)
 	mustEmbedUnimplementedManagerServer()
 }
@@ -93,8 +115,14 @@ func (UnimplementedManagerServer) CreateDataFin(context.Context, *CreateDataFinR
 func (UnimplementedManagerServer) GetDataFins(context.Context, *GetDataFinsRequest) (*GetDataFinsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDataFins not implemented")
 }
+func (UnimplementedManagerServer) CheckIDDataFin(context.Context, *CheckIDDataFinRequest) (*CheckIDDataFinResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckIDDataFin not implemented")
+}
 func (UnimplementedManagerServer) CheckDataFin(context.Context, *CheckDataFinRequest) (*CheckDataFinResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckDataFin not implemented")
+}
+func (UnimplementedManagerServer) CheckIDDataFinWithData(context.Context, *CheckIDDataFinWithDataRequest) (*CheckIDDataFinResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckIDDataFinWithData not implemented")
 }
 func (UnimplementedManagerServer) CheckDataFinWithData(context.Context, *CheckDataFinWithDataRequest) (*CheckDataFinResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckDataFinWithData not implemented")
@@ -148,6 +176,24 @@ func _Manager_GetDataFins_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Manager_CheckIDDataFin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckIDDataFinRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagerServer).CheckIDDataFin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/bright.datafin.Manager/CheckIDDataFin",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagerServer).CheckIDDataFin(ctx, req.(*CheckIDDataFinRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Manager_CheckDataFin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CheckDataFinRequest)
 	if err := dec(in); err != nil {
@@ -162,6 +208,24 @@ func _Manager_CheckDataFin_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ManagerServer).CheckDataFin(ctx, req.(*CheckDataFinRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Manager_CheckIDDataFinWithData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckIDDataFinWithDataRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagerServer).CheckIDDataFinWithData(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/bright.datafin.Manager/CheckIDDataFinWithData",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagerServer).CheckIDDataFinWithData(ctx, req.(*CheckIDDataFinWithDataRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -200,8 +264,16 @@ var Manager_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Manager_GetDataFins_Handler,
 		},
 		{
+			MethodName: "CheckIDDataFin",
+			Handler:    _Manager_CheckIDDataFin_Handler,
+		},
+		{
 			MethodName: "CheckDataFin",
 			Handler:    _Manager_CheckDataFin_Handler,
+		},
+		{
+			MethodName: "CheckIDDataFinWithData",
+			Handler:    _Manager_CheckIDDataFinWithData_Handler,
 		},
 		{
 			MethodName: "CheckDataFinWithData",

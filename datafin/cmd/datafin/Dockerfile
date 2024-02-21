@@ -12,7 +12,6 @@ RUN mkdir $ENV_DATA_DIR
 
 RUN apt  update \
     && apt install -y --no-install-recommends ca-certificates curl
-RUN apt install gcc-multilib g++-multilib -y
 
 WORKDIR /usr/local/bin/
 

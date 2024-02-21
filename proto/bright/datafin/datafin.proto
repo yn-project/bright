@@ -21,9 +21,22 @@ service Manager {
       body:"*"
     };
   }
+  rpc CheckIDDataFin(CheckIDDataFinRequest) returns (CheckIDDataFinResponse) {
+    option (google.api.http) = {
+      post:"/check/id/datafin"
+      body:"*"
+    };
+  }
   rpc CheckDataFin(CheckDataFinRequest) returns (CheckDataFinResponse) {
     option (google.api.http) = {
       post:"/check/datafin"
+      body:"*"
+    };
+  }
+
+  rpc CheckIDDataFinWithData(CheckIDDataFinWithDataRequest) returns (CheckIDDataFinResponse) {
+    option (google.api.http) = {
+      post:"/check/id/datafin/with/data"
       body:"*"
     };
   }
@@ -89,8 +102,7 @@ message DataFinInfo{
 }
 
 enum DataType{
-  DataTypeDefault = 0;
-  RawType = 10;
+  RawType = 0;
   JsonType = 20;
 }
 
@@ -104,30 +116,65 @@ enum DataFinState{
 
 message GetDataFinsRequest{
   string   TopicID = 10 [json_name="topicID"]; 
-  repeated string DataFinIDs = 20 [json_name="dataFinIDs"]; 
+  repeated string DataFinIDs = 20 [json_name="dataFinIDs"];
 }
 
 message GetDataFinsResponse{
   repeated DataFinInfo Infos = 10 [json_name="infos"]; 
+  uint32 Total = 20 [json_name="total"]; 
 }
 
+message CheckIDDataFinItem {
+  string DataID = 10  [json_name="dataID"];  
+  optional string DataFin = 20  [json_name="dataFin"]; 
+}
+
+message CheckIDDataFinRequest{
+  string TopicID = 10  [json_name="topicID"]; 
+  repeated CheckIDDataFinItem Infos = 20 [json_name="infos"]; 
+}
+
+message CheckIDDataFinResp{
+  string DataID = 10 [json_name="topicID"]; 
+  string DataFin = 20 [json_name="dataFin"];  
+  uint32 TxTime = 30 [json_name="txTime"];   
+  bool   Passed = 40 [json_name="passed"];   
+}
+
+message CheckIDDataFinResponse{
+  string TopicID = 10 [json_name="topicID"]; 
+  repeated CheckIDDataFinResp Infos = 20 [json_name="infos"];    
+}
 
 message CheckDataFinRequest{
   string TopicID = 10  [json_name="topicID"]; 
-  optional string DataID = 20  [json_name="dataID"];  
-  optional string DataFin = 30  [json_name="dataFin"];   
+  repeated string DataFins = 20 [json_name="dataFins"]; 
+}
+
+message CheckDataFinResp{
+  string DataFin = 10 [json_name="dataFin"];  
+  uint32 TxTime = 20 [json_name="txTime"];   
+  bool   Passed = 30 [json_name="passed"];   
 }
 
 message CheckDataFinResponse{
   string TopicID = 10 [json_name="topicID"]; 
-  string OnChainDataFin = 20 [json_name="onChainDataFin"];  
-  string TxTime = 30 [json_name="txTime"];   
-  bool   Passed = 40 [json_name="passed"];   
+  repeated CheckDataFinResp Infos = 20 [json_name="infos"];    
+}
+
+message CheckIDDataFinWithDataItem {
+  string DataID = 10  [json_name="dataID"]; 
+  optional string Data = 20  [json_name="data"]; 
+}
+
+message CheckIDDataFinWithDataRequest{
+  string    TopicID = 10  [json_name="topicID"]; 
+  DataType  Type = 20 [json_name="type"];
+  repeated CheckIDDataFinWithDataItem Infos = 30 [json_name="infos"]; 
 }
 
 message CheckDataFinWithDataRequest{
-  string   TopicID = 10  [json_name="topicID"]; 
-  string   DataID = 20  [json_name="dataID"];  
-  DataType Type = 30  [json_name="type"];   
-  string   Data = 40  [json_name="data"];   
+  string TopicID = 10  [json_name="topicID"]; 
+  DataType  Type = 20 [json_name="type"];
+  repeated string Datas = 30 [json_name="datas"]; 
 }

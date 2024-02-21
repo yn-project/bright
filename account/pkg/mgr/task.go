@@ -2,6 +2,7 @@ package mgr
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/Vigo-Tea/go-ethereum-ant/accounts/abi/bind"
@@ -190,5 +191,38 @@ func WithWriteContract(ctx context.Context, needRoot bool, handle func(ctx conte
 			return err
 		}
 		return handle(ctx, txOpts, contract, cli)
+	})
+}
+
+func WithReadContract(ctx context.Context, needRoot bool, handle func(ctx context.Context, from common.Address, contract *data_fin.DataFin, cli *ethclient.Client) error) error {
+	contractAddr, err := contractmgr.GetContract(ctx)
+	if err != nil {
+		return err
+	}
+
+	amgr := GetAccountMGR()
+	var from string
+	if needRoot {
+		from, err = amgr.GetRootAccountPub(ctx)
+	} else {
+		accs, err := amgr.GetTreeAccountPub(ctx)
+		if err == nil && len(accs) > 0 {
+			from = accs[0]
+		}
+	}
+
+	if err != nil {
+		return err
+	}
+	if from == "" {
+		return fmt.Errorf("have no available accounts")
+	}
+
+	return endpointmgr.WithClient(ctx, func(ctx context.Context, cli *ethclient.Client) error {
+		contract, err := data_fin.NewDataFin(*contractAddr, cli)
+		if err != nil {
+			return err
+		}
+		return handle(ctx, common.HexToAddress(from), contract, cli)
 	})
 }

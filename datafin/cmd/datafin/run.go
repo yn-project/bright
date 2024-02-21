@@ -22,6 +22,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 	"yun.tea/block/bright/datafin/pkg/db"
+	"yun.tea/block/bright/datafin/pkg/mgr"
 	"yun.tea/block/bright/datafin/pkg/servicename"
 )
 
@@ -47,6 +48,7 @@ var runCmd = &cli.Command{
 	Action: func(c *cli.Context) error {
 		go runGRPCServer(config.GetConfig().DataFin.GrpcPort)
 		go runHTTPServer(config.GetConfig().DataFin.HTTPPort, config.GetConfig().DataFin.GrpcPort)
+		go mgr.Maintain(c.Context)
 		sigchan := make(chan os.Signal, 1)
 		signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 
