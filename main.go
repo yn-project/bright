@@ -12,38 +12,49 @@ import (
 )
 
 func main() {
-	topicID := "fffs"
-	producer, err := dataFinProducer(topicID)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(0)
-	}
-	randkey := utils.RandomBase58(5)
-	for i := 0; i < 10; i++ {
-		_, err = producer.Send(context.Background(), &pulsar.ProducerMessage{
-			Key:     fmt.Sprintf("%v-%v", randkey, i),
-			Payload: []byte("ssdf"),
-		})
+	topicID := "f2f2fs"
+	go func() {
+		producer, err := dataFinProducer(topicID)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(0)
+		}
+		for i := 0; i < 100; i++ {
+			_, err = producer.Send(context.Background(), &pulsar.ProducerMessage{
+				Key:     fmt.Sprintf("%v-%v", utils.RandomBase58(5), i),
+				Payload: []byte("ssdf"),
+			})
+		}
+	}()
+	consum := func(name string) {
+		consummer, err := dataFinConsummer(topicID, name)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(0)
+		}
+
+		for {
+			select {
+			case item := <-consummer.Chan():
+				fmt.Printf("%v,%v,%v\n", name, item.Key(), string(item.Payload()))
+				item.AckID(item.ID())
+				// time.Sleep(time.Second + time.Microsecond*300)
+			case <-time.NewTicker(time.Second * 10).C:
+				return
+			}
+
+		}
+
 	}
 
-	fmt.Println(randkey)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(0)
-	}
-	time.Sleep(time.Minute * 10)
+	time.Sleep(time.Second)
 
-	consummer, err := dataFinConsummer(topicID, "sssss")
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(0)
-	}
-
-	for i := 0; i < 10; i++ {
-		item := <-consummer.Chan()
-		fmt.Println(item.Key())
-		fmt.Println(string(item.Payload()))
-	}
+	go consum("c1")
+	time.Sleep(time.Second)
+	// go consum("c2")
+	time.Sleep(time.Second * 2)
+	consum("c3")
+	// time.Sleep(time.Second * 33)
 
 }
 func dataFinProducer(topicID string) (pulsar.Producer, error) {
@@ -65,10 +76,11 @@ func dataFinConsummer(topic string, name string) (pulsar.Consumer, error) {
 	}
 
 	consumer, err := cli.Subscribe(pulsar.ConsumerOptions{
-		Topic:            topic,
-		SubscriptionName: name,
-		Type:             pulsar.Shared,
-		RetryEnable:      true,
+		Topic: topic,
+		// SubscriptionInitialPosition: pulsar.SubscriptionPositionEarliest,
+		SubscriptionName: "name",
+		// Name:                        name,
+		Type: pulsar.Shared,
 	})
 
 	return consumer, err

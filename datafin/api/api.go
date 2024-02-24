@@ -27,5 +27,5 @@ func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOpt
 	if err != nil {
 		return err
 	}
-	return topicproto.RegisterManagerHandlerFromEndpoint(context.Background(), mux, endpoint, opts)
+	return datafinproto.RegisterManagerHandlerFromEndpoint(context.Background(), mux, endpoint, opts)
 }

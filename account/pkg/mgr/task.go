@@ -107,8 +107,9 @@ func CheckAllAccountState(ctx context.Context) {
 	if err != nil {
 		logger.Sugar().Errorw("CheckAllAccountState", "Err", err)
 	}
-
-	logger.Sugar().Infow("CheckAllAccountState", "root account", availableRootAcc.Pub)
+	if availableRootAcc != nil {
+		logger.Sugar().Infow("CheckAllAccountState", "root account", availableRootAcc.Pub)
+	}
 	treeAccList := []string{}
 	for _, v := range availableTreeAccs {
 		treeAccList = append(treeAccList, v.Pub)

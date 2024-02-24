@@ -135,7 +135,7 @@ message CheckIDDataFinRequest{
 }
 
 message CheckIDDataFinResp{
-  string DataID = 10 [json_name="topicID"]; 
+  string DataID = 10 [json_name="dataID"]; 
   string DataFin = 20 [json_name="dataFin"];  
   uint32 TxTime = 30 [json_name="txTime"];   
   bool   Passed = 40 [json_name="passed"];   

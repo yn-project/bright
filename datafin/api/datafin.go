@@ -12,7 +12,6 @@ import (
 	accountmgr "yun.tea/block/bright/account/pkg/mgr"
 	converter "yun.tea/block/bright/datafin/pkg/converter/datafin"
 	crud "yun.tea/block/bright/datafin/pkg/crud/datafin"
-	"yun.tea/block/bright/datafin/pkg/mgr"
 
 	data_fin "yun.tea/block/bright/common/chains/eth/datafin"
 	"yun.tea/block/bright/common/cruder"
@@ -63,13 +62,6 @@ func (s *DataFinServer) CreateDataFin(ctx context.Context, in *proto.CreateDataF
 		return &proto.CreateDataFinResponse{}, err
 	}
 
-	go func() {
-		err := mgr.PutDataFinInfos(context.Background(), in.TopicID, converter.Ent2GrpcMany(infos))
-		if err != nil {
-			logger.Sugar().Errorf("failed to put datafin to pulsar,topic-id: %v,type: %v", in.TopicID, in.Type)
-		}
-	}()
-
 	logger.Sugar().Infof("success to create datafin,topic-id: %v,type: %v", in.TopicID, in.Type)
 	return &proto.CreateDataFinResponse{
 		Infos: converter.Ent2GrpcMany(infos),
@@ -116,10 +108,14 @@ func (s *DataFinServer) CheckDataFin(ctx context.Context, in *proto.CheckDataFin
 	}
 
 	rets := []*big.Int{}
-	accountmgr.WithReadContract(ctx, false, func(ctx context.Context, from common.Address, contract *data_fin.DataFin, cli *ethclient.Client) error {
+	err = accountmgr.WithReadContract(ctx, false, func(ctx context.Context, from common.Address, contract *data_fin.DataFin, cli *ethclient.Client) error {
 		rets, err = contract.VerifyItems(&bind.CallOpts{Pending: true, From: from, Context: ctx}, in.TopicID, vals)
 		return err
 	})
+	if err != nil {
+		logger.Sugar().Error(err)
+		return &proto.CheckDataFinResponse{}, err
+	}
 
 	infos := []*proto.CheckDataFinResp{}
 	for i, v := range in.DataFins {
@@ -145,7 +141,11 @@ func (s *DataFinServer) CheckIDDataFin(ctx context.Context, in *proto.CheckIDDat
 
 	vals := []*big.Int{}
 	ids := []string{}
+	nullDataFin := ""
 	for _, v := range in.Infos {
+		if v.DataFin == nil {
+			v.DataFin = &nullDataFin
+		}
 		fin256, err := utils.FromHexString(*v.DataFin)
 		if err != nil {
 			vals = append(vals, &big.Int{})
@@ -156,11 +156,16 @@ func (s *DataFinServer) CheckIDDataFin(ctx context.Context, in *proto.CheckIDDat
 	}
 
 	rets := []*big.Int{}
-	accountmgr.WithReadContract(ctx, false, func(ctx context.Context, from common.Address, contract *data_fin.DataFin, cli *ethclient.Client) error {
+	err = accountmgr.WithReadContract(ctx, false, func(ctx context.Context, from common.Address, contract *data_fin.DataFin, cli *ethclient.Client) error {
 		rets, err = contract.VerifyIDItems(&bind.CallOpts{Pending: true, From: from, Context: ctx}, in.TopicID, ids, vals)
 		return err
 	})
-
+	if err != nil {
+		logger.Sugar().Error(err)
+		return &proto.CheckIDDataFinResponse{}, err
+	}
+	fmt.Println(utils.PrettyStruct(ids))
+	fmt.Println(utils.PrettyStruct(rets))
 	infos := []*proto.CheckIDDataFinResp{}
 	for i, v := range in.Infos {
 		infos = append(infos, &proto.CheckIDDataFinResp{
@@ -202,10 +207,14 @@ func (s *DataFinServer) CheckDataFinWithData(ctx context.Context, in *proto.Chec
 	}
 
 	rets := []*big.Int{}
-	accountmgr.WithReadContract(ctx, false, func(ctx context.Context, from common.Address, contract *data_fin.DataFin, cli *ethclient.Client) error {
+	err = accountmgr.WithReadContract(ctx, false, func(ctx context.Context, from common.Address, contract *data_fin.DataFin, cli *ethclient.Client) error {
 		rets, err = contract.VerifyItems(&bind.CallOpts{Pending: true, From: from, Context: ctx}, in.TopicID, vals)
 		return err
 	})
+	if err != nil {
+		logger.Sugar().Error(err)
+		return &proto.CheckDataFinResponse{}, err
+	}
 
 	infos := []*proto.CheckDataFinResp{}
 	for i, v := range dfhash {
@@ -237,8 +246,11 @@ func (s *DataFinServer) CheckIDDataFinWithData(ctx context.Context, in *proto.Ch
 	vals := []*big.Int{}
 	ids := []string{}
 	dfhash := []string{}
-
+	nullDataFin := ""
 	for _, v := range in.Infos {
+		if v.Data == nil {
+			v.Data = &nullDataFin
+		}
 		fin256, err := utils.SumSha256String(*v.Data, needCompact)
 		if err != nil {
 			vals = append(vals, &big.Int{})
@@ -250,10 +262,14 @@ func (s *DataFinServer) CheckIDDataFinWithData(ctx context.Context, in *proto.Ch
 	}
 
 	rets := []*big.Int{}
-	accountmgr.WithReadContract(ctx, false, func(ctx context.Context, from common.Address, contract *data_fin.DataFin, cli *ethclient.Client) error {
+	err = accountmgr.WithReadContract(ctx, false, func(ctx context.Context, from common.Address, contract *data_fin.DataFin, cli *ethclient.Client) error {
 		rets, err = contract.VerifyIDItems(&bind.CallOpts{Pending: true, From: from, Context: ctx}, in.TopicID, ids, vals)
 		return err
 	})
+	if err != nil {
+		logger.Sugar().Error(err)
+		return &proto.CheckIDDataFinResponse{}, err
+	}
 
 	infos := []*proto.CheckIDDataFinResp{}
 	for i, v := range in.Infos {

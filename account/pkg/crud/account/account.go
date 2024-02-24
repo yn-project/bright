@@ -203,8 +203,8 @@ func Rows(ctx context.Context, conds *proto.Conds, offset, limit int) ([]*ent.Ac
 			return err
 		}
 		rows, err = stm.
-			Offset(offset).
 			Order(ent.Desc(account.FieldUpdatedAt)).
+			Offset(offset).
 			Limit(limit).
 			All(_ctx)
 		if err != nil {

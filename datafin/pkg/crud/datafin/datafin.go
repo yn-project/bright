@@ -246,8 +246,8 @@ func Rows(ctx context.Context, conds *proto.Conds, offset, limit int) ([]*ent.Da
 			return err
 		}
 		rows, err = stm.
+			Order(ent.Desc(datafin.FieldCreatedAt)).
 			Offset(offset).
-			Order(ent.Desc(datafin.FieldUpdatedAt)).
 			Limit(limit).
 			All(_ctx)
 		if err != nil {

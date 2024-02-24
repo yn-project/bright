@@ -151,12 +151,13 @@ func (aMGR *accountsMGR) LockUsingAccount(address *AccountKey, expire time.Durat
 }
 
 func (aMGR *accountsMGR) GetTreeAccountPub(ctx context.Context) (pubKeys []string, err error) {
-	addresses := []AccountKey{}
-	err = ctredis.Get(treeAccountsStoreKey, addresses)
+
+	_addresses := &AccountKeyList{}
+	err = ctredis.Get(treeAccountsStoreKey, _addresses)
 	if err != nil {
 		return nil, fmt.Errorf("have no available tree accounts,err: %v", err)
 	}
-
+	addresses := *_addresses
 	if len(addresses) == 0 {
 		return nil, fmt.Errorf("have no available tree accounts")
 	}
