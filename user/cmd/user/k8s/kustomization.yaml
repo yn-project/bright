@@ -1,3 +1,3 @@
 resources:
-  - 01-user-server.viper.yaml
-  - 02-user-server.yaml
+  - 01-user.viper.yaml
+  - 02-user.yaml

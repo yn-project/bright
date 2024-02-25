@@ -1,7 +1,7 @@
 FROM centos:centos7.9.2009
 
-COPY user-server /usr/local/bin/user-server
-COPY UserServer.viper.yaml /etc/UserServer/UserServer.viper.yaml
+COPY user /usr/local/bin/user
+COPY User.viper.yaml /etc/User/User.viper.yaml
 ENV ENV_DATA_DIR=/data \
     ENV_LOG_DIR=/var/log \
     ENV_LOG_LEVEL=debug \
@@ -14,4 +14,4 @@ RUN yum install ca-certificates curl -y
 
 WORKDIR /usr/local/bin/
 
-CMD ./user-server run
+CMD ./user run
