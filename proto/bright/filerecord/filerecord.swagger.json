@@ -145,9 +145,6 @@
         "ID": {
           "type": "string"
         },
-        "PackageName": {
-          "type": "string"
-        },
         "FileName": {
           "type": "string"
         },
@@ -179,9 +176,6 @@
       "type": "object",
       "properties": {
         "ID": {
-          "type": "string"
-        },
-        "PackageName": {
           "type": "string"
         },
         "FileName": {

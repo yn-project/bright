@@ -11,16 +11,15 @@ func Ent2Grpc(row *ent.FileRecord) *proto.FileRecordInfo {
 	}
 
 	return &proto.FileRecordInfo{
-		ID:          row.ID.String(),
-		PackageName: row.PackageName,
-		FileName:    row.FileName,
-		TopicID:     row.TopicID,
-		RecordNum:   row.RecordNum,
-		Sha1Sum:     row.Sha1Sum,
-		State:       proto.FileRecordState(proto.FileRecordState_value[row.State]),
-		Remark:      row.Remark,
-		CreatedAt:   row.CreatedAt,
-		UpdatedAt:   row.UpdatedAt,
+		ID:        row.ID.String(),
+		FileName:  row.FileName,
+		TopicID:   row.TopicID,
+		RecordNum: row.RecordNum,
+		Sha1Sum:   row.Sha1Sum,
+		State:     proto.FileRecordState(proto.FileRecordState_value[row.State]),
+		Remark:    row.Remark,
+		CreatedAt: row.CreatedAt,
+		UpdatedAt: row.UpdatedAt,
 	}
 }
 

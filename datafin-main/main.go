@@ -9,5 +9,5 @@ import (
 
 func main() {
 	logger.Init(logger.DebugLevel, "./a.log")
-	mgr.Maintain(context.Background())
+	mgr.ParseFileTask(context.Background())
 }

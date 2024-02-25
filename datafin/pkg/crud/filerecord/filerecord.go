@@ -35,9 +35,6 @@ func CreateSet(c *ent.FileRecordCreate, in *proto.FileRecordReq) *ent.FileRecord
 	if in.ID != nil {
 		c.SetID(uuid.New())
 	}
-	if in.PackageName != nil {
-		c.SetPackageName(in.GetPackageName())
-	}
 	if in.FileName != nil {
 		c.SetFileName(in.GetFileName())
 	}
@@ -99,9 +96,6 @@ func Update(ctx context.Context, in *proto.FileRecordReq) (*ent.FileRecord, erro
 }
 
 func UpdateSet(u *ent.FileRecordUpdateOne, in *proto.FileRecordReq) *ent.FileRecordUpdateOne {
-	if in.PackageName != nil {
-		u.SetPackageName(in.GetPackageName())
-	}
 	if in.FileName != nil {
 		u.SetFileName(in.GetFileName())
 	}
@@ -156,9 +150,6 @@ func setQueryConds(conds *proto.FileRecordConds, cli *ent.Client) (*ent.FileReco
 			}
 		}
 		stm.Where(filerecord.IDIn(ids...))
-	}
-	if conds.PackageName != nil {
-		stm.Where(filerecord.PackageName(conds.GetPackageName()))
 	}
 	if conds.FileName != nil {
 		stm.Where(filerecord.FileName(conds.GetFileName()))

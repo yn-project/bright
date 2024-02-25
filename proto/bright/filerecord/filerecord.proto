@@ -37,7 +37,6 @@ enum FileRecordState{
 
 message FileRecordReq {
   optional string ID = 10;
-  optional string PackageName = 11;
   optional string FileName = 20;
   optional string TopicID = 30;
   optional uint32 RecordNum = 40;
@@ -48,7 +47,6 @@ message FileRecordReq {
 
 message FileRecordInfo {
   string ID = 10;
-  string PackageName = 11;
   string FileName = 20;
   string TopicID = 30;
   uint32 RecordNum = 40;
@@ -61,7 +59,6 @@ message FileRecordInfo {
 
 message FileRecordConds {
   optional string ID = 10;
-  optional string PackageName = 11;
   optional string FileName = 20;
   optional string TopicID = 30;
   optional uint32 RecordNum = 40;

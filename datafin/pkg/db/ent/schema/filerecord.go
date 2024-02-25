@@ -24,7 +24,6 @@ func (FileRecord) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).
 			Unique(),
-		field.String("package_name"),
 		field.String("file_name"),
 		field.String("topic_id"),
 		field.Uint32("record_num").Default(0),
