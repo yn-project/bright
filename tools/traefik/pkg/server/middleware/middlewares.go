@@ -30,6 +30,8 @@ import (
 	"github.com/traefik/traefik/v2/pkg/middlewares/stripprefixregex"
 	"github.com/traefik/traefik/v2/pkg/middlewares/tracing"
 	"github.com/traefik/traefik/v2/pkg/server/provider"
+
+	"github.com/traefik/traefik/v2/pkg/middlewares/bright"
 )
 
 type middlewareStackType int
@@ -337,6 +339,28 @@ func (b *Builder) buildConstructor(ctx context.Context, middlewareName string) (
 		}
 		middleware = func(next http.Handler) (http.Handler, error) {
 			return stripprefixregex.New(ctx, next, *config.StripPrefixRegex, middlewareName)
+		}
+	}
+
+	// HeadersToBody
+	if config.HeadersToBody != nil {
+		if middleware != nil {
+			return nil, badConf
+		}
+
+		middleware = func(next http.Handler) (http.Handler, error) {
+			return bright.NewHeadersToBody(ctx, next, *config.HeadersToBody, middlewareName)
+		}
+	}
+
+	// RBACAuth
+	if config.RBACAuth != nil {
+		if middleware != nil {
+			return nil, badConf
+		}
+
+		middleware = func(next http.Handler) (http.Handler, error) {
+			return bright.NewRBAC(ctx, next, *config.RBACAuth, middlewareName)
 		}
 	}
 
