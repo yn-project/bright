@@ -67,6 +67,11 @@ service Manager {
       body:"*"
     };
   }
+  rpc QRCheck(QRCheckRequest) returns (QRCheckResponse) {
+    option (google.api.http) = {
+      get:"/qr/check"
+    };
+  }
 }
 
 message DataFinReq{
@@ -124,7 +129,7 @@ message DataFinInfo{
 
 enum DataType{
   RawType = 0;
-  JsonType = 20;
+  JsonType = 10;
 }
 
 enum DataFinState{
@@ -157,7 +162,7 @@ message GetAllDataFinsResponse{
 }
 
 message CheckIDDataFinItem {
-  string DataID = 10  [json_name="dataID"];  
+  string DataID = 10 [json_name="dataID"];  
   optional string DataFin = 20  [json_name="dataFin"]; 
 }
 
@@ -191,7 +196,7 @@ message CheckDataFinResp{
 
 message CheckDataFinResponse{
   string TopicID = 10 [json_name="topicID"]; 
-  repeated CheckDataFinResp Infos = 20 [json_name="infos"];    
+  repeated CheckDataFinResp Infos = 20 [json_name="infos"];
 }
 
 message CheckIDDataFinWithDataItem {
@@ -230,4 +235,16 @@ message GetQRCheckUrlRequest{
 
 message  GetQRCheckUrlResponse{
   string Url = 10  [json_name="url"]; 
+}
+
+message QRCheckRequest{
+  string Type = 10 [json_name="type"];
+  string TopicID = 20 [json_name="topicID"]; 
+  string Payload = 30  [json_name="payload"]; 
+}
+
+message  QRCheckResponse{
+  string DataFin = 10 [json_name="dataFin"];  
+  uint32 TxTime = 20 [json_name="txTime"];   
+  bool   Passed = 30 [json_name="passed"];   
 }
