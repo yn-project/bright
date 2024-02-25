@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+package bright.filerecord;
+
+option go_package = "yun.tea/block/bright/proto/bright/filerecord";
+import "bright/bright.proto";
+import "bright/basetype/basetype.proto";
+import "google/api/annotations.proto";
+
+
+service Manager {
+  rpc CreateFileRecord(CreateFileRecordRequest) returns (CreateFileRecordResponse) {
+    option (google.api.http) = {
+      post:"/create/filerecord"
+      body:"*"
+    };
+  }
+  rpc GetFileRecord(GetFileRecordRequest) returns (GetFileRecordResponse) {
+    option (google.api.http) = {
+      post:"/get/filerecord"
+      body:"*"
+    };
+  }
+  rpc GetFileRecords(GetFileRecordsRequest) returns (GetFileRecordsResponse) {
+    option (google.api.http) = {
+      post:"/get/filerecords"
+      body:"*"
+    };
+  }
+}
+
+enum FileRecordState{
+  FileRecordDefault = 0;
+  FileRecordSuccess = 10;
+  FileRecordFailed = 20;
+}
+
+message FileRecordReq {
+  optional string ID = 10;
+  optional string PackageName = 11;
+  optional string FileName = 20;
+  optional string TopicID = 30;
+  optional uint32 RecordNum = 40;
+  optional string Sha1Sum = 50;
+  optional FileRecordState State = 60;
+  optional string Remark = 70;
+}
+
+message FileRecordInfo {
+  string ID = 10;
+  string PackageName = 11;
+  string FileName = 20;
+  string TopicID = 30;
+  uint32 RecordNum = 40;
+  string Sha1Sum = 50;
+  FileRecordState State = 60;
+  string Remark = 70;
+  uint32 CreatedAt = 80;
+  uint32 UpdatedAt = 90;
+}
+
+message FileRecordConds {
+  optional string ID = 10;
+  optional string PackageName = 11;
+  optional string FileName = 20;
+  optional string TopicID = 30;
+  optional uint32 RecordNum = 40;
+  optional string Sha1Sum = 50;
+  optional FileRecordState State = 60;
+  optional string Remark = 70;
+  repeated string IDs = 100;
+}
+
+message CreateFileRecordRequest { 
+  string File = 10;
+  string TopicID = 20;
+  string Type = 30;
+  string Remark = 40;
+ }
+message CreateFileRecordResponse { FileRecordInfo Info = 10; }
+
+message GetFileRecordRequest { string ID = 10; }
+message GetFileRecordResponse { FileRecordInfo Info = 10; }
+
+message GetFileRecordsRequest {
+  FileRecordConds Info = 10;
+  int32 Offset = 20;
+  int32 Limit = 30;
+}
+
+message GetFileRecordsResponse {
+  repeated FileRecordInfo Infos = 10;
+  uint32 Total = 20;
+}

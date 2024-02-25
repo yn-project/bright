@@ -1,0 +1,302 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "bright/filerecord/filerecord.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Manager"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/create/filerecord": {
+      "post": {
+        "operationId": "Manager_CreateFileRecord",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/filerecordCreateFileRecordResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/filerecordCreateFileRecordRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Manager"
+        ]
+      }
+    },
+    "/get/filerecord": {
+      "post": {
+        "operationId": "Manager_GetFileRecord",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/filerecordGetFileRecordResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/filerecordGetFileRecordRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Manager"
+        ]
+      }
+    },
+    "/get/filerecords": {
+      "post": {
+        "operationId": "Manager_GetFileRecords",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/filerecordGetFileRecordsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/filerecordGetFileRecordsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Manager"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "filerecordCreateFileRecordRequest": {
+      "type": "object",
+      "properties": {
+        "File": {
+          "type": "string"
+        },
+        "TopicID": {
+          "type": "string"
+        },
+        "Type": {
+          "type": "string"
+        },
+        "Remark": {
+          "type": "string"
+        }
+      }
+    },
+    "filerecordCreateFileRecordResponse": {
+      "type": "object",
+      "properties": {
+        "Info": {
+          "$ref": "#/definitions/filerecordFileRecordInfo"
+        }
+      }
+    },
+    "filerecordFileRecordConds": {
+      "type": "object",
+      "properties": {
+        "ID": {
+          "type": "string"
+        },
+        "PackageName": {
+          "type": "string"
+        },
+        "FileName": {
+          "type": "string"
+        },
+        "TopicID": {
+          "type": "string"
+        },
+        "RecordNum": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "Sha1Sum": {
+          "type": "string"
+        },
+        "State": {
+          "$ref": "#/definitions/filerecordFileRecordState"
+        },
+        "Remark": {
+          "type": "string"
+        },
+        "IDs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "filerecordFileRecordInfo": {
+      "type": "object",
+      "properties": {
+        "ID": {
+          "type": "string"
+        },
+        "PackageName": {
+          "type": "string"
+        },
+        "FileName": {
+          "type": "string"
+        },
+        "TopicID": {
+          "type": "string"
+        },
+        "RecordNum": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "Sha1Sum": {
+          "type": "string"
+        },
+        "State": {
+          "$ref": "#/definitions/filerecordFileRecordState"
+        },
+        "Remark": {
+          "type": "string"
+        },
+        "CreatedAt": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "UpdatedAt": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "filerecordFileRecordState": {
+      "type": "string",
+      "enum": [
+        "FileRecordDefault",
+        "FileRecordSuccess",
+        "FileRecordFailed"
+      ],
+      "default": "FileRecordDefault"
+    },
+    "filerecordGetFileRecordRequest": {
+      "type": "object",
+      "properties": {
+        "ID": {
+          "type": "string"
+        }
+      }
+    },
+    "filerecordGetFileRecordResponse": {
+      "type": "object",
+      "properties": {
+        "Info": {
+          "$ref": "#/definitions/filerecordFileRecordInfo"
+        }
+      }
+    },
+    "filerecordGetFileRecordsRequest": {
+      "type": "object",
+      "properties": {
+        "Info": {
+          "$ref": "#/definitions/filerecordFileRecordConds"
+        },
+        "Offset": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "Limit": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "filerecordGetFileRecordsResponse": {
+      "type": "object",
+      "properties": {
+        "Infos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/filerecordFileRecordInfo"
+          }
+        },
+        "Total": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}
