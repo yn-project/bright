@@ -272,6 +272,48 @@
         ]
       }
     },
+    "/qr/check": {
+      "get": {
+        "operationId": "Manager_QRCheck",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/datafinQRCheckResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Type",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "TopicID",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "Payload",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Manager"
+        ]
+      }
+    },
     "/qr/check/default/parms": {
       "post": {
         "operationId": "Manager_QRCheckDefaultParms",
@@ -669,6 +711,21 @@
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "datafinQRCheckResponse": {
+      "type": "object",
+      "properties": {
+        "DataFin": {
+          "type": "string"
+        },
+        "TxTime": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "Passed": {
+          "type": "boolean"
         }
       }
     },

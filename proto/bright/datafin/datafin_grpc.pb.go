@@ -31,6 +31,7 @@ type ManagerClient interface {
 	CheckDataFinWithData(ctx context.Context, in *CheckDataFinWithDataRequest, opts ...grpc.CallOption) (*CheckDataFinResponse, error)
 	QRCheckDefaultParms(ctx context.Context, in *QRCheckDefaultParmsRequest, opts ...grpc.CallOption) (*QRCheckDefaultParmsResponse, error)
 	GetQRCheckUrl(ctx context.Context, in *GetQRCheckUrlRequest, opts ...grpc.CallOption) (*GetQRCheckUrlResponse, error)
+	QRCheck(ctx context.Context, in *QRCheckRequest, opts ...grpc.CallOption) (*QRCheckResponse, error)
 }
 
 type managerClient struct {
@@ -122,6 +123,15 @@ func (c *managerClient) GetQRCheckUrl(ctx context.Context, in *GetQRCheckUrlRequ
 	return out, nil
 }
 
+func (c *managerClient) QRCheck(ctx context.Context, in *QRCheckRequest, opts ...grpc.CallOption) (*QRCheckResponse, error) {
+	out := new(QRCheckResponse)
+	err := c.cc.Invoke(ctx, "/bright.datafin.Manager/QRCheck", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ManagerServer is the server API for Manager service.
 // All implementations must embed UnimplementedManagerServer
 // for forward compatibility
@@ -135,6 +145,7 @@ type ManagerServer interface {
 	CheckDataFinWithData(context.Context, *CheckDataFinWithDataRequest) (*CheckDataFinResponse, error)
 	QRCheckDefaultParms(context.Context, *QRCheckDefaultParmsRequest) (*QRCheckDefaultParmsResponse, error)
 	GetQRCheckUrl(context.Context, *GetQRCheckUrlRequest) (*GetQRCheckUrlResponse, error)
+	QRCheck(context.Context, *QRCheckRequest) (*QRCheckResponse, error)
 	mustEmbedUnimplementedManagerServer()
 }
 
@@ -168,6 +179,9 @@ func (UnimplementedManagerServer) QRCheckDefaultParms(context.Context, *QRCheckD
 }
 func (UnimplementedManagerServer) GetQRCheckUrl(context.Context, *GetQRCheckUrlRequest) (*GetQRCheckUrlResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetQRCheckUrl not implemented")
+}
+func (UnimplementedManagerServer) QRCheck(context.Context, *QRCheckRequest) (*QRCheckResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method QRCheck not implemented")
 }
 func (UnimplementedManagerServer) mustEmbedUnimplementedManagerServer() {}
 
@@ -344,6 +358,24 @@ func _Manager_GetQRCheckUrl_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Manager_QRCheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QRCheckRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagerServer).QRCheck(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/bright.datafin.Manager/QRCheck",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagerServer).QRCheck(ctx, req.(*QRCheckRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Manager_ServiceDesc is the grpc.ServiceDesc for Manager service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -386,6 +418,10 @@ var Manager_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetQRCheckUrl",
 			Handler:    _Manager_GetQRCheckUrl_Handler,
+		},
+		{
+			MethodName: "QRCheck",
+			Handler:    _Manager_QRCheck_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

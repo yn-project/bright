@@ -3,8 +3,13 @@ package datafin
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/hex"
+	"encoding/json"
 	"fmt"
+	"io"
 	"math/big"
+	"net/http"
 
 	"github.com/Vigo-Tea/go-ethereum-ant/accounts/abi/bind"
 	"github.com/Vigo-Tea/go-ethereum-ant/common"
@@ -323,27 +328,102 @@ func (s *DataFinServer) QRCheckDefaultParms(ctx context.Context, in *proto.QRChe
 }
 
 func (s *DataFinServer) GetQRCheckUrl(ctx context.Context, in *proto.GetQRCheckUrlRequest) (*proto.GetQRCheckUrlResponse, error) {
-	topicServer := &TopicServer{}
-	resp, err := topicServer.GetTopics(ctx, &topic.GetTopicsRequest{
-		Offset: 0,
-		Limit:  0,
-	})
-
-	if err != nil {
-		return &proto.GetQRCheckUrlResponse{}, err
-	}
-
-	topicIDs := []string{}
-	for _, v := range resp.Infos {
-		topicIDs = append(topicIDs, v.TopicID)
-	}
-
-	types := []string{}
-	for _, v := range proto.DataFinState_name {
-		types = append(types, v)
-	}
-
 	return &proto.GetQRCheckUrlResponse{
-		Url: "",
+		Url: fmt.Sprintf(
+			"%v/api/datafin/qr/check?TopicID=%v&Type=%v&Payload=%v",
+			in.PrefixUrl,
+			in.TopicID,
+			in.Type,
+			base64.RawStdEncoding.EncodeToString(
+				[]byte(in.UrlParams),
+			),
+		),
 	}, nil
+}
+
+func (s *DataFinServer) QRCheck(ctx context.Context, in *proto.QRCheckRequest) (*proto.QRCheckResponse, error) {
+	_qrParams, err := base64.RawStdEncoding.DecodeString(in.Payload)
+	if err != nil {
+		return &proto.QRCheckResponse{}, err
+	}
+
+	qrParams := string(_qrParams)
+	resp, _ := http.Get(qrParams)
+	if resp != nil {
+		defer resp.Body.Close()
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			qrParams = string(body)
+		}
+	}
+
+	_, err = hex.DecodeString(qrParams)
+	if err == nil {
+		resp, err := s.CheckDataFin(ctx, &proto.CheckDataFinRequest{
+			TopicID:  in.TopicID,
+			DataFins: []string{qrParams},
+		})
+		if err != nil {
+			return nil, err
+		}
+		return &proto.QRCheckResponse{
+			DataFin: resp.Infos[0].DataFin,
+			TxTime:  resp.Infos[0].TxTime,
+			Passed:  resp.Infos[0].Passed,
+		}, nil
+	}
+
+	checkIDItem := &proto.CheckIDDataFinItem{}
+	err = json.Unmarshal([]byte(qrParams), checkIDItem)
+	if err == nil {
+		resp, err := s.CheckIDDataFin(ctx, &proto.CheckIDDataFinRequest{
+			TopicID: in.TopicID,
+			Infos: []*proto.CheckIDDataFinItem{
+				checkIDItem,
+			},
+		})
+		if err != nil {
+			return nil, err
+		}
+		return &proto.QRCheckResponse{
+			DataFin: resp.Infos[0].DataFin,
+			TxTime:  resp.Infos[0].TxTime,
+			Passed:  resp.Infos[0].Passed,
+		}, nil
+	}
+
+	checkIDWithDataItem := &proto.CheckIDDataFinWithDataItem{}
+	err = json.Unmarshal([]byte(qrParams), checkIDWithDataItem)
+	if err == nil {
+		resp, err := s.CheckIDDataFinWithData(ctx, &proto.CheckIDDataFinWithDataRequest{
+			TopicID: in.TopicID,
+			Infos: []*proto.CheckIDDataFinWithDataItem{
+				checkIDWithDataItem,
+			},
+		})
+		if err != nil {
+			return nil, err
+		}
+		return &proto.QRCheckResponse{
+			DataFin: resp.Infos[0].DataFin,
+			TxTime:  resp.Infos[0].TxTime,
+			Passed:  resp.Infos[0].Passed,
+		}, nil
+	}
+
+	if err == nil {
+		resp, err := s.CheckDataFin(ctx, &proto.CheckDataFinRequest{
+			TopicID:  in.TopicID,
+			DataFins: []string{qrParams},
+		})
+		if err != nil {
+			return nil, err
+		}
+		return &proto.QRCheckResponse{
+			DataFin: resp.Infos[0].DataFin,
+			TxTime:  resp.Infos[0].TxTime,
+			Passed:  resp.Infos[0].Passed,
+		}, nil
+	}
+	return &proto.QRCheckResponse{}, fmt.Errorf("failed to parse payload")
 }
