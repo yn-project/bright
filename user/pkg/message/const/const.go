@@ -1,5 +1,5 @@
 package user
 
 const (
-	ServiceName = "userserver.bright.yn"
+	ServiceName = "user.bright.yn"
 )

@@ -1,3 +1,3 @@
 package servicename
 
-const ServiceName = "UserServer"
+const ServiceName = "User"
