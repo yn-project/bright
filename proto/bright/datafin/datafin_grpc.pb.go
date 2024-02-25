@@ -24,10 +24,13 @@ const _ = grpc.SupportPackageIsVersion7
 type ManagerClient interface {
 	CreateDataFin(ctx context.Context, in *CreateDataFinRequest, opts ...grpc.CallOption) (*CreateDataFinResponse, error)
 	GetDataFins(ctx context.Context, in *GetDataFinsRequest, opts ...grpc.CallOption) (*GetDataFinsResponse, error)
+	GetAllDataFins(ctx context.Context, in *GetAllDataFinsRequest, opts ...grpc.CallOption) (*GetAllDataFinsResponse, error)
 	CheckIDDataFin(ctx context.Context, in *CheckIDDataFinRequest, opts ...grpc.CallOption) (*CheckIDDataFinResponse, error)
 	CheckDataFin(ctx context.Context, in *CheckDataFinRequest, opts ...grpc.CallOption) (*CheckDataFinResponse, error)
 	CheckIDDataFinWithData(ctx context.Context, in *CheckIDDataFinWithDataRequest, opts ...grpc.CallOption) (*CheckIDDataFinResponse, error)
 	CheckDataFinWithData(ctx context.Context, in *CheckDataFinWithDataRequest, opts ...grpc.CallOption) (*CheckDataFinResponse, error)
+	QRCheckDefaultParms(ctx context.Context, in *QRCheckDefaultParmsRequest, opts ...grpc.CallOption) (*QRCheckDefaultParmsResponse, error)
+	GetQRCheckUrl(ctx context.Context, in *GetQRCheckUrlRequest, opts ...grpc.CallOption) (*GetQRCheckUrlResponse, error)
 }
 
 type managerClient struct {
@@ -50,6 +53,15 @@ func (c *managerClient) CreateDataFin(ctx context.Context, in *CreateDataFinRequ
 func (c *managerClient) GetDataFins(ctx context.Context, in *GetDataFinsRequest, opts ...grpc.CallOption) (*GetDataFinsResponse, error) {
 	out := new(GetDataFinsResponse)
 	err := c.cc.Invoke(ctx, "/bright.datafin.Manager/GetDataFins", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *managerClient) GetAllDataFins(ctx context.Context, in *GetAllDataFinsRequest, opts ...grpc.CallOption) (*GetAllDataFinsResponse, error) {
+	out := new(GetAllDataFinsResponse)
+	err := c.cc.Invoke(ctx, "/bright.datafin.Manager/GetAllDataFins", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -92,16 +104,37 @@ func (c *managerClient) CheckDataFinWithData(ctx context.Context, in *CheckDataF
 	return out, nil
 }
 
+func (c *managerClient) QRCheckDefaultParms(ctx context.Context, in *QRCheckDefaultParmsRequest, opts ...grpc.CallOption) (*QRCheckDefaultParmsResponse, error) {
+	out := new(QRCheckDefaultParmsResponse)
+	err := c.cc.Invoke(ctx, "/bright.datafin.Manager/QRCheckDefaultParms", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *managerClient) GetQRCheckUrl(ctx context.Context, in *GetQRCheckUrlRequest, opts ...grpc.CallOption) (*GetQRCheckUrlResponse, error) {
+	out := new(GetQRCheckUrlResponse)
+	err := c.cc.Invoke(ctx, "/bright.datafin.Manager/GetQRCheckUrl", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ManagerServer is the server API for Manager service.
 // All implementations must embed UnimplementedManagerServer
 // for forward compatibility
 type ManagerServer interface {
 	CreateDataFin(context.Context, *CreateDataFinRequest) (*CreateDataFinResponse, error)
 	GetDataFins(context.Context, *GetDataFinsRequest) (*GetDataFinsResponse, error)
+	GetAllDataFins(context.Context, *GetAllDataFinsRequest) (*GetAllDataFinsResponse, error)
 	CheckIDDataFin(context.Context, *CheckIDDataFinRequest) (*CheckIDDataFinResponse, error)
 	CheckDataFin(context.Context, *CheckDataFinRequest) (*CheckDataFinResponse, error)
 	CheckIDDataFinWithData(context.Context, *CheckIDDataFinWithDataRequest) (*CheckIDDataFinResponse, error)
 	CheckDataFinWithData(context.Context, *CheckDataFinWithDataRequest) (*CheckDataFinResponse, error)
+	QRCheckDefaultParms(context.Context, *QRCheckDefaultParmsRequest) (*QRCheckDefaultParmsResponse, error)
+	GetQRCheckUrl(context.Context, *GetQRCheckUrlRequest) (*GetQRCheckUrlResponse, error)
 	mustEmbedUnimplementedManagerServer()
 }
 
@@ -115,6 +148,9 @@ func (UnimplementedManagerServer) CreateDataFin(context.Context, *CreateDataFinR
 func (UnimplementedManagerServer) GetDataFins(context.Context, *GetDataFinsRequest) (*GetDataFinsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDataFins not implemented")
 }
+func (UnimplementedManagerServer) GetAllDataFins(context.Context, *GetAllDataFinsRequest) (*GetAllDataFinsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllDataFins not implemented")
+}
 func (UnimplementedManagerServer) CheckIDDataFin(context.Context, *CheckIDDataFinRequest) (*CheckIDDataFinResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckIDDataFin not implemented")
 }
@@ -126,6 +162,12 @@ func (UnimplementedManagerServer) CheckIDDataFinWithData(context.Context, *Check
 }
 func (UnimplementedManagerServer) CheckDataFinWithData(context.Context, *CheckDataFinWithDataRequest) (*CheckDataFinResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckDataFinWithData not implemented")
+}
+func (UnimplementedManagerServer) QRCheckDefaultParms(context.Context, *QRCheckDefaultParmsRequest) (*QRCheckDefaultParmsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method QRCheckDefaultParms not implemented")
+}
+func (UnimplementedManagerServer) GetQRCheckUrl(context.Context, *GetQRCheckUrlRequest) (*GetQRCheckUrlResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetQRCheckUrl not implemented")
 }
 func (UnimplementedManagerServer) mustEmbedUnimplementedManagerServer() {}
 
@@ -172,6 +214,24 @@ func _Manager_GetDataFins_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ManagerServer).GetDataFins(ctx, req.(*GetDataFinsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Manager_GetAllDataFins_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAllDataFinsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagerServer).GetAllDataFins(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/bright.datafin.Manager/GetAllDataFins",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagerServer).GetAllDataFins(ctx, req.(*GetAllDataFinsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -248,6 +308,42 @@ func _Manager_CheckDataFinWithData_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Manager_QRCheckDefaultParms_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QRCheckDefaultParmsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagerServer).QRCheckDefaultParms(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/bright.datafin.Manager/QRCheckDefaultParms",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagerServer).QRCheckDefaultParms(ctx, req.(*QRCheckDefaultParmsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Manager_GetQRCheckUrl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetQRCheckUrlRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagerServer).GetQRCheckUrl(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/bright.datafin.Manager/GetQRCheckUrl",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagerServer).GetQRCheckUrl(ctx, req.(*GetQRCheckUrlRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Manager_ServiceDesc is the grpc.ServiceDesc for Manager service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -264,6 +360,10 @@ var Manager_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Manager_GetDataFins_Handler,
 		},
 		{
+			MethodName: "GetAllDataFins",
+			Handler:    _Manager_GetAllDataFins_Handler,
+		},
+		{
 			MethodName: "CheckIDDataFin",
 			Handler:    _Manager_CheckIDDataFin_Handler,
 		},
@@ -278,6 +378,14 @@ var Manager_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CheckDataFinWithData",
 			Handler:    _Manager_CheckDataFinWithData_Handler,
+		},
+		{
+			MethodName: "QRCheckDefaultParms",
+			Handler:    _Manager_QRCheckDefaultParms_Handler,
+		},
+		{
+			MethodName: "GetQRCheckUrl",
+			Handler:    _Manager_GetQRCheckUrl_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

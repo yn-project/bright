@@ -18,8 +18,6 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
 	FieldDeletedAt = "deleted_at"
-	// FieldPackageName holds the string denoting the package_name field in the database.
-	FieldPackageName = "package_name"
 	// FieldFileName holds the string denoting the file_name field in the database.
 	FieldFileName = "file_name"
 	// FieldTopicID holds the string denoting the topic_id field in the database.
@@ -42,7 +40,6 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldDeletedAt,
-	FieldPackageName,
 	FieldFileName,
 	FieldTopicID,
 	FieldRecordNum,

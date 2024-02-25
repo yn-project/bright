@@ -1129,7 +1129,6 @@ type FileRecordMutation struct {
 	addupdated_at *int32
 	deleted_at    *uint32
 	adddeleted_at *int32
-	package_name  *string
 	file_name     *string
 	topic_id      *string
 	record_num    *uint32
@@ -1415,42 +1414,6 @@ func (m *FileRecordMutation) ResetDeletedAt() {
 	m.adddeleted_at = nil
 }
 
-// SetPackageName sets the "package_name" field.
-func (m *FileRecordMutation) SetPackageName(s string) {
-	m.package_name = &s
-}
-
-// PackageName returns the value of the "package_name" field in the mutation.
-func (m *FileRecordMutation) PackageName() (r string, exists bool) {
-	v := m.package_name
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldPackageName returns the old "package_name" field's value of the FileRecord entity.
-// If the FileRecord object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *FileRecordMutation) OldPackageName(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPackageName is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPackageName requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPackageName: %w", err)
-	}
-	return oldValue.PackageName, nil
-}
-
-// ResetPackageName resets all changes to the "package_name" field.
-func (m *FileRecordMutation) ResetPackageName() {
-	m.package_name = nil
-}
-
 // SetFileName sets the "file_name" field.
 func (m *FileRecordMutation) SetFileName(s string) {
 	m.file_name = &s
@@ -1719,7 +1682,7 @@ func (m *FileRecordMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *FileRecordMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 9)
 	if m.created_at != nil {
 		fields = append(fields, filerecord.FieldCreatedAt)
 	}
@@ -1728,9 +1691,6 @@ func (m *FileRecordMutation) Fields() []string {
 	}
 	if m.deleted_at != nil {
 		fields = append(fields, filerecord.FieldDeletedAt)
-	}
-	if m.package_name != nil {
-		fields = append(fields, filerecord.FieldPackageName)
 	}
 	if m.file_name != nil {
 		fields = append(fields, filerecord.FieldFileName)
@@ -1764,8 +1724,6 @@ func (m *FileRecordMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case filerecord.FieldDeletedAt:
 		return m.DeletedAt()
-	case filerecord.FieldPackageName:
-		return m.PackageName()
 	case filerecord.FieldFileName:
 		return m.FileName()
 	case filerecord.FieldTopicID:
@@ -1793,8 +1751,6 @@ func (m *FileRecordMutation) OldField(ctx context.Context, name string) (ent.Val
 		return m.OldUpdatedAt(ctx)
 	case filerecord.FieldDeletedAt:
 		return m.OldDeletedAt(ctx)
-	case filerecord.FieldPackageName:
-		return m.OldPackageName(ctx)
 	case filerecord.FieldFileName:
 		return m.OldFileName(ctx)
 	case filerecord.FieldTopicID:
@@ -1836,13 +1792,6 @@ func (m *FileRecordMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDeletedAt(v)
-		return nil
-	case filerecord.FieldPackageName:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetPackageName(v)
 		return nil
 	case filerecord.FieldFileName:
 		v, ok := value.(string)
@@ -2003,9 +1952,6 @@ func (m *FileRecordMutation) ResetField(name string) error {
 		return nil
 	case filerecord.FieldDeletedAt:
 		m.ResetDeletedAt()
-		return nil
-	case filerecord.FieldPackageName:
-		m.ResetPackageName()
 		return nil
 	case filerecord.FieldFileName:
 		m.ResetFileName()

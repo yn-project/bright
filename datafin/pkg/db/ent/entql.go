@@ -51,16 +51,15 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "FileRecord",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			filerecord.FieldCreatedAt:   {Type: field.TypeUint32, Column: filerecord.FieldCreatedAt},
-			filerecord.FieldUpdatedAt:   {Type: field.TypeUint32, Column: filerecord.FieldUpdatedAt},
-			filerecord.FieldDeletedAt:   {Type: field.TypeUint32, Column: filerecord.FieldDeletedAt},
-			filerecord.FieldPackageName: {Type: field.TypeString, Column: filerecord.FieldPackageName},
-			filerecord.FieldFileName:    {Type: field.TypeString, Column: filerecord.FieldFileName},
-			filerecord.FieldTopicID:     {Type: field.TypeString, Column: filerecord.FieldTopicID},
-			filerecord.FieldRecordNum:   {Type: field.TypeUint32, Column: filerecord.FieldRecordNum},
-			filerecord.FieldSha1Sum:     {Type: field.TypeString, Column: filerecord.FieldSha1Sum},
-			filerecord.FieldState:       {Type: field.TypeString, Column: filerecord.FieldState},
-			filerecord.FieldRemark:      {Type: field.TypeString, Column: filerecord.FieldRemark},
+			filerecord.FieldCreatedAt: {Type: field.TypeUint32, Column: filerecord.FieldCreatedAt},
+			filerecord.FieldUpdatedAt: {Type: field.TypeUint32, Column: filerecord.FieldUpdatedAt},
+			filerecord.FieldDeletedAt: {Type: field.TypeUint32, Column: filerecord.FieldDeletedAt},
+			filerecord.FieldFileName:  {Type: field.TypeString, Column: filerecord.FieldFileName},
+			filerecord.FieldTopicID:   {Type: field.TypeString, Column: filerecord.FieldTopicID},
+			filerecord.FieldRecordNum: {Type: field.TypeUint32, Column: filerecord.FieldRecordNum},
+			filerecord.FieldSha1Sum:   {Type: field.TypeString, Column: filerecord.FieldSha1Sum},
+			filerecord.FieldState:     {Type: field.TypeString, Column: filerecord.FieldState},
+			filerecord.FieldRemark:    {Type: field.TypeString, Column: filerecord.FieldRemark},
 		},
 	}
 	graph.Nodes[2] = &sqlgraph.Node{
@@ -242,11 +241,6 @@ func (f *FileRecordFilter) WhereUpdatedAt(p entql.Uint32P) {
 // WhereDeletedAt applies the entql uint32 predicate on the deleted_at field.
 func (f *FileRecordFilter) WhereDeletedAt(p entql.Uint32P) {
 	f.Where(p.Field(filerecord.FieldDeletedAt))
-}
-
-// WherePackageName applies the entql string predicate on the package_name field.
-func (f *FileRecordFilter) WherePackageName(p entql.StringP) {
-	f.Where(p.Field(filerecord.FieldPackageName))
 }
 
 // WhereFileName applies the entql string predicate on the file_name field.

@@ -263,6 +263,35 @@ func Rows(ctx context.Context, conds *proto.Conds, offset, limit int) ([]*ent.Da
 	return rows, total, nil
 }
 
+func AllRows(ctx context.Context, desc bool, offset, limit int) ([]*ent.DataFin, int, error) {
+	var err error
+	rows := []*ent.DataFin{}
+	var total int
+
+	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
+		dtm := cli.DataFin.Query()
+		if desc {
+			dtm.Order(ent.Desc(datafin.FieldCreatedAt))
+		} else {
+			dtm.Order(ent.Asc(datafin.FieldCreatedAt))
+		}
+		rows, err = dtm.
+			Offset(offset).
+			Limit(limit).
+			All(_ctx)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return rows, total, nil
+}
+
 func Delete(ctx context.Context, id uuid.UUID) (*ent.DataFin, error) {
 	var info *ent.DataFin
 	var err error

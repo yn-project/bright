@@ -88,12 +88,17 @@ func UploadDataFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	saveFile, err := os.Create(fmt.Sprintf("%v/%v", config.GetConfig().DataFin.DataDir, uuid.NewString()))
+	filePath := fmt.Sprintf("%v/%v", config.GetConfig().DataFin.DataDir, uuid.NewString())
+	donePath := fmt.Sprintf("%v/done-%v", config.GetConfig().DataFin.DataDir, uuid.NewString())
+	saveFile, err := os.Create(filePath)
 	if err != nil {
 		errMsg = fmt.Sprintf("failed to create file,err: %v", err)
 		return
 	}
-	defer saveFile.Close()
+	defer func() {
+		saveFile.Close()
+		os.Rename(filePath, donePath)
+	}()
 
 	_, err = saveFile.Write(metaData)
 	if err != nil {
@@ -149,7 +154,7 @@ func (s *FileRecordServer) GetFileRecord(ctx context.Context, in *proto.GetFileR
 		return &proto.GetFileRecordResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
-	logger.Sugar().Infof("success to get filerecord,id: %v,package name: %v,file name: %v", info.ID, info.PackageName, info.FileName)
+	logger.Sugar().Infof("success to get filerecord,id: %v,sha1sum: %v,file name: %v", info.ID, info.Sha1Sum, info.FileName)
 	return &proto.GetFileRecordResponse{
 		Info: converter.Ent2Grpc(info),
 	}, nil

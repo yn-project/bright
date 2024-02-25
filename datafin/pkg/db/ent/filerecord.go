@@ -22,8 +22,6 @@ type FileRecord struct {
 	UpdatedAt uint32 `json:"updated_at,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
 	DeletedAt uint32 `json:"deleted_at,omitempty"`
-	// PackageName holds the value of the "package_name" field.
-	PackageName string `json:"package_name,omitempty"`
 	// FileName holds the value of the "file_name" field.
 	FileName string `json:"file_name,omitempty"`
 	// TopicID holds the value of the "topic_id" field.
@@ -45,7 +43,7 @@ func (*FileRecord) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case filerecord.FieldCreatedAt, filerecord.FieldUpdatedAt, filerecord.FieldDeletedAt, filerecord.FieldRecordNum:
 			values[i] = new(sql.NullInt64)
-		case filerecord.FieldPackageName, filerecord.FieldFileName, filerecord.FieldTopicID, filerecord.FieldSha1Sum, filerecord.FieldState, filerecord.FieldRemark:
+		case filerecord.FieldFileName, filerecord.FieldTopicID, filerecord.FieldSha1Sum, filerecord.FieldState, filerecord.FieldRemark:
 			values[i] = new(sql.NullString)
 		case filerecord.FieldID:
 			values[i] = new(uuid.UUID)
@@ -87,12 +85,6 @@ func (fr *FileRecord) assignValues(columns []string, values []interface{}) error
 				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
 			} else if value.Valid {
 				fr.DeletedAt = uint32(value.Int64)
-			}
-		case filerecord.FieldPackageName:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field package_name", values[i])
-			} else if value.Valid {
-				fr.PackageName = value.String
 			}
 		case filerecord.FieldFileName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -166,9 +158,6 @@ func (fr *FileRecord) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("deleted_at=")
 	builder.WriteString(fmt.Sprintf("%v", fr.DeletedAt))
-	builder.WriteString(", ")
-	builder.WriteString("package_name=")
-	builder.WriteString(fr.PackageName)
 	builder.WriteString(", ")
 	builder.WriteString("file_name=")
 	builder.WriteString(fr.FileName)

@@ -42,7 +42,6 @@ var (
 		{Name: "created_at", Type: field.TypeUint32},
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
-		{Name: "package_name", Type: field.TypeString},
 		{Name: "file_name", Type: field.TypeString},
 		{Name: "topic_id", Type: field.TypeString},
 		{Name: "record_num", Type: field.TypeUint32, Default: 0},
@@ -57,14 +56,14 @@ var (
 		PrimaryKey: []*schema.Column{FileRecordsColumns[0]},
 		Indexes: []*schema.Index{
 			{
-				Name:    "filerecord_package_name_file_name",
+				Name:    "filerecord_file_name",
 				Unique:  false,
-				Columns: []*schema.Column{FileRecordsColumns[4], FileRecordsColumns[5]},
+				Columns: []*schema.Column{FileRecordsColumns[4]},
 			},
 			{
 				Name:    "filerecord_topic_id",
 				Unique:  false,
-				Columns: []*schema.Column{FileRecordsColumns[6]},
+				Columns: []*schema.Column{FileRecordsColumns[5]},
 			},
 		},
 	}

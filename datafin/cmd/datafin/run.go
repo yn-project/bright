@@ -50,6 +50,7 @@ var runCmd = &cli.Command{
 		go runGRPCServer(config.GetConfig().DataFin.GrpcPort)
 		go runHTTPServer(config.GetConfig().DataFin.HTTPPort, config.GetConfig().DataFin.GrpcPort)
 		go mgr.Maintain(c.Context)
+		go mgr.ParseFileTask(c.Context)
 		sigchan := make(chan os.Signal, 1)
 		signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 

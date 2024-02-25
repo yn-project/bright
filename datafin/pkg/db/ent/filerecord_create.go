@@ -65,12 +65,6 @@ func (frc *FileRecordCreate) SetNillableDeletedAt(u *uint32) *FileRecordCreate {
 	return frc
 }
 
-// SetPackageName sets the "package_name" field.
-func (frc *FileRecordCreate) SetPackageName(s string) *FileRecordCreate {
-	frc.mutation.SetPackageName(s)
-	return frc
-}
-
 // SetFileName sets the "file_name" field.
 func (frc *FileRecordCreate) SetFileName(s string) *FileRecordCreate {
 	frc.mutation.SetFileName(s)
@@ -262,9 +256,6 @@ func (frc *FileRecordCreate) check() error {
 	if _, ok := frc.mutation.DeletedAt(); !ok {
 		return &ValidationError{Name: "deleted_at", err: errors.New(`ent: missing required field "FileRecord.deleted_at"`)}
 	}
-	if _, ok := frc.mutation.PackageName(); !ok {
-		return &ValidationError{Name: "package_name", err: errors.New(`ent: missing required field "FileRecord.package_name"`)}
-	}
 	if _, ok := frc.mutation.FileName(); !ok {
 		return &ValidationError{Name: "file_name", err: errors.New(`ent: missing required field "FileRecord.file_name"`)}
 	}
@@ -340,14 +331,6 @@ func (frc *FileRecordCreate) createSpec() (*FileRecord, *sqlgraph.CreateSpec) {
 			Column: filerecord.FieldDeletedAt,
 		})
 		_node.DeletedAt = value
-	}
-	if value, ok := frc.mutation.PackageName(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: filerecord.FieldPackageName,
-		})
-		_node.PackageName = value
 	}
 	if value, ok := frc.mutation.FileName(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -500,18 +483,6 @@ func (u *FileRecordUpsert) UpdateDeletedAt() *FileRecordUpsert {
 // AddDeletedAt adds v to the "deleted_at" field.
 func (u *FileRecordUpsert) AddDeletedAt(v uint32) *FileRecordUpsert {
 	u.Add(filerecord.FieldDeletedAt, v)
-	return u
-}
-
-// SetPackageName sets the "package_name" field.
-func (u *FileRecordUpsert) SetPackageName(v string) *FileRecordUpsert {
-	u.Set(filerecord.FieldPackageName, v)
-	return u
-}
-
-// UpdatePackageName sets the "package_name" field to the value that was provided on create.
-func (u *FileRecordUpsert) UpdatePackageName() *FileRecordUpsert {
-	u.SetExcluded(filerecord.FieldPackageName)
 	return u
 }
 
@@ -707,20 +678,6 @@ func (u *FileRecordUpsertOne) AddDeletedAt(v uint32) *FileRecordUpsertOne {
 func (u *FileRecordUpsertOne) UpdateDeletedAt() *FileRecordUpsertOne {
 	return u.Update(func(s *FileRecordUpsert) {
 		s.UpdateDeletedAt()
-	})
-}
-
-// SetPackageName sets the "package_name" field.
-func (u *FileRecordUpsertOne) SetPackageName(v string) *FileRecordUpsertOne {
-	return u.Update(func(s *FileRecordUpsert) {
-		s.SetPackageName(v)
-	})
-}
-
-// UpdatePackageName sets the "package_name" field to the value that was provided on create.
-func (u *FileRecordUpsertOne) UpdatePackageName() *FileRecordUpsertOne {
-	return u.Update(func(s *FileRecordUpsert) {
-		s.UpdatePackageName()
 	})
 }
 
@@ -1094,20 +1051,6 @@ func (u *FileRecordUpsertBulk) AddDeletedAt(v uint32) *FileRecordUpsertBulk {
 func (u *FileRecordUpsertBulk) UpdateDeletedAt() *FileRecordUpsertBulk {
 	return u.Update(func(s *FileRecordUpsert) {
 		s.UpdateDeletedAt()
-	})
-}
-
-// SetPackageName sets the "package_name" field.
-func (u *FileRecordUpsertBulk) SetPackageName(v string) *FileRecordUpsertBulk {
-	return u.Update(func(s *FileRecordUpsert) {
-		s.SetPackageName(v)
-	})
-}
-
-// UpdatePackageName sets the "package_name" field to the value that was provided on create.
-func (u *FileRecordUpsertBulk) UpdatePackageName() *FileRecordUpsertBulk {
-	return u.Update(func(s *FileRecordUpsert) {
-		s.UpdatePackageName()
 	})
 }
 

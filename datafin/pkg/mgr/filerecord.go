@@ -8,8 +8,9 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
+	"time"
 
-	"yun.tea/block/bright/common/utils"
 	datafinclient "yun.tea/block/bright/datafin/pkg/client/datafin"
 	crud "yun.tea/block/bright/datafin/pkg/crud/filerecord"
 	datafinproto "yun.tea/block/bright/proto/bright/datafin"
@@ -19,19 +20,39 @@ import (
 )
 
 func ParseFileTask(ctx context.Context) {
+	for {
+		select {
+		case <-time.NewTicker(time.Second * 2).C:
+			parseFileTask(ctx)
+		case <-ctx.Done():
+			return
+		}
+	}
+}
+
+func parseFileTask(ctx context.Context) {
 	filesDir := config.GetConfig().DataFin.DataDir
 	files, _ := os.ReadDir(filesDir)
 	for _, f := range files {
 		filePath := fmt.Sprintf("%v/%v", filesDir, f.Name())
+		if !strings.Contains(f.Name(), "done-") {
+			continue
+		}
 		if f.IsDir() {
 			continue
 		}
 
 		allBytes, err := os.ReadFile(filePath)
+		if err != nil {
+			os.Remove(filePath)
+			continue
+		}
+
+		sha1sum := fmt.Sprintf("%x", sha1.Sum(allBytes))
 
 		ff, err := os.Open(filePath)
 		if err != nil {
-			os.Remove(f.Name())
+			os.Remove(filePath)
 			continue
 		}
 		defer ff.Close()
@@ -39,7 +60,7 @@ func ParseFileTask(ctx context.Context) {
 		r := bufio.NewReader(ff)
 		bytes, _, err := r.ReadLine()
 		if err != nil {
-			os.Remove(f.Name())
+			os.Remove(filePath)
 			continue
 		}
 
@@ -47,16 +68,13 @@ func ParseFileTask(ctx context.Context) {
 		err = json.Unmarshal(bytes, req)
 		if err != nil {
 			fmt.Println(err)
-			os.Remove(f.Name())
+			os.Remove(filePath)
 			continue
 		}
 
-		fmt.Println(utils.PrettyStruct(req))
 		infos := []*datafinproto.DataItemReq{}
 
 		for {
-			// ReadLine is a low-level line-reading primitive.
-			// Most callers should use ReadBytes('\n') or ReadString('\n') instead or use a Scanner.
 			bytes, _, err := r.ReadLine()
 			if err == io.EOF {
 				break
@@ -74,23 +92,27 @@ func ParseFileTask(ctx context.Context) {
 			infos = append(infos, info)
 		}
 
-		recordNum := uint32(len(infos))
+		os.Remove(filePath)
+
 		_, err = datafinclient.CreateDataFin(ctx, &datafinproto.CreateDataFinRequest{
 			TopicID: req.TopicID,
 			Type:    datafinproto.DataType(datafinproto.DataType_value[req.Type]),
 			Infos:   infos,
 		})
 
+		state := proto.FileRecordState_FileRecordSuccess
 		if err != nil {
 			req.Remark = err.Error()
-
+			state = proto.FileRecordState_FileRecordFailed
 		}
 
-		checkSum := sha1.Sum()
+		recordNum := uint32(len(infos))
 		crud.Create(ctx, &proto.FileRecordReq{
 			FileName:  &req.File,
 			TopicID:   &req.TopicID,
 			RecordNum: &recordNum,
+			Sha1Sum:   &sha1sum,
+			State:     &state,
 			Remark:    &req.Remark,
 		})
 

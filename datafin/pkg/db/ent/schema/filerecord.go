@@ -35,7 +35,7 @@ func (FileRecord) Fields() []ent.Field {
 
 func (FileRecord) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("package_name", "file_name"),
+		index.Fields("file_name"),
 		index.Fields("topic_id"),
 	}
 }

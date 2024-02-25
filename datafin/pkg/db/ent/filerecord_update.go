@@ -83,12 +83,6 @@ func (fru *FileRecordUpdate) AddDeletedAt(u int32) *FileRecordUpdate {
 	return fru
 }
 
-// SetPackageName sets the "package_name" field.
-func (fru *FileRecordUpdate) SetPackageName(s string) *FileRecordUpdate {
-	fru.mutation.SetPackageName(s)
-	return fru
-}
-
 // SetFileName sets the "file_name" field.
 func (fru *FileRecordUpdate) SetFileName(s string) *FileRecordUpdate {
 	fru.mutation.SetFileName(s)
@@ -294,13 +288,6 @@ func (fru *FileRecordUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: filerecord.FieldDeletedAt,
 		})
 	}
-	if value, ok := fru.mutation.PackageName(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: filerecord.FieldPackageName,
-		})
-	}
 	if value, ok := fru.mutation.FileName(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -429,12 +416,6 @@ func (fruo *FileRecordUpdateOne) SetNillableDeletedAt(u *uint32) *FileRecordUpda
 // AddDeletedAt adds u to the "deleted_at" field.
 func (fruo *FileRecordUpdateOne) AddDeletedAt(u int32) *FileRecordUpdateOne {
 	fruo.mutation.AddDeletedAt(u)
-	return fruo
-}
-
-// SetPackageName sets the "package_name" field.
-func (fruo *FileRecordUpdateOne) SetPackageName(s string) *FileRecordUpdateOne {
-	fruo.mutation.SetPackageName(s)
 	return fruo
 }
 
@@ -671,13 +652,6 @@ func (fruo *FileRecordUpdateOne) sqlSave(ctx context.Context) (_node *FileRecord
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: filerecord.FieldDeletedAt,
-		})
-	}
-	if value, ok := fruo.mutation.PackageName(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: filerecord.FieldPackageName,
 		})
 	}
 	if value, ok := fruo.mutation.FileName(); ok {

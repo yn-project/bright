@@ -89,6 +89,14 @@ func (s *DataFinServer) GetDataFins(ctx context.Context, in *proto.GetDataFinsRe
 	return &proto.GetDataFinsResponse{Infos: converter.Ent2GrpcMany(rows), Total: uint32(total)}, nil
 }
 
+func (s *DataFinServer) GetAllDataFins(ctx context.Context, in *proto.GetAllDataFinsRequest) (*proto.GetAllDataFinsResponse, error) {
+	rows, total, err := crud.AllRows(ctx, in.Desc, int(in.Offset), int(in.Limit))
+	if err != nil {
+		return &proto.GetAllDataFinsResponse{}, err
+	}
+	return &proto.GetAllDataFinsResponse{Infos: converter.Ent2GrpcMany(rows), Total: uint32(total)}, nil
+}
+
 func (s *DataFinServer) CheckDataFin(ctx context.Context, in *proto.CheckDataFinRequest) (*proto.CheckDataFinResponse, error) {
 	topicServer := &TopicServer{}
 	_, err := topicServer.GetTopic(ctx, &topic.GetTopicRequest{TopicID: in.TopicID})
@@ -283,5 +291,59 @@ func (s *DataFinServer) CheckIDDataFinWithData(ctx context.Context, in *proto.Ch
 	return &proto.CheckIDDataFinResponse{
 		TopicID: in.TopicID,
 		Infos:   infos,
+	}, nil
+}
+
+func (s *DataFinServer) QRCheckDefaultParms(ctx context.Context, in *proto.QRCheckDefaultParmsRequest) (*proto.QRCheckDefaultParmsResponse, error) {
+	topicServer := &TopicServer{}
+	resp, err := topicServer.GetTopics(ctx, &topic.GetTopicsRequest{
+		Offset: 0,
+		Limit:  0,
+	})
+
+	if err != nil {
+		return &proto.QRCheckDefaultParmsResponse{}, err
+	}
+
+	topicIDs := []string{}
+	for _, v := range resp.Infos {
+		topicIDs = append(topicIDs, v.TopicID)
+	}
+
+	types := []string{}
+	for _, v := range proto.DataFinState_name {
+		types = append(types, v)
+	}
+
+	return &proto.QRCheckDefaultParmsResponse{
+		PrefixUrl: fmt.Sprintf("%v/%v", in.HostAddr, "api/qr/check"),
+		Types:     types,
+		TopicIDs:  topicIDs,
+	}, nil
+}
+
+func (s *DataFinServer) GetQRCheckUrl(ctx context.Context, in *proto.GetQRCheckUrlRequest) (*proto.GetQRCheckUrlResponse, error) {
+	topicServer := &TopicServer{}
+	resp, err := topicServer.GetTopics(ctx, &topic.GetTopicsRequest{
+		Offset: 0,
+		Limit:  0,
+	})
+
+	if err != nil {
+		return &proto.GetQRCheckUrlResponse{}, err
+	}
+
+	topicIDs := []string{}
+	for _, v := range resp.Infos {
+		topicIDs = append(topicIDs, v.TopicID)
+	}
+
+	types := []string{}
+	for _, v := range proto.DataFinState_name {
+		types = append(types, v)
+	}
+
+	return &proto.GetQRCheckUrlResponse{
+		Url: "",
 	}, nil
 }

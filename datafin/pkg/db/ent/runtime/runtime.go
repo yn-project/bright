@@ -80,7 +80,7 @@ func init() {
 	// filerecord.DefaultDeletedAt holds the default value on creation for the deleted_at field.
 	filerecord.DefaultDeletedAt = filerecordDescDeletedAt.Default.(func() uint32)
 	// filerecordDescRecordNum is the schema descriptor for record_num field.
-	filerecordDescRecordNum := filerecordFields[4].Descriptor()
+	filerecordDescRecordNum := filerecordFields[3].Descriptor()
 	// filerecord.DefaultRecordNum holds the default value on creation for the record_num field.
 	filerecord.DefaultRecordNum = filerecordDescRecordNum.Default.(uint32)
 	// filerecordDescID is the schema descriptor for id field.

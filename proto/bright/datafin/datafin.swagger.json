@@ -176,6 +176,38 @@
         ]
       }
     },
+    "/get/all/datafins": {
+      "post": {
+        "operationId": "Manager_GetAllDataFins",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/datafinGetAllDataFinsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/datafinGetAllDataFinsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Manager"
+        ]
+      }
+    },
     "/get/datafins": {
       "post": {
         "operationId": "Manager_GetDataFins",
@@ -200,6 +232,70 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/datafinGetDataFinsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Manager"
+        ]
+      }
+    },
+    "/get/qr/check/url": {
+      "post": {
+        "operationId": "Manager_GetQRCheckUrl",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/datafinGetQRCheckUrlResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/datafinGetQRCheckUrlRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Manager"
+        ]
+      }
+    },
+    "/qr/check/default/parms": {
+      "post": {
+        "operationId": "Manager_QRCheckDefaultParms",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/datafinQRCheckDefaultParmsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/datafinQRCheckDefaultParmsRequest"
             }
           }
         ],
@@ -461,6 +557,38 @@
       ],
       "default": "RawType"
     },
+    "datafinGetAllDataFinsRequest": {
+      "type": "object",
+      "properties": {
+        "Offset": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "Limit": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "Desc": {
+          "type": "boolean"
+        }
+      }
+    },
+    "datafinGetAllDataFinsResponse": {
+      "type": "object",
+      "properties": {
+        "Infos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/datafinDataFinInfo"
+          }
+        },
+        "Total": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
     "datafinGetDataFinsRequest": {
       "type": "object",
       "properties": {
@@ -488,6 +616,59 @@
         "Total": {
           "type": "integer",
           "format": "int64"
+        }
+      }
+    },
+    "datafinGetQRCheckUrlRequest": {
+      "type": "object",
+      "properties": {
+        "PrefixUrl": {
+          "type": "string"
+        },
+        "Type": {
+          "type": "string"
+        },
+        "TopicID": {
+          "type": "string"
+        },
+        "UrlParams": {
+          "type": "string"
+        }
+      }
+    },
+    "datafinGetQRCheckUrlResponse": {
+      "type": "object",
+      "properties": {
+        "Url": {
+          "type": "string"
+        }
+      }
+    },
+    "datafinQRCheckDefaultParmsRequest": {
+      "type": "object",
+      "properties": {
+        "HostAddr": {
+          "type": "string"
+        }
+      }
+    },
+    "datafinQRCheckDefaultParmsResponse": {
+      "type": "object",
+      "properties": {
+        "PrefixUrl": {
+          "type": "string"
+        },
+        "Types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "TopicIDs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

@@ -21,6 +21,14 @@ service Manager {
       body:"*"
     };
   }
+
+  rpc GetAllDataFins(GetAllDataFinsRequest) returns (GetAllDataFinsResponse) {
+    option (google.api.http) = {
+      post:"/get/all/datafins"
+      body:"*"
+    };
+  }
+
   rpc CheckIDDataFin(CheckIDDataFinRequest) returns (CheckIDDataFinResponse) {
     option (google.api.http) = {
       post:"/check/id/datafin"
@@ -43,6 +51,19 @@ service Manager {
   rpc CheckDataFinWithData(CheckDataFinWithDataRequest) returns (CheckDataFinResponse) {
     option (google.api.http) = {
       post:"/check/datafin/with/data"
+      body:"*"
+    };
+  }
+
+  rpc QRCheckDefaultParms(QRCheckDefaultParmsRequest) returns (QRCheckDefaultParmsResponse) {
+    option (google.api.http) = {
+      post:"/qr/check/default/parms"
+      body:"*"
+    };
+  }
+  rpc GetQRCheckUrl(GetQRCheckUrlRequest) returns (GetQRCheckUrlResponse) {
+    option (google.api.http) = {
+      post:"/get/qr/check/url"
       body:"*"
     };
   }
@@ -124,6 +145,17 @@ message GetDataFinsResponse{
   uint32 Total = 20 [json_name="total"]; 
 }
 
+message GetAllDataFinsRequest{
+  uint32   Offset = 10 [json_name="offset"]; 
+  uint32   Limit = 20 [json_name="limit"]; 
+  bool   Desc = 30 [json_name="desc"]; 
+}
+
+message GetAllDataFinsResponse{
+  repeated DataFinInfo Infos = 10 [json_name="infos"]; 
+  uint32 Total = 20 [json_name="total"]; 
+}
+
 message CheckIDDataFinItem {
   string DataID = 10  [json_name="dataID"];  
   optional string DataFin = 20  [json_name="dataFin"]; 
@@ -177,4 +209,25 @@ message CheckDataFinWithDataRequest{
   string TopicID = 10  [json_name="topicID"]; 
   DataType  Type = 20 [json_name="type"];
   repeated string Datas = 30 [json_name="datas"]; 
+}
+
+message QRCheckDefaultParmsRequest{
+  string    HostAddr = 10  [json_name="hostAddr"]; 
+}
+
+message  QRCheckDefaultParmsResponse{
+  string PrefixUrl = 10  [json_name="prefixUrl"]; 
+  repeated string Types = 20 [json_name="types"];
+  repeated string TopicIDs = 30 [json_name="topicIDs"]; 
+}
+
+message GetQRCheckUrlRequest{
+  string PrefixUrl = 10  [json_name="prefixUrl"]; 
+  string Type = 20 [json_name="type"];
+  string TopicID = 30 [json_name="topicID"]; 
+  string UrlParams = 40  [json_name="urlParams"]; 
+}
+
+message  GetQRCheckUrlResponse{
+  string Url = 10  [json_name="url"]; 
 }

@@ -100,13 +100,6 @@ func DeletedAt(v uint32) predicate.FileRecord {
 	})
 }
 
-// PackageName applies equality check predicate on the "package_name" field. It's identical to PackageNameEQ.
-func PackageName(v string) predicate.FileRecord {
-	return predicate.FileRecord(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldPackageName), v))
-	})
-}
-
 // FileName applies equality check predicate on the "file_name" field. It's identical to FileNameEQ.
 func FileName(v string) predicate.FileRecord {
 	return predicate.FileRecord(func(s *sql.Selector) {
@@ -338,105 +331,6 @@ func DeletedAtLT(v uint32) predicate.FileRecord {
 func DeletedAtLTE(v uint32) predicate.FileRecord {
 	return predicate.FileRecord(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldDeletedAt), v))
-	})
-}
-
-// PackageNameEQ applies the EQ predicate on the "package_name" field.
-func PackageNameEQ(v string) predicate.FileRecord {
-	return predicate.FileRecord(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldPackageName), v))
-	})
-}
-
-// PackageNameNEQ applies the NEQ predicate on the "package_name" field.
-func PackageNameNEQ(v string) predicate.FileRecord {
-	return predicate.FileRecord(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldPackageName), v))
-	})
-}
-
-// PackageNameIn applies the In predicate on the "package_name" field.
-func PackageNameIn(vs ...string) predicate.FileRecord {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.FileRecord(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldPackageName), v...))
-	})
-}
-
-// PackageNameNotIn applies the NotIn predicate on the "package_name" field.
-func PackageNameNotIn(vs ...string) predicate.FileRecord {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.FileRecord(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldPackageName), v...))
-	})
-}
-
-// PackageNameGT applies the GT predicate on the "package_name" field.
-func PackageNameGT(v string) predicate.FileRecord {
-	return predicate.FileRecord(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldPackageName), v))
-	})
-}
-
-// PackageNameGTE applies the GTE predicate on the "package_name" field.
-func PackageNameGTE(v string) predicate.FileRecord {
-	return predicate.FileRecord(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldPackageName), v))
-	})
-}
-
-// PackageNameLT applies the LT predicate on the "package_name" field.
-func PackageNameLT(v string) predicate.FileRecord {
-	return predicate.FileRecord(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldPackageName), v))
-	})
-}
-
-// PackageNameLTE applies the LTE predicate on the "package_name" field.
-func PackageNameLTE(v string) predicate.FileRecord {
-	return predicate.FileRecord(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldPackageName), v))
-	})
-}
-
-// PackageNameContains applies the Contains predicate on the "package_name" field.
-func PackageNameContains(v string) predicate.FileRecord {
-	return predicate.FileRecord(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldPackageName), v))
-	})
-}
-
-// PackageNameHasPrefix applies the HasPrefix predicate on the "package_name" field.
-func PackageNameHasPrefix(v string) predicate.FileRecord {
-	return predicate.FileRecord(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldPackageName), v))
-	})
-}
-
-// PackageNameHasSuffix applies the HasSuffix predicate on the "package_name" field.
-func PackageNameHasSuffix(v string) predicate.FileRecord {
-	return predicate.FileRecord(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldPackageName), v))
-	})
-}
-
-// PackageNameEqualFold applies the EqualFold predicate on the "package_name" field.
-func PackageNameEqualFold(v string) predicate.FileRecord {
-	return predicate.FileRecord(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldPackageName), v))
-	})
-}
-
-// PackageNameContainsFold applies the ContainsFold predicate on the "package_name" field.
-func PackageNameContainsFold(v string) predicate.FileRecord {
-	return predicate.FileRecord(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldPackageName), v))
 	})
 }
 
