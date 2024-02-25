@@ -7,8 +7,8 @@ COLOR:=\\033[36m
 NOCOLOR:=\\033[0m
 GITREPO=$(shell git remote -v | grep fetch | awk '{print $$2}' | sed 's/\.git//g' | sed 's/https:\/\///g')
 
-PROJECTS= endpoint account contract datafin
-GO_PROJECTS= endpoint account contract datafin
+PROJECTS= endpoint account contract datafin user
+GO_PROJECTS= endpoint account contract datafin user
 
 ##@ init project
 init:
@@ -45,6 +45,7 @@ gen-ent:
 	go run entgo.io/ent/cmd/ent generate --feature entql,sql/lock,sql/execquery,sql/upsert,privacy,schema/snapshot,sql/modifier ./account/pkg/db/ent/schema
 	go run entgo.io/ent/cmd/ent generate --feature entql,sql/lock,sql/execquery,sql/upsert,privacy,schema/snapshot,sql/modifier ./contract/pkg/db/ent/schema
 	go run entgo.io/ent/cmd/ent generate --feature entql,sql/lock,sql/execquery,sql/upsert,privacy,schema/snapshot,sql/modifier ./datafin/pkg/db/ent/schema
+	go run entgo.io/ent/cmd/ent generate --feature entql,sql/lock,sql/execquery,sql/upsert,privacy,schema/snapshot,sql/modifier ./user/pkg/db/ent/schema
 
 ifdef AIMPROJECT
 PROJECTS= $(AIMPROJECT)

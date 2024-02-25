@@ -25,6 +25,12 @@ grpc-port=30141
 log-file="/var/log/datafin.log"
 data-dir="/mnt/data"
 
+[user]
+domain="user"
+http-port=30150
+grpc-port=30151
+log-file="/var/log/account.log"
+
 [mysql]
 domain="mysql-headless"
 port=3306

@@ -37,6 +37,24 @@ func Get(key string, v any) error {
 	return nil
 }
 
+func EnableNilGet(key string, v any) error {
+	cli := GetClient()
+
+	ctx, cancel := context.WithTimeout(context.Background(), ConnectTimeout)
+	defer cancel()
+
+	err := cli.Get(ctx, key).Scan(v)
+	err = ErrFilter(err)
+	if err != nil {
+		if err.Error() == "redis: nil" {
+			return fmt.Errorf("nil")
+		}
+		return fmt.Errorf("fail get key %v: %v", key, err)
+	}
+
+	return nil
+}
+
 func Del(key string) error {
 	cli := GetClient()
 
