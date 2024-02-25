@@ -1,7 +1,0 @@
----
-config:
-  hostname: "user-server.yn"
-  http_port: 30150
-  grpc_port: 30151
-  prometheus_port: 30152
-  logdir: "./"
