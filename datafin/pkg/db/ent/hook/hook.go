@@ -22,6 +22,19 @@ func (f DataFinFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 	return f(ctx, mv)
 }
 
+// The FileRecordFunc type is an adapter to allow the use of ordinary
+// function as FileRecord mutator.
+type FileRecordFunc func(context.Context, *ent.FileRecordMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f FileRecordFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.FileRecordMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.FileRecordMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The TopicFunc type is an adapter to allow the use of ordinary
 // function as Topic mutator.
 type TopicFunc func(context.Context, *ent.TopicMutation) (ent.Value, error)

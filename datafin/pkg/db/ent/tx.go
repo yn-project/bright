@@ -16,6 +16,8 @@ type Tx struct {
 	config
 	// DataFin is the client for interacting with the DataFin builders.
 	DataFin *DataFinClient
+	// FileRecord is the client for interacting with the FileRecord builders.
+	FileRecord *FileRecordClient
 	// Topic is the client for interacting with the Topic builders.
 	Topic *TopicClient
 
@@ -154,6 +156,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.DataFin = NewDataFinClient(tx.config)
+	tx.FileRecord = NewFileRecordClient(tx.config)
 	tx.Topic = NewTopicClient(tx.config)
 }
 

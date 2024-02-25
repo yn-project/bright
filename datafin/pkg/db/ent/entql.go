@@ -4,6 +4,7 @@ package ent
 
 import (
 	"yun.tea/block/bright/datafin/pkg/db/ent/datafin"
+	"yun.tea/block/bright/datafin/pkg/db/ent/filerecord"
 	"yun.tea/block/bright/datafin/pkg/db/ent/topic"
 
 	"entgo.io/ent/dialect/sql"
@@ -14,7 +15,7 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 2)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 3)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   datafin.Table,
@@ -40,6 +41,29 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 	}
 	graph.Nodes[1] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   filerecord.Table,
+			Columns: filerecord.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeUUID,
+				Column: filerecord.FieldID,
+			},
+		},
+		Type: "FileRecord",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			filerecord.FieldCreatedAt:   {Type: field.TypeUint32, Column: filerecord.FieldCreatedAt},
+			filerecord.FieldUpdatedAt:   {Type: field.TypeUint32, Column: filerecord.FieldUpdatedAt},
+			filerecord.FieldDeletedAt:   {Type: field.TypeUint32, Column: filerecord.FieldDeletedAt},
+			filerecord.FieldPackageName: {Type: field.TypeString, Column: filerecord.FieldPackageName},
+			filerecord.FieldFileName:    {Type: field.TypeString, Column: filerecord.FieldFileName},
+			filerecord.FieldTopicID:     {Type: field.TypeString, Column: filerecord.FieldTopicID},
+			filerecord.FieldRecordNum:   {Type: field.TypeUint32, Column: filerecord.FieldRecordNum},
+			filerecord.FieldSha1Sum:     {Type: field.TypeString, Column: filerecord.FieldSha1Sum},
+			filerecord.FieldState:       {Type: field.TypeString, Column: filerecord.FieldState},
+			filerecord.FieldRemark:      {Type: field.TypeString, Column: filerecord.FieldRemark},
+		},
+	}
+	graph.Nodes[2] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   topic.Table,
 			Columns: topic.Columns,
@@ -166,6 +190,96 @@ func (f *DataFinFilter) WhereRemark(p entql.StringP) {
 }
 
 // addPredicate implements the predicateAdder interface.
+func (frq *FileRecordQuery) addPredicate(pred func(s *sql.Selector)) {
+	frq.predicates = append(frq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the FileRecordQuery builder.
+func (frq *FileRecordQuery) Filter() *FileRecordFilter {
+	return &FileRecordFilter{config: frq.config, predicateAdder: frq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *FileRecordMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the FileRecordMutation builder.
+func (m *FileRecordMutation) Filter() *FileRecordFilter {
+	return &FileRecordFilter{config: m.config, predicateAdder: m}
+}
+
+// FileRecordFilter provides a generic filtering capability at runtime for FileRecordQuery.
+type FileRecordFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *FileRecordFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[1].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql [16]byte predicate on the id field.
+func (f *FileRecordFilter) WhereID(p entql.ValueP) {
+	f.Where(p.Field(filerecord.FieldID))
+}
+
+// WhereCreatedAt applies the entql uint32 predicate on the created_at field.
+func (f *FileRecordFilter) WhereCreatedAt(p entql.Uint32P) {
+	f.Where(p.Field(filerecord.FieldCreatedAt))
+}
+
+// WhereUpdatedAt applies the entql uint32 predicate on the updated_at field.
+func (f *FileRecordFilter) WhereUpdatedAt(p entql.Uint32P) {
+	f.Where(p.Field(filerecord.FieldUpdatedAt))
+}
+
+// WhereDeletedAt applies the entql uint32 predicate on the deleted_at field.
+func (f *FileRecordFilter) WhereDeletedAt(p entql.Uint32P) {
+	f.Where(p.Field(filerecord.FieldDeletedAt))
+}
+
+// WherePackageName applies the entql string predicate on the package_name field.
+func (f *FileRecordFilter) WherePackageName(p entql.StringP) {
+	f.Where(p.Field(filerecord.FieldPackageName))
+}
+
+// WhereFileName applies the entql string predicate on the file_name field.
+func (f *FileRecordFilter) WhereFileName(p entql.StringP) {
+	f.Where(p.Field(filerecord.FieldFileName))
+}
+
+// WhereTopicID applies the entql string predicate on the topic_id field.
+func (f *FileRecordFilter) WhereTopicID(p entql.StringP) {
+	f.Where(p.Field(filerecord.FieldTopicID))
+}
+
+// WhereRecordNum applies the entql uint32 predicate on the record_num field.
+func (f *FileRecordFilter) WhereRecordNum(p entql.Uint32P) {
+	f.Where(p.Field(filerecord.FieldRecordNum))
+}
+
+// WhereSha1Sum applies the entql string predicate on the sha1_sum field.
+func (f *FileRecordFilter) WhereSha1Sum(p entql.StringP) {
+	f.Where(p.Field(filerecord.FieldSha1Sum))
+}
+
+// WhereState applies the entql string predicate on the state field.
+func (f *FileRecordFilter) WhereState(p entql.StringP) {
+	f.Where(p.Field(filerecord.FieldState))
+}
+
+// WhereRemark applies the entql string predicate on the remark field.
+func (f *FileRecordFilter) WhereRemark(p entql.StringP) {
+	f.Where(p.Field(filerecord.FieldRemark))
+}
+
+// addPredicate implements the predicateAdder interface.
 func (tq *TopicQuery) addPredicate(pred func(s *sql.Selector)) {
 	tq.predicates = append(tq.predicates, pred)
 }
@@ -194,7 +308,7 @@ type TopicFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *TopicFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[1].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[2].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})

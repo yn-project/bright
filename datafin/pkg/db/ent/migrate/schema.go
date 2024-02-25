@@ -36,6 +36,38 @@ var (
 			},
 		},
 	}
+	// FileRecordsColumns holds the columns for the "file_records" table.
+	FileRecordsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "created_at", Type: field.TypeUint32},
+		{Name: "updated_at", Type: field.TypeUint32},
+		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "package_name", Type: field.TypeString},
+		{Name: "file_name", Type: field.TypeString},
+		{Name: "topic_id", Type: field.TypeString},
+		{Name: "record_num", Type: field.TypeUint32, Default: 0},
+		{Name: "sha1_sum", Type: field.TypeString},
+		{Name: "state", Type: field.TypeString},
+		{Name: "remark", Type: field.TypeString, Nullable: true},
+	}
+	// FileRecordsTable holds the schema information for the "file_records" table.
+	FileRecordsTable = &schema.Table{
+		Name:       "file_records",
+		Columns:    FileRecordsColumns,
+		PrimaryKey: []*schema.Column{FileRecordsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "filerecord_package_name_file_name",
+				Unique:  false,
+				Columns: []*schema.Column{FileRecordsColumns[4], FileRecordsColumns[5]},
+			},
+			{
+				Name:    "filerecord_topic_id",
+				Unique:  false,
+				Columns: []*schema.Column{FileRecordsColumns[6]},
+			},
+		},
+	}
 	// TopicsColumns holds the columns for the "topics" table.
 	TopicsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
@@ -65,6 +97,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		DataFinsTable,
+		FileRecordsTable,
 		TopicsTable,
 	}
 )

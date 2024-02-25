@@ -28,8 +28,9 @@ type config struct {
 
 // hooks per client, for fast access.
 type hooks struct {
-	DataFin []ent.Hook
-	Topic   []ent.Hook
+	DataFin    []ent.Hook
+	FileRecord []ent.Hook
+	Topic      []ent.Hook
 }
 
 // Options applies the options on the config object.

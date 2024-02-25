@@ -12,6 +12,7 @@ import (
 	"yun.tea/block/bright/datafin/pkg/db/ent/migrate"
 
 	"yun.tea/block/bright/datafin/pkg/db/ent/datafin"
+	"yun.tea/block/bright/datafin/pkg/db/ent/filerecord"
 	"yun.tea/block/bright/datafin/pkg/db/ent/topic"
 
 	"entgo.io/ent/dialect"
@@ -25,6 +26,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// DataFin is the client for interacting with the DataFin builders.
 	DataFin *DataFinClient
+	// FileRecord is the client for interacting with the FileRecord builders.
+	FileRecord *FileRecordClient
 	// Topic is the client for interacting with the Topic builders.
 	Topic *TopicClient
 }
@@ -41,6 +44,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.DataFin = NewDataFinClient(c.config)
+	c.FileRecord = NewFileRecordClient(c.config)
 	c.Topic = NewTopicClient(c.config)
 }
 
@@ -73,10 +77,11 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:     ctx,
-		config:  cfg,
-		DataFin: NewDataFinClient(cfg),
-		Topic:   NewTopicClient(cfg),
+		ctx:        ctx,
+		config:     cfg,
+		DataFin:    NewDataFinClient(cfg),
+		FileRecord: NewFileRecordClient(cfg),
+		Topic:      NewTopicClient(cfg),
 	}, nil
 }
 
@@ -94,10 +99,11 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:     ctx,
-		config:  cfg,
-		DataFin: NewDataFinClient(cfg),
-		Topic:   NewTopicClient(cfg),
+		ctx:        ctx,
+		config:     cfg,
+		DataFin:    NewDataFinClient(cfg),
+		FileRecord: NewFileRecordClient(cfg),
+		Topic:      NewTopicClient(cfg),
 	}, nil
 }
 
@@ -127,6 +133,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.DataFin.Use(hooks...)
+	c.FileRecord.Use(hooks...)
 	c.Topic.Use(hooks...)
 }
 
@@ -219,6 +226,97 @@ func (c *DataFinClient) GetX(ctx context.Context, id uuid.UUID) *DataFin {
 func (c *DataFinClient) Hooks() []Hook {
 	hooks := c.hooks.DataFin
 	return append(hooks[:len(hooks):len(hooks)], datafin.Hooks[:]...)
+}
+
+// FileRecordClient is a client for the FileRecord schema.
+type FileRecordClient struct {
+	config
+}
+
+// NewFileRecordClient returns a client for the FileRecord from the given config.
+func NewFileRecordClient(c config) *FileRecordClient {
+	return &FileRecordClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `filerecord.Hooks(f(g(h())))`.
+func (c *FileRecordClient) Use(hooks ...Hook) {
+	c.hooks.FileRecord = append(c.hooks.FileRecord, hooks...)
+}
+
+// Create returns a builder for creating a FileRecord entity.
+func (c *FileRecordClient) Create() *FileRecordCreate {
+	mutation := newFileRecordMutation(c.config, OpCreate)
+	return &FileRecordCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of FileRecord entities.
+func (c *FileRecordClient) CreateBulk(builders ...*FileRecordCreate) *FileRecordCreateBulk {
+	return &FileRecordCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for FileRecord.
+func (c *FileRecordClient) Update() *FileRecordUpdate {
+	mutation := newFileRecordMutation(c.config, OpUpdate)
+	return &FileRecordUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *FileRecordClient) UpdateOne(fr *FileRecord) *FileRecordUpdateOne {
+	mutation := newFileRecordMutation(c.config, OpUpdateOne, withFileRecord(fr))
+	return &FileRecordUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *FileRecordClient) UpdateOneID(id uuid.UUID) *FileRecordUpdateOne {
+	mutation := newFileRecordMutation(c.config, OpUpdateOne, withFileRecordID(id))
+	return &FileRecordUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for FileRecord.
+func (c *FileRecordClient) Delete() *FileRecordDelete {
+	mutation := newFileRecordMutation(c.config, OpDelete)
+	return &FileRecordDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *FileRecordClient) DeleteOne(fr *FileRecord) *FileRecordDeleteOne {
+	return c.DeleteOneID(fr.ID)
+}
+
+// DeleteOne returns a builder for deleting the given entity by its id.
+func (c *FileRecordClient) DeleteOneID(id uuid.UUID) *FileRecordDeleteOne {
+	builder := c.Delete().Where(filerecord.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &FileRecordDeleteOne{builder}
+}
+
+// Query returns a query builder for FileRecord.
+func (c *FileRecordClient) Query() *FileRecordQuery {
+	return &FileRecordQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a FileRecord entity by its id.
+func (c *FileRecordClient) Get(ctx context.Context, id uuid.UUID) (*FileRecord, error) {
+	return c.Query().Where(filerecord.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *FileRecordClient) GetX(ctx context.Context, id uuid.UUID) *FileRecord {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *FileRecordClient) Hooks() []Hook {
+	hooks := c.hooks.FileRecord
+	return append(hooks[:len(hooks):len(hooks)], filerecord.Hooks[:]...)
 }
 
 // TopicClient is a client for the Topic schema.

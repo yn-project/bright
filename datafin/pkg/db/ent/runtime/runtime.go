@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"yun.tea/block/bright/datafin/pkg/db/ent/datafin"
+	"yun.tea/block/bright/datafin/pkg/db/ent/filerecord"
 	"yun.tea/block/bright/datafin/pkg/db/ent/schema"
 	"yun.tea/block/bright/datafin/pkg/db/ent/topic"
 
@@ -50,6 +51,42 @@ func init() {
 	datafinDescID := datafinFields[0].Descriptor()
 	// datafin.DefaultID holds the default value on creation for the id field.
 	datafin.DefaultID = datafinDescID.Default.(func() uuid.UUID)
+	filerecordMixin := schema.FileRecord{}.Mixin()
+	filerecord.Policy = privacy.NewPolicies(filerecordMixin[0], schema.FileRecord{})
+	filerecord.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := filerecord.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	filerecordMixinFields0 := filerecordMixin[0].Fields()
+	_ = filerecordMixinFields0
+	filerecordFields := schema.FileRecord{}.Fields()
+	_ = filerecordFields
+	// filerecordDescCreatedAt is the schema descriptor for created_at field.
+	filerecordDescCreatedAt := filerecordMixinFields0[0].Descriptor()
+	// filerecord.DefaultCreatedAt holds the default value on creation for the created_at field.
+	filerecord.DefaultCreatedAt = filerecordDescCreatedAt.Default.(func() uint32)
+	// filerecordDescUpdatedAt is the schema descriptor for updated_at field.
+	filerecordDescUpdatedAt := filerecordMixinFields0[1].Descriptor()
+	// filerecord.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	filerecord.DefaultUpdatedAt = filerecordDescUpdatedAt.Default.(func() uint32)
+	// filerecord.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	filerecord.UpdateDefaultUpdatedAt = filerecordDescUpdatedAt.UpdateDefault.(func() uint32)
+	// filerecordDescDeletedAt is the schema descriptor for deleted_at field.
+	filerecordDescDeletedAt := filerecordMixinFields0[2].Descriptor()
+	// filerecord.DefaultDeletedAt holds the default value on creation for the deleted_at field.
+	filerecord.DefaultDeletedAt = filerecordDescDeletedAt.Default.(func() uint32)
+	// filerecordDescRecordNum is the schema descriptor for record_num field.
+	filerecordDescRecordNum := filerecordFields[4].Descriptor()
+	// filerecord.DefaultRecordNum holds the default value on creation for the record_num field.
+	filerecord.DefaultRecordNum = filerecordDescRecordNum.Default.(uint32)
+	// filerecordDescID is the schema descriptor for id field.
+	filerecordDescID := filerecordFields[0].Descriptor()
+	// filerecord.DefaultID holds the default value on creation for the id field.
+	filerecord.DefaultID = filerecordDescID.Default.(func() uuid.UUID)
 	topicMixin := schema.Topic{}.Mixin()
 	topic.Policy = privacy.NewPolicies(topicMixin[0], schema.Topic{})
 	topic.Hooks[0] = func(next ent.Mutator) ent.Mutator {

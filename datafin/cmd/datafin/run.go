@@ -16,6 +16,7 @@ import (
 	"yun.tea/block/bright/config"
 
 	"yun.tea/block/bright/common/logger"
+	"yun.tea/block/bright/common/servermux"
 	api "yun.tea/block/bright/datafin/api"
 
 	"google.golang.org/grpc"
@@ -84,7 +85,9 @@ func runHTTPServer(httpPort, grpcPort int) {
 		log.Fatalf("Fail to register gRPC gateway service endpoint: %v", err)
 	}
 
-	err = http.ListenAndServe(httpEndpoint, mux)
+	servermux.AppServerMux().Handle("/", mux)
+
+	err = http.ListenAndServe(httpEndpoint, servermux.AppServerMux())
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}

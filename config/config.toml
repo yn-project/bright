@@ -23,6 +23,7 @@ domain="datafin"
 http-port=30140
 grpc-port=30141
 log-file="/var/log/datafin.log"
+data-dir="/mnt/data"
 
 [mysql]
 domain="mysql-headless"

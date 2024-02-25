@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"yun.tea/block/bright/datafin/pkg/db/ent/datafin"
+	"yun.tea/block/bright/datafin/pkg/db/ent/filerecord"
 	"yun.tea/block/bright/datafin/pkg/db/ent/topic"
 )
 
@@ -32,8 +33,9 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
-		datafin.Table: datafin.ValidColumn,
-		topic.Table:   topic.ValidColumn,
+		datafin.Table:    datafin.ValidColumn,
+		filerecord.Table: filerecord.ValidColumn,
+		topic.Table:      topic.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {
