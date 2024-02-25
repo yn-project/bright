@@ -22,7 +22,7 @@ spec:
           imagePullPolicy: Always
           volumeMounts:
             - name: service-config
-              mountPath: /etc/UserServer
+              mountPath: /etc/User
           env:
             - name: ENV_CLUSTER_NAMESPACE
               valueFrom:
