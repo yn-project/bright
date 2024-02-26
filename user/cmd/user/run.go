@@ -34,6 +34,7 @@ var runCmd = &cli.Command{
 		return logger.Sync()
 	},
 	Before: func(ctx *cli.Context) error {
+		fmt.Println("===============config.GetConfig(): ", config.GetConfig().AuthApis.LoginApis)
 		err := logger.Init(logger.DebugLevel, config.GetConfig().User.LogFile)
 		if err != nil {
 			return err

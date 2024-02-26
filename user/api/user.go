@@ -17,6 +17,7 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"yun.tea/block/bright/common/ctredis"
+	"yun.tea/block/bright/config"
 )
 
 const (
@@ -384,6 +385,12 @@ func (s *Server) Logined(ctx context.Context, in *proto.LoginedRequest) (*proto.
 		return &proto.LoginedResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
+	if in.Token != token {
+		err = fmt.Errorf("invalid logined")
+		logger.Sugar().Errorw("Logined", "ID", in.GetUserID(), "error", err)
+		return &proto.LoginedResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
 	user := converter.Ent2Grpc(info)
 
 	metadata, err := MetadataFromContext(ctx)
@@ -416,46 +423,53 @@ func (s *Server) Logined(ctx context.Context, in *proto.LoginedRequest) (*proto.
 	}, nil
 }
 
-func (s *Server) Authenticate(ctx context.Context, in *proto.AuthenticateRequest) (*proto.AuthenticateResponse, error) {
+func loginCheck(ctx context.Context, UserID, Token string) error {
 	var err error
-	if in.Token == "" {
+
+	if Token == "" {
 		err := fmt.Errorf("invalid token")
 		logger.Sugar().Errorw("Authenticate", "error", err)
-		return &proto.AuthenticateResponse{}, status.Error(codes.Internal, err.Error())
+		return err
 	}
 
-	id, err := uuid.Parse(in.GetUserID())
+	id, err := uuid.Parse(UserID)
 	if err != nil {
-		logger.Sugar().Errorw("Authenticate", "ID", in.GetUserID(), "error", err)
-		return &proto.AuthenticateResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		logger.Sugar().Errorw("Authenticate", "ID", UserID, "error", err)
+		return err
 	}
 
 	info, err := crud.Row(ctx, id)
 	if err != nil {
 		err := fmt.Errorf("invalid user")
 		logger.Sugar().Errorw("Authenticate", "error", err)
-		return &proto.AuthenticateResponse{}, status.Error(codes.Internal, err.Error())
+		return err
 	}
 
 	var token string
 	err = ctredis.Get(fmt.Sprintf("%v/%v", PrefixLogin, info.ID.String()), &token)
 	if err != nil {
-		logger.Sugar().Errorw("Logined", "ID", in.GetUserID(), "error", err)
+		logger.Sugar().Errorw("Logined", "ID", UserID, "error", err)
 		err = fmt.Errorf("invalid authenticate")
-		return &proto.AuthenticateResponse{}, status.Error(codes.Internal, err.Error())
+		return err
 	}
 
 	if token == "" {
 		err = fmt.Errorf("invalid logined")
-		logger.Sugar().Errorw("Logined", "ID", in.GetUserID(), "error", err)
-		return &proto.AuthenticateResponse{}, status.Error(codes.Internal, err.Error())
+		logger.Sugar().Errorw("Logined", "token", token, "error", err)
+		return err
+	}
+
+	if Token != token {
+		err = fmt.Errorf("invalid logined")
+		logger.Sugar().Errorw("Logined", "input token", Token, "session token", token, "error", err)
+		return err
 	}
 
 	metadata, err := MetadataFromContext(ctx)
 	if err != nil {
 		logger.Sugar().Errorw("Logined", "error", err)
 		err := fmt.Errorf("invalid authenticate")
-		return &proto.AuthenticateResponse{}, status.Error(codes.Internal, err.Error())
+		return err
 	}
 	metadata.UserID = info.ID
 	metadata.User = converter.Ent2Grpc(info)
@@ -464,17 +478,73 @@ func (s *Server) Authenticate(ctx context.Context, in *proto.AuthenticateRequest
 	if err != nil {
 		logger.Sugar().Errorw("Logined", "error", err)
 		err := fmt.Errorf("invalid authenticate")
-		return &proto.AuthenticateResponse{}, status.Error(codes.Internal, err.Error())
+		return err
 	}
 
 	err = ctredis.Set(fmt.Sprintf("%v/%v", PrefixLogin, info.ID.String()), token, LoginExpireTime)
 	if err != nil {
 		logger.Sugar().Errorw("Logined", "error", err)
 		err := fmt.Errorf("invalid authenticate")
+		return err
+	}
+
+	return nil
+}
+
+func (s *Server) Authenticate(ctx context.Context, in *proto.AuthenticateRequest) (*proto.AuthenticateResponse, error) {
+	loginApis := config.GetConfig().AuthApis.LoginApis
+	NoLoginApis := config.GetConfig().AuthApis.NoLoginApis
+	publicApis := config.GetConfig().AuthApis.PublicApis
+	fmt.Println("loginApis: ", loginApis)
+	fmt.Println("NoLoginApis: ", NoLoginApis)
+	fmt.Println("publicApis: ", publicApis)
+
+	apisMap := map[string]string{}
+	for _, item := range NoLoginApis {
+		apisMap[item] = "NOLOGIN"
+	}
+	for _, item := range loginApis {
+		apisMap[item] = "LOGIN"
+	}
+	for _, item := range publicApis {
+		apisMap[item] = "PUBLICLOGIN"
+	}
+
+	if in.Resource == "" {
+		err := fmt.Errorf("invalid Resource")
+		logger.Sugar().Errorw("Authenticate", "error", err)
+		return &proto.AuthenticateResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	apiType, ok := apisMap[in.Resource]
+	if !ok {
+		err := fmt.Errorf("invalid api: %v", in.Resource)
+		logger.Sugar().Errorw("Authenticate", "error", err)
+		return &proto.AuthenticateResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	fmt.Println("apiType: ", apiType)
+
+	authResult := false
+	switch apiType {
+	case "NOLOGIN":
+		authResult = true
+	case "LOGIN":
+		err := loginCheck(ctx, *in.UserID, in.Token)
+		if err != nil {
+			logger.Sugar().Errorw("Authenticate", "error", err)
+			authResult = false
+		} else {
+			authResult = true
+		}
+	case "PUBLICLOGIN":
+		authResult = true
+	default:
+		err := fmt.Errorf("invalid api: %v, %v", in.Resource, apiType)
+		logger.Sugar().Errorw("Authenticate", "error", err)
 		return &proto.AuthenticateResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
 	return &proto.AuthenticateResponse{
-		Info: true,
+		Info: authResult,
 	}, nil
 }

@@ -50,3 +50,7 @@ connection-timeout=30
 topic-sync-task="topic_sync_task"
 topic-transform-image="topic_transform_image"
 
+[auth-apis]
+login-apis=['/api/logined','/api/logout','/api/get/users','/api/create/user','/api/update/user','/api/delete/user']
+nologin-apis=['/api/login','/api/authenticate']
+public-apis=['/api/account/get/accounts','/api/datafin/get/topics']
