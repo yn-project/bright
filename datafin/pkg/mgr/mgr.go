@@ -2,7 +2,6 @@ package mgr
 
 import (
 	"context"
-	"fmt"
 	"math/big"
 	"time"
 
@@ -185,8 +184,6 @@ func dataFinTask(ctx context.Context, topicID string, isIDTopic bool) error {
 		}
 		vals = append(vals, _val.ToBigInt())
 		ids = append(ids, item.DataID)
-		fmt.Println(_val.ToString())
-		fmt.Println(item.DataID)
 	}
 
 	var tx *types.Transaction

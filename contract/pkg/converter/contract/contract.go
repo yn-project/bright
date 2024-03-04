@@ -11,11 +11,13 @@ func Ent2Grpc(row *ent.Contract) *proto.Contract {
 	}
 
 	return &proto.Contract{
-		ID:      row.ID.String(),
-		Address: row.Address,
-		Name:    row.Name,
-		Version: row.Version,
-		Remark:  row.Remark,
+		ID:        row.ID.String(),
+		Address:   row.Address,
+		Name:      row.Name,
+		Version:   row.Version,
+		Remark:    row.Remark,
+		CreatedAt: uint64(row.CreatedAt),
+		UpdatedAt: uint64(row.UpdatedAt),
 	}
 }
 

@@ -45,13 +45,13 @@ func UploadDataFile(w http.ResponseWriter, r *http.Request) {
 	var err error
 	var errMsg string
 	defer func() {
+		respBody = []byte("successed to upload file to server")
 		if errMsg != "" {
 			logger.Sugar().Errorf("failed to upload file to server, err: %v", errMsg)
 			w.WriteHeader(http.StatusBadRequest)
 			respBody = []byte(errMsg)
 		}
 
-		respBody = []byte("successed to upload file to server")
 		_, err = w.Write(respBody)
 		if err != nil {
 			logger.Sugar().Errorf("failed to write response,err %v", err)

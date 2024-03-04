@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"yun.tea/block/bright/common/logger"
 	datafinclient "yun.tea/block/bright/datafin/pkg/client/datafin"
 	crud "yun.tea/block/bright/datafin/pkg/crud/filerecord"
 	datafinproto "yun.tea/block/bright/proto/bright/datafin"
@@ -44,6 +45,7 @@ func parseFileTask(ctx context.Context) {
 
 		allBytes, err := os.ReadFile(filePath)
 		if err != nil {
+			logger.Sugar().Error(err)
 			os.Remove(filePath)
 			continue
 		}
@@ -52,6 +54,7 @@ func parseFileTask(ctx context.Context) {
 
 		ff, err := os.Open(filePath)
 		if err != nil {
+			logger.Sugar().Error(err)
 			os.Remove(filePath)
 			continue
 		}
@@ -60,6 +63,7 @@ func parseFileTask(ctx context.Context) {
 		r := bufio.NewReader(ff)
 		bytes, _, err := r.ReadLine()
 		if err != nil {
+			logger.Sugar().Error(err)
 			os.Remove(filePath)
 			continue
 		}
@@ -67,7 +71,7 @@ func parseFileTask(ctx context.Context) {
 		req := &proto.CreateFileRecordRequest{}
 		err = json.Unmarshal(bytes, req)
 		if err != nil {
-			fmt.Println(err)
+			logger.Sugar().Error(err)
 			os.Remove(filePath)
 			continue
 		}
@@ -81,12 +85,14 @@ func parseFileTask(ctx context.Context) {
 			}
 
 			if err != nil {
+				logger.Sugar().Error(err)
 				break
 			}
 
 			info := &datafinproto.DataItemReq{}
 			err = json.Unmarshal(bytes, info)
 			if err != nil {
+				logger.Sugar().Error(err)
 				continue
 			}
 			infos = append(infos, info)
@@ -102,12 +108,13 @@ func parseFileTask(ctx context.Context) {
 
 		state := proto.FileRecordState_FileRecordSuccess
 		if err != nil {
+			logger.Sugar().Error(err)
 			req.Remark = err.Error()
 			state = proto.FileRecordState_FileRecordFailed
 		}
 
 		recordNum := uint32(len(infos))
-		crud.Create(ctx, &proto.FileRecordReq{
+		_, err = crud.Create(ctx, &proto.FileRecordReq{
 			FileName:  &req.File,
 			TopicID:   &req.TopicID,
 			RecordNum: &recordNum,
@@ -115,6 +122,8 @@ func parseFileTask(ctx context.Context) {
 			State:     &state,
 			Remark:    &req.Remark,
 		})
-
+		if err != nil {
+			logger.Sugar().Error(err)
+		}
 	}
 }
