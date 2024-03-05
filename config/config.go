@@ -19,6 +19,7 @@ type Config struct {
 	Endpoint Endpoint `toml:"endpoint" env:"endpoint"`
 	Account  Account  `toml:"account" env:"account"`
 	User     User     `toml:"user" env:"user"`
+	AuthApis AuthApis `toml:"auth-apis" env:"auth_apis"`
 	DataFin  DataFin  `toml:"datafin" env:"datafin"`
 	MySQL    MySQL    `toml:"mysql" env:"mysql"`
 	Pulsar   Pulsar   `toml:"pulsar" env:"pulsar"`
@@ -52,6 +53,12 @@ type User struct {
 	HTTPPort int    `toml:"http-port" env:"http_port"`
 	GrpcPort int    `toml:"grpc-port" env:"grpc_port"`
 	LogFile  string `toml:"log-file" env:"log_file"`
+}
+
+type AuthApis struct {
+	LoginApis   []string `toml:"login-apis" env:"login_apis"`
+	NoLoginApis []string `toml:"nologin-apis" env:"nologin_apis"`
+	PublicApis  []string `toml:"public-apis" env:"public_apis"`
 }
 
 type DataFin struct {
