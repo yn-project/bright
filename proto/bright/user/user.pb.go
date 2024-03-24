@@ -1161,6 +1161,108 @@ func (x *AuthenticateResponse) GetInfo() bool {
 	return false
 }
 
+type AuthLoginRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	AuthCode     string `protobuf:"bytes,10,opt,name=AuthCode,proto3" json:"AuthCode,omitempty"`
+	AuthTenantID string `protobuf:"bytes,20,opt,name=AuthTenantID,proto3" json:"AuthTenantID,omitempty"`
+}
+
+func (x *AuthLoginRequest) Reset() {
+	*x = AuthLoginRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_bright_user_user_proto_msgTypes[21]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AuthLoginRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AuthLoginRequest) ProtoMessage() {}
+
+func (x *AuthLoginRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bright_user_user_proto_msgTypes[21]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AuthLoginRequest.ProtoReflect.Descriptor instead.
+func (*AuthLoginRequest) Descriptor() ([]byte, []int) {
+	return file_bright_user_user_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *AuthLoginRequest) GetAuthCode() string {
+	if x != nil {
+		return x.AuthCode
+	}
+	return ""
+}
+
+func (x *AuthLoginRequest) GetAuthTenantID() string {
+	if x != nil {
+		return x.AuthTenantID
+	}
+	return ""
+}
+
+type AuthLoginResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Info *User `protobuf:"bytes,10,opt,name=Info,proto3" json:"Info,omitempty"`
+}
+
+func (x *AuthLoginResponse) Reset() {
+	*x = AuthLoginResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_bright_user_user_proto_msgTypes[22]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AuthLoginResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AuthLoginResponse) ProtoMessage() {}
+
+func (x *AuthLoginResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bright_user_user_proto_msgTypes[22]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AuthLoginResponse.ProtoReflect.Descriptor instead.
+func (*AuthLoginResponse) Descriptor() ([]byte, []int) {
+	return file_bright_user_user_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *AuthLoginResponse) GetInfo() *User {
+	if x != nil {
+		return x.Info
+	}
+	return nil
+}
+
 var File_bright_user_user_proto protoreflect.FileDescriptor
 
 var file_bright_user_user_proto_rawDesc = []byte{
@@ -1270,7 +1372,16 @@ var file_bright_user_user_proto_rawDesc = []byte{
 	0x65, 0x72, 0x49, 0x44, 0x22, 0x2a, 0x0a, 0x14, 0x41, 0x75, 0x74, 0x68, 0x65, 0x6e, 0x74, 0x69,
 	0x63, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x12, 0x0a, 0x04,
 	0x49, 0x6e, 0x66, 0x6f, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x08, 0x52, 0x04, 0x49, 0x6e, 0x66, 0x6f,
-	0x32, 0xf1, 0x06, 0x0a, 0x07, 0x4d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x72, 0x12, 0x66, 0x0a, 0x0a,
+	0x22, 0x52, 0x0a, 0x10, 0x41, 0x75, 0x74, 0x68, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x1a, 0x0a, 0x08, 0x41, 0x75, 0x74, 0x68, 0x43, 0x6f, 0x64, 0x65,
+	0x18, 0x0a, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x41, 0x75, 0x74, 0x68, 0x43, 0x6f, 0x64, 0x65,
+	0x12, 0x22, 0x0a, 0x0c, 0x41, 0x75, 0x74, 0x68, 0x54, 0x65, 0x6e, 0x61, 0x6e, 0x74, 0x49, 0x44,
+	0x18, 0x14, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x41, 0x75, 0x74, 0x68, 0x54, 0x65, 0x6e, 0x61,
+	0x6e, 0x74, 0x49, 0x44, 0x22, 0x3a, 0x0a, 0x11, 0x41, 0x75, 0x74, 0x68, 0x4c, 0x6f, 0x67, 0x69,
+	0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x25, 0x0a, 0x04, 0x49, 0x6e, 0x66,
+	0x6f, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x72, 0x69, 0x67, 0x68, 0x74,
+	0x2e, 0x75, 0x73, 0x65, 0x72, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x52, 0x04, 0x49, 0x6e, 0x66, 0x6f,
+	0x32, 0xd4, 0x07, 0x0a, 0x07, 0x4d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x72, 0x12, 0x66, 0x0a, 0x0a,
 	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x55, 0x73, 0x65, 0x72, 0x12, 0x1e, 0x2e, 0x62, 0x72, 0x69,
 	0x67, 0x68, 0x74, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x55,
 	0x73, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1f, 0x2e, 0x62, 0x72, 0x69,
@@ -1325,10 +1436,16 @@ var file_bright_user_user_proto_rawDesc = []byte{
 	0x2e, 0x75, 0x73, 0x65, 0x72, 0x2e, 0x41, 0x75, 0x74, 0x68, 0x65, 0x6e, 0x74, 0x69, 0x63, 0x61,
 	0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x18, 0x82, 0xd3, 0xe4, 0x93,
 	0x02, 0x12, 0x3a, 0x01, 0x2a, 0x22, 0x0d, 0x2f, 0x61, 0x75, 0x74, 0x68, 0x65, 0x6e, 0x74, 0x69,
-	0x63, 0x61, 0x74, 0x65, 0x42, 0x28, 0x5a, 0x26, 0x79, 0x75, 0x6e, 0x2e, 0x74, 0x65, 0x61, 0x2f,
-	0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x2f, 0x62, 0x72, 0x69, 0x67, 0x68, 0x74, 0x2f, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x2f, 0x62, 0x72, 0x69, 0x67, 0x68, 0x74, 0x2f, 0x75, 0x73, 0x65, 0x72, 0x62, 0x06,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x63, 0x61, 0x74, 0x65, 0x12, 0x61, 0x0a, 0x09, 0x41, 0x75, 0x74, 0x68, 0x4c, 0x6f, 0x67, 0x69,
+	0x6e, 0x12, 0x1d, 0x2e, 0x62, 0x72, 0x69, 0x67, 0x68, 0x74, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x2e,
+	0x41, 0x75, 0x74, 0x68, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x1e, 0x2e, 0x62, 0x72, 0x69, 0x67, 0x68, 0x74, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x2e, 0x41,
+	0x75, 0x74, 0x68, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x22, 0x15, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x0f, 0x3a, 0x01, 0x2a, 0x22, 0x0a, 0x2f, 0x61, 0x75,
+	0x74, 0x68, 0x6c, 0x6f, 0x67, 0x69, 0x6e, 0x42, 0x28, 0x5a, 0x26, 0x79, 0x75, 0x6e, 0x2e, 0x74,
+	0x65, 0x61, 0x2f, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x2f, 0x62, 0x72, 0x69, 0x67, 0x68, 0x74, 0x2f,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x62, 0x72, 0x69, 0x67, 0x68, 0x74, 0x2f, 0x75, 0x73, 0x65,
+	0x72, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1343,7 +1460,7 @@ func file_bright_user_user_proto_rawDescGZIP() []byte {
 	return file_bright_user_user_proto_rawDescData
 }
 
-var file_bright_user_user_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
+var file_bright_user_user_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_bright_user_user_proto_goTypes = []interface{}{
 	(*UserReq)(nil),               // 0: bright.user.UserReq
 	(*User)(nil),                  // 1: bright.user.User
@@ -1366,13 +1483,15 @@ var file_bright_user_user_proto_goTypes = []interface{}{
 	(*LoginedResponse)(nil),       // 18: bright.user.LoginedResponse
 	(*AuthenticateRequest)(nil),   // 19: bright.user.AuthenticateRequest
 	(*AuthenticateResponse)(nil),  // 20: bright.user.AuthenticateResponse
-	(*bright.StringVal)(nil),      // 21: bright.StringVal
-	(*bright.StringSliceVal)(nil), // 22: bright.StringSliceVal
+	(*AuthLoginRequest)(nil),      // 21: bright.user.AuthLoginRequest
+	(*AuthLoginResponse)(nil),     // 22: bright.user.AuthLoginResponse
+	(*bright.StringVal)(nil),      // 23: bright.StringVal
+	(*bright.StringSliceVal)(nil), // 24: bright.StringSliceVal
 }
 var file_bright_user_user_proto_depIdxs = []int32{
-	21, // 0: bright.user.Conds.ID:type_name -> bright.StringVal
-	21, // 1: bright.user.Conds.Name:type_name -> bright.StringVal
-	22, // 2: bright.user.Conds.IDs:type_name -> bright.StringSliceVal
+	23, // 0: bright.user.Conds.ID:type_name -> bright.StringVal
+	23, // 1: bright.user.Conds.Name:type_name -> bright.StringVal
+	24, // 2: bright.user.Conds.IDs:type_name -> bright.StringSliceVal
 	0,  // 3: bright.user.CreateUserRequest.Info:type_name -> bright.user.UserReq
 	1,  // 4: bright.user.CreateUserResponse.Info:type_name -> bright.user.User
 	0,  // 5: bright.user.UpdateUserRequest.Info:type_name -> bright.user.UserReq
@@ -1384,29 +1503,32 @@ var file_bright_user_user_proto_depIdxs = []int32{
 	1,  // 11: bright.user.LoginResponse.Info:type_name -> bright.user.User
 	1,  // 12: bright.user.LogoutResponse.Info:type_name -> bright.user.User
 	1,  // 13: bright.user.LoginedResponse.Info:type_name -> bright.user.User
-	3,  // 14: bright.user.Manager.CreateUser:input_type -> bright.user.CreateUserRequest
-	5,  // 15: bright.user.Manager.UpdateUser:input_type -> bright.user.UpdateUserRequest
-	7,  // 16: bright.user.Manager.GetUser:input_type -> bright.user.GetUserRequest
-	9,  // 17: bright.user.Manager.GetUsers:input_type -> bright.user.GetUsersRequest
-	11, // 18: bright.user.Manager.DeleteUser:input_type -> bright.user.DeleteUserRequest
-	13, // 19: bright.user.Manager.Login:input_type -> bright.user.LoginRequest
-	15, // 20: bright.user.Manager.Logout:input_type -> bright.user.LogoutRequest
-	17, // 21: bright.user.Manager.Logined:input_type -> bright.user.LoginedRequest
-	19, // 22: bright.user.Manager.Authenticate:input_type -> bright.user.AuthenticateRequest
-	4,  // 23: bright.user.Manager.CreateUser:output_type -> bright.user.CreateUserResponse
-	6,  // 24: bright.user.Manager.UpdateUser:output_type -> bright.user.UpdateUserResponse
-	8,  // 25: bright.user.Manager.GetUser:output_type -> bright.user.GetUserResponse
-	10, // 26: bright.user.Manager.GetUsers:output_type -> bright.user.GetUsersResponse
-	12, // 27: bright.user.Manager.DeleteUser:output_type -> bright.user.DeleteUserResponse
-	14, // 28: bright.user.Manager.Login:output_type -> bright.user.LoginResponse
-	16, // 29: bright.user.Manager.Logout:output_type -> bright.user.LogoutResponse
-	18, // 30: bright.user.Manager.Logined:output_type -> bright.user.LoginedResponse
-	20, // 31: bright.user.Manager.Authenticate:output_type -> bright.user.AuthenticateResponse
-	23, // [23:32] is the sub-list for method output_type
-	14, // [14:23] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	1,  // 14: bright.user.AuthLoginResponse.Info:type_name -> bright.user.User
+	3,  // 15: bright.user.Manager.CreateUser:input_type -> bright.user.CreateUserRequest
+	5,  // 16: bright.user.Manager.UpdateUser:input_type -> bright.user.UpdateUserRequest
+	7,  // 17: bright.user.Manager.GetUser:input_type -> bright.user.GetUserRequest
+	9,  // 18: bright.user.Manager.GetUsers:input_type -> bright.user.GetUsersRequest
+	11, // 19: bright.user.Manager.DeleteUser:input_type -> bright.user.DeleteUserRequest
+	13, // 20: bright.user.Manager.Login:input_type -> bright.user.LoginRequest
+	15, // 21: bright.user.Manager.Logout:input_type -> bright.user.LogoutRequest
+	17, // 22: bright.user.Manager.Logined:input_type -> bright.user.LoginedRequest
+	19, // 23: bright.user.Manager.Authenticate:input_type -> bright.user.AuthenticateRequest
+	21, // 24: bright.user.Manager.AuthLogin:input_type -> bright.user.AuthLoginRequest
+	4,  // 25: bright.user.Manager.CreateUser:output_type -> bright.user.CreateUserResponse
+	6,  // 26: bright.user.Manager.UpdateUser:output_type -> bright.user.UpdateUserResponse
+	8,  // 27: bright.user.Manager.GetUser:output_type -> bright.user.GetUserResponse
+	10, // 28: bright.user.Manager.GetUsers:output_type -> bright.user.GetUsersResponse
+	12, // 29: bright.user.Manager.DeleteUser:output_type -> bright.user.DeleteUserResponse
+	14, // 30: bright.user.Manager.Login:output_type -> bright.user.LoginResponse
+	16, // 31: bright.user.Manager.Logout:output_type -> bright.user.LogoutResponse
+	18, // 32: bright.user.Manager.Logined:output_type -> bright.user.LoginedResponse
+	20, // 33: bright.user.Manager.Authenticate:output_type -> bright.user.AuthenticateResponse
+	22, // 34: bright.user.Manager.AuthLogin:output_type -> bright.user.AuthLoginResponse
+	25, // [25:35] is the sub-list for method output_type
+	15, // [15:25] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_bright_user_user_proto_init() }
@@ -1667,6 +1789,30 @@ func file_bright_user_user_proto_init() {
 				return nil
 			}
 		}
+		file_bright_user_user_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*AuthLoginRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_bright_user_user_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*AuthLoginResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	file_bright_user_user_proto_msgTypes[0].OneofWrappers = []interface{}{}
 	file_bright_user_user_proto_msgTypes[19].OneofWrappers = []interface{}{}
@@ -1676,7 +1822,7 @@ func file_bright_user_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_bright_user_user_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   21,
+			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

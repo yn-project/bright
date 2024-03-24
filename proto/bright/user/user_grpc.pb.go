@@ -31,6 +31,7 @@ type ManagerClient interface {
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error)
 	Logined(ctx context.Context, in *LoginedRequest, opts ...grpc.CallOption) (*LoginedResponse, error)
 	Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateResponse, error)
+	AuthLogin(ctx context.Context, in *AuthLoginRequest, opts ...grpc.CallOption) (*AuthLoginResponse, error)
 }
 
 type managerClient struct {
@@ -122,6 +123,15 @@ func (c *managerClient) Authenticate(ctx context.Context, in *AuthenticateReques
 	return out, nil
 }
 
+func (c *managerClient) AuthLogin(ctx context.Context, in *AuthLoginRequest, opts ...grpc.CallOption) (*AuthLoginResponse, error) {
+	out := new(AuthLoginResponse)
+	err := c.cc.Invoke(ctx, "/bright.user.Manager/AuthLogin", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ManagerServer is the server API for Manager service.
 // All implementations must embed UnimplementedManagerServer
 // for forward compatibility
@@ -135,6 +145,7 @@ type ManagerServer interface {
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
 	Logined(context.Context, *LoginedRequest) (*LoginedResponse, error)
 	Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateResponse, error)
+	AuthLogin(context.Context, *AuthLoginRequest) (*AuthLoginResponse, error)
 	mustEmbedUnimplementedManagerServer()
 }
 
@@ -168,6 +179,9 @@ func (UnimplementedManagerServer) Logined(context.Context, *LoginedRequest) (*Lo
 }
 func (UnimplementedManagerServer) Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Authenticate not implemented")
+}
+func (UnimplementedManagerServer) AuthLogin(context.Context, *AuthLoginRequest) (*AuthLoginResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AuthLogin not implemented")
 }
 func (UnimplementedManagerServer) mustEmbedUnimplementedManagerServer() {}
 
@@ -344,6 +358,24 @@ func _Manager_Authenticate_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Manager_AuthLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AuthLoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagerServer).AuthLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/bright.user.Manager/AuthLogin",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagerServer).AuthLogin(ctx, req.(*AuthLoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Manager_ServiceDesc is the grpc.ServiceDesc for Manager service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -386,6 +418,10 @@ var Manager_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Authenticate",
 			Handler:    _Manager_Authenticate_Handler,
+		},
+		{
+			MethodName: "AuthLogin",
+			Handler:    _Manager_AuthLogin_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
