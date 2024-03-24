@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"os"
 	"time"
 
 	converter "yun.tea/block/bright/user/pkg/converter/user"
@@ -557,8 +558,8 @@ func (s *Server) Authenticate(ctx context.Context, in *proto.AuthenticateRequest
 type AuthCodeRequestData struct {
 	GrantCode  string `json:"grantCode"`
 	RememberMe bool   `json:"rememberMe"`
-	TenantID   string `json:tenantId`
-	AppID      string `json:appId`
+	TenantID   string `json:"tenantId"`
+	AppID      string `json:"appId"`
 }
 
 type AuthCodeResponseData struct {
@@ -577,10 +578,16 @@ type AuthCodeResponseData struct {
 	} `json:"data"`
 }
 
-const tokenApiDomain = "https://tenant-manage-api.dev.ennew.com/TenantManage"
+var tokenApiDomainMap = map[string]string{
+	"dev":  "https://tenant-manage-api.dev.ennew.com/TenantManage",
+	"fat":  "https://tenant-manage-api.fat.ennew.com/TenantManage",
+	"uat":  "https://tenant-manage-api.uat.ennew.com/TenantManage",
+	"prod": "https://authentication-center-new.ennew.com/TenantManage",
+}
+
 const tokenApiURL = "/unify/auth/authentication"
 
-func getAuthToken(ctx context.Context, authCode, authTenantID string) (string, string, error) {
+func getAuthToken(authCode, authTenantID string) (string, string, error) {
 	data := AuthCodeRequestData{
 		GrantCode:  authCode,
 		RememberMe: false,
@@ -592,13 +599,27 @@ func getAuthToken(ctx context.Context, authCode, authTenantID string) (string, s
 	jsonValue, err := json.Marshal(data)
 	if err != nil {
 		fmt.Println("Error marshaling JSON:", err)
+		err := fmt.Errorf("invalid token")
+		logger.Sugar().Errorw("AuthLogin", "error", err)
 		return "", "", err
 	}
 
 	// 创建HTTP的POST请求
+	envName := os.Getenv("SYSTEM_ENV")
+	if envName == "" {
+		err := fmt.Errorf("invalid token")
+		logger.Sugar().Errorw("AuthLogin", "error", err)
+		return "", "", fmt.Errorf("invalid env")
+	}
+	tokenApiDomain, ok := tokenApiDomainMap[envName]
+	if !ok {
+		err := fmt.Errorf("invalid env: %v", envName)
+		logger.Sugar().Errorw("AuthLogin", "error", err)
+		return "", "", err
+	}
 	req, err := http.NewRequest("POST", tokenApiDomain+tokenApiURL, bytes.NewBuffer(jsonValue))
 	if err != nil {
-		fmt.Println("Error creating request:", err)
+		logger.Sugar().Errorw("AuthLogin", "error", err)
 		return "", "", err
 	}
 
@@ -611,7 +632,7 @@ func getAuthToken(ctx context.Context, authCode, authTenantID string) (string, s
 	// 发送请求
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println("Error sending request:", err)
+		err := fmt.Errorf("error sending request: %v", err)
 		return "", "", err
 	}
 	defer resp.Body.Close()
@@ -619,7 +640,7 @@ func getAuthToken(ctx context.Context, authCode, authTenantID string) (string, s
 	// 读取响应体
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println("Error reading response body:", err)
+		err := fmt.Errorf("error reading response body: %v", err)
 		return "", "", err
 	}
 
@@ -633,12 +654,12 @@ func getAuthToken(ctx context.Context, authCode, authTenantID string) (string, s
 	// 解析JSON响应
 	err = json.Unmarshal(body, &responseData)
 	if err != nil {
-		fmt.Println("Error parsing JSON response:", err)
+		err := fmt.Errorf("error parsing JSON response: %v", err)
 		return "", "", err
 	}
 
 	if !responseData.Success {
-		fmt.Println("Auth Failed")
+		err := fmt.Errorf("auth Failed: %v", responseData.Code)
 		return "", "", err
 	}
 
@@ -661,23 +682,45 @@ type AuthUserResponseData struct {
 	} `json:"data"`
 }
 
-const authUserDomain = "https://auth-center.dev.ennew.com/userCenter"
+var authUserDomainMap = map[string]string{
+	"dev":  "https://auth-center.dev.ennew.com/userCenter",
+	"fat":  "https://auth-center.fat.ennew.com/userCenter",
+	"uat":  "https://auth-center.uat.ennew.com/userCenter",
+	"prod": "https://authentication-center-new.ennew.com/userCenter",
+}
+
 const authUserApiURL = "/unify/auth/userInfoByCurrentToken"
 
-func getAuthUser(ctx context.Context, loginToken, shortToken string) (string, error) {
+func getAuthUser(loginToken, shortToken string) (string, error) {
 	data := AuthUserRequestData{}
 
 	// 将结构体编码为JSON
 	jsonValue, err := json.Marshal(data)
 	if err != nil {
-		fmt.Println("Error marshaling JSON:", err)
+		err := fmt.Errorf("error marshaling JSON: %v", err)
+		logger.Sugar().Errorw("AuthLogin", "error", err)
+		return "", err
+	}
+
+	// 创建HTTP的POST请求
+	envName := os.Getenv("SYSTEM_ENV")
+	if envName == "" {
+		err := fmt.Errorf("invalid env")
+		logger.Sugar().Errorw("AuthLogin", "error", err)
+		return "", err
+	}
+	authUserDomain, ok := authUserDomainMap[envName]
+	if !ok {
+		err := fmt.Errorf("invalid env: %v", envName)
+		logger.Sugar().Errorw("AuthLogin", "error", err)
 		return "", err
 	}
 
 	// 创建HTTP的POST请求
 	req, err := http.NewRequest("POST", authUserDomain+authUserApiURL, bytes.NewBuffer(jsonValue))
 	if err != nil {
-		fmt.Println("Error creating request:", err)
+		err := fmt.Errorf("error creating request: %v", err)
+		logger.Sugar().Errorw("AuthLogin", "error", err)
 		return "", err
 	}
 
@@ -692,7 +735,8 @@ func getAuthUser(ctx context.Context, loginToken, shortToken string) (string, er
 	// 发送请求
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println("Error sending request:", err)
+		err := fmt.Errorf("error sending request: %v", err)
+		logger.Sugar().Errorw("AuthLogin", "error", err)
 		return "", err
 	}
 	defer resp.Body.Close()
@@ -700,13 +744,16 @@ func getAuthUser(ctx context.Context, loginToken, shortToken string) (string, er
 	// 读取响应体
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println("Error reading response body:", err)
+		err := fmt.Errorf("error reading response body: %v", err)
+		logger.Sugar().Errorw("AuthLogin", "error", err)
 		return "", err
 	}
 
 	// 打印响应状态码和响应体
 	if resp.Status != "200" {
-		return "", fmt.Errorf("authLogin failed")
+		err := fmt.Errorf("auth Failed")
+		logger.Sugar().Errorw("AuthLogin", "error", err)
+		return "", err
 	}
 
 	var responseData AuthUserResponseData
@@ -714,12 +761,14 @@ func getAuthUser(ctx context.Context, loginToken, shortToken string) (string, er
 	// 解析JSON响应
 	err = json.Unmarshal(body, &responseData)
 	if err != nil {
-		fmt.Println("Error parsing JSON response:", err)
+		err := fmt.Errorf("error parsing JSON response: %v", err)
+		logger.Sugar().Errorw("AuthLogin", "error", err)
 		return "", err
 	}
 
 	if !responseData.Success {
-		fmt.Println("Auth Failed")
+		err := fmt.Errorf("auth Failed")
+		logger.Sugar().Errorw("AuthLogin", "error", err)
 		return "", err
 	}
 
@@ -740,7 +789,7 @@ func (s *Server) AuthLogin(ctx context.Context, in *proto.AuthLoginRequest) (*pr
 	}
 
 	// 请求统一认证API授权接口获取长短Token
-	longToken, shortToken, err := getAuthToken(ctx, in.AuthCode, in.AuthTenantID)
+	longToken, shortToken, err := getAuthToken(in.AuthCode, in.AuthTenantID)
 	if err != nil {
 		logger.Sugar().Errorw("AuthLogin", "error", err)
 		err := fmt.Errorf("invalid get token")
@@ -748,7 +797,7 @@ func (s *Server) AuthLogin(ctx context.Context, in *proto.AuthLoginRequest) (*pr
 	}
 
 	// 用长短Token获取用户信息
-	authUserName, err := getAuthUser(ctx, longToken, shortToken)
+	authUserName, err := getAuthUser(longToken, shortToken)
 	if err != nil {
 		logger.Sugar().Errorw("AuthLogin", "error", err)
 		err := fmt.Errorf("invalid get auth user info")
