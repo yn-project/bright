@@ -52,18 +52,17 @@
 #     headerNames:
 #       - X-App-ID
 
-# ---
-# apiVersion: traefik.containo.us/v1alpha1
-# kind: Middleware
-# metadata:
-#   name: app-user-role-rbac-auth
-#   namespace: kube-system
-# spec:
-#   rbacAuth:
-#     headerNames:
-#       - X-App-ID
-#       - X-User-ID
-#       - X-App-Login-Token
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: user-role-rbac-auth
+  namespace: kube-system
+spec:
+  rbacAuth:
+    headerNames:
+      - X-User-ID
+      - X-Login-Token
 
 ---
 apiVersion: traefik.containo.us/v1alpha1
