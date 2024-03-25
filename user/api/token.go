@@ -20,6 +20,8 @@ type Metadata struct {
 	User      *proto.User
 }
 
+const tokenAccessSecret = "KdJotrSavIOArznhirWNfTgfEblWphLqLTVv"
+
 func MetadataFromContext(ctx context.Context) (*Metadata, error) {
 	meta, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
@@ -57,11 +59,6 @@ func (meta *Metadata) ToJWTClaims() jwt.MapClaims {
 }
 
 func createToken(meta *Metadata) (string, error) {
-	tokenAccessSecret := os.Getenv("LOGIN_TOKEN_ACCESS_SECRET")
-	if tokenAccessSecret == "" {
-		return "", fmt.Errorf("invalid login token access secret")
-	}
-
 	claims := meta.ToJWTClaims()
 	candidate := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	token, err := candidate.SignedString([]byte(tokenAccessSecret))

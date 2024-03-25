@@ -48,6 +48,38 @@
         ]
       }
     },
+    "/authlogin": {
+      "post": {
+        "operationId": "Manager_AuthLogin",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/userAuthLoginResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/userAuthLoginRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Manager"
+        ]
+      }
+    },
     "/create/user": {
       "post": {
         "operationId": "Manager_CreateUser",
@@ -356,6 +388,25 @@
             "type": "object",
             "$ref": "#/definitions/protobufAny"
           }
+        }
+      }
+    },
+    "userAuthLoginRequest": {
+      "type": "object",
+      "properties": {
+        "AuthCode": {
+          "type": "string"
+        },
+        "AuthTenantID": {
+          "type": "string"
+        }
+      }
+    },
+    "userAuthLoginResponse": {
+      "type": "object",
+      "properties": {
+        "Info": {
+          "$ref": "#/definitions/userUser"
         }
       }
     },

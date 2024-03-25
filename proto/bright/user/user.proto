@@ -61,6 +61,12 @@ service Manager {
       body:"*"
     };
   }
+  rpc AuthLogin(AuthLoginRequest) returns (AuthLoginResponse) {
+    option (google.api.http) = {
+      post:"/authlogin"
+      body:"*"
+    };
+  }
 }
 
 message UserReq {
@@ -134,3 +140,9 @@ message AuthenticateRequest {
   string Method = 40;
 }
 message AuthenticateResponse { bool Info = 10; }
+
+message AuthLoginRequest { 
+  string AuthCode     = 10;
+  string AuthTenantID = 20; 
+}
+message AuthLoginResponse { User Info = 10; }
