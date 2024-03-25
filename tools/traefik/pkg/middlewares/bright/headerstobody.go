@@ -45,6 +45,7 @@ func (ctb *headersToBody) GetTracingInformation() (string, ext.SpanKindEnum) {
 
 func (ctb *headersToBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	logger := log.FromContext(middlewares.GetLoggerCtx(req.Context(), ctb.name, basicTypeName))
+	logger.Warnf("Read body: %v %v", ctb.name, basicTypeName)
 
 	myBody, err := io.ReadAll(req.Body)
 	if err != nil {

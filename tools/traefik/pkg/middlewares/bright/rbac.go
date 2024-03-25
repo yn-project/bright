@@ -46,7 +46,7 @@ func (ra *rbacAuth) GetTracingInformation() (string, ext.SpanKindEnum) {
 
 func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	logger := log.FromContext(middlewares.GetLoggerCtx(req.Context(), ra.name, authTypeName))
-
+	logger.Warnf("ServeHTTP %v %v", ra.name, authTypeName)
 	var userID *string
 	var userToken *string
 
@@ -54,6 +54,7 @@ func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 	for _, name := range ra.headerNames {
 		header := req.Header.Get(name)
+		logger.Warnf("get header %v", header)
 		if header == "" {
 			logger.Warnf("fail get header %v", name)
 			ok = false
@@ -102,6 +103,8 @@ func (ra *rbacAuth) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		goto lFail
 	}
 
+	logger.Warnf("set aReq %v", aReq)
+	logger.Warnf("set authHost %v", authHost)
 	resp, err = resty.
 		New().
 		R().
