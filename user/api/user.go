@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 	"time"
 
 	converter "yun.tea/block/bright/user/pkg/converter/user"
@@ -24,6 +25,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"yun.tea/block/bright/common/ctredis"
 	"yun.tea/block/bright/config"
+	"yun.tea/block/bright/user/pkg/db/ent"
 )
 
 const (
@@ -568,10 +570,10 @@ type AuthCodeResponseData struct {
 	Message string `json:"message"`
 	Data    struct {
 		LoginToken struct {
-			MaxAge   string `json:"maxAge"`
+			MaxAge   uint32 `json:"maxAge"`
 			Name     string `json:"name"`
-			HttpOnly string `json:"httpOnly"`
-			Secure   string `json:"secure"`
+			HttpOnly bool   `json:"httpOnly"`
+			Secure   bool   `json:"secure"`
 			Value    string `json:"value"`
 		} `json:"ennUnifiedAuthorizationCookie"`
 		ShortToken string `json:"ennUnifiedCsrfToken"`
@@ -579,7 +581,7 @@ type AuthCodeResponseData struct {
 }
 
 var tokenApiDomainMap = map[string]string{
-	"dev":  "https://tenant-manage-api.dev.ennew.com/TenantManage",
+	"dev":  "http://220.163.224.24:8303/iop/user",
 	"fat":  "https://tenant-manage-api.fat.ennew.com/TenantManage",
 	"uat":  "https://tenant-manage-api.uat.ennew.com/TenantManage",
 	"prod": "https://authentication-center-new.ennew.com/TenantManage",
@@ -592,14 +594,13 @@ func getAuthToken(authCode, authTenantID string) (string, string, error) {
 		GrantCode:  authCode,
 		RememberMe: false,
 		TenantID:   authTenantID,
-		AppID:      "tenant-management-backstage",
+		AppID:      "mh_ncpzszxt",
 	}
 
 	// 将结构体编码为JSON
 	jsonValue, err := json.Marshal(data)
 	if err != nil {
-		fmt.Println("Error marshaling JSON:", err)
-		err := fmt.Errorf("invalid token")
+		err := fmt.Errorf("error marshaling JSON: %v", err)
 		logger.Sugar().Errorw("AuthLogin", "error", err)
 		return "", "", err
 	}
@@ -611,12 +612,16 @@ func getAuthToken(authCode, authTenantID string) (string, string, error) {
 		logger.Sugar().Errorw("AuthLogin", "error", err)
 		return "", "", fmt.Errorf("invalid env")
 	}
+	// if envName == "dev" {
+	// 	return "123456", "234567", nil
+	// }
 	tokenApiDomain, ok := tokenApiDomainMap[envName]
 	if !ok {
 		err := fmt.Errorf("invalid env: %v", envName)
 		logger.Sugar().Errorw("AuthLogin", "error", err)
 		return "", "", err
 	}
+	fmt.Println("tokenApiDomain: ", tokenApiDomain)
 	req, err := http.NewRequest("POST", tokenApiDomain+tokenApiURL, bytes.NewBuffer(jsonValue))
 	if err != nil {
 		logger.Sugar().Errorw("AuthLogin", "error", err)
@@ -629,6 +634,7 @@ func getAuthToken(authCode, authTenantID string) (string, string, error) {
 	// 创建HTTP客户端
 	client := &http.Client{}
 
+	fmt.Println("req: ", req)
 	// 发送请求
 	resp, err := client.Do(req)
 	if err != nil {
@@ -645,8 +651,11 @@ func getAuthToken(authCode, authTenantID string) (string, string, error) {
 	}
 
 	// 打印响应状态码和响应体
-	if resp.Status != "200" {
-		return "", "", fmt.Errorf("authLogin failed")
+	if strings.TrimSpace(resp.Status) != "200" {
+		fmt.Println("resp.Status: ", resp.Status)
+		fmt.Println("resp.Body: ", resp.Body)
+		fmt.Println("resp: ", resp)
+		return "", "", fmt.Errorf("authLogin failed: %v", resp.Status)
 	}
 
 	var responseData AuthCodeResponseData
@@ -676,14 +685,14 @@ type AuthUserResponseData struct {
 		UserID       string `json:"userId"`
 		Username     string `json:"username"`
 		NickName     string `json:"nickName"`
-		HasTenant    string `json:"hasTenant"`
+		HasTenant    bool   `json:"hasTenant"`
 		TenantID     string `json:"tenantId"`
 		TerminalType string `json:"terminalType"`
 	} `json:"data"`
 }
 
 var authUserDomainMap = map[string]string{
-	"dev":  "https://auth-center.dev.ennew.com/userCenter",
+	"dev":  "http://220.163.224.24:8303/iop/user",
 	"fat":  "https://auth-center.fat.ennew.com/userCenter",
 	"uat":  "https://auth-center.uat.ennew.com/userCenter",
 	"prod": "https://authentication-center-new.ennew.com/userCenter",
@@ -709,6 +718,9 @@ func getAuthUser(loginToken, shortToken string) (string, error) {
 		logger.Sugar().Errorw("AuthLogin", "error", err)
 		return "", err
 	}
+	// if envName == "dev" {
+	// 	return "admin3", nil
+	// }
 	authUserDomain, ok := authUserDomainMap[envName]
 	if !ok {
 		err := fmt.Errorf("invalid env: %v", envName)
@@ -750,8 +762,8 @@ func getAuthUser(loginToken, shortToken string) (string, error) {
 	}
 
 	// 打印响应状态码和响应体
-	if resp.Status != "200" {
-		err := fmt.Errorf("auth Failed")
+	if strings.TrimSpace(resp.Status) != "200" {
+		err := fmt.Errorf("auth Failed: %v", resp.Status)
 		logger.Sugar().Errorw("AuthLogin", "error", err)
 		return "", err
 	}
@@ -807,9 +819,10 @@ func (s *Server) AuthLogin(ctx context.Context, in *proto.AuthLoginRequest) (*pr
 	// 检查用户信息是否存在表中，存在则直接返回，不存在则创建一条记录并返回
 	info, err := crud.RowByName(ctx, authUserName)
 	if err != nil {
-		err := fmt.Errorf("invalid user")
-		logger.Sugar().Errorw("AuthLogin", "error", err)
-		return &proto.AuthLoginResponse{}, status.Error(codes.Internal, err.Error())
+		if !ent.IsNotFound(err) {
+			logger.Sugar().Errorw("AuthLogin", "error", err)
+			return &proto.AuthLoginResponse{}, status.Error(codes.Internal, err.Error())
+		}
 	}
 
 	if info == nil {

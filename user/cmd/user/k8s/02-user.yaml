@@ -38,6 +38,11 @@ spec:
                 secretKeyRef:
                   name: redis-cluster
                   key: redis-password
+            - name: SYSTEM_ENV
+              value: "dev"
+              # value: "fat"
+              # value: "uat"
+              # value: "prod"
       volumes:
         - name: service-config
           configMap:
