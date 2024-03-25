@@ -1,0 +1,15 @@
+FROM centos:centos7
+
+RUN yum install -y epel-release && \
+    yum update -y && \
+    yum install -y nginx && \
+    yum clean all
+
+COPY static/ /usr/share/nginx/html/traefik/dashboard
+COPY nginx.conf.template /etc/nginx/nginx.conf
+RUN rm -rf /usr/share/nginx/html/index.html
+RUN ln -s /usr/share/nginx/html/traefik/dashboard/index.html /usr/share/nginx/html/index.html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
