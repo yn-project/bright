@@ -24,7 +24,6 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"yun.tea/block/bright/common/ctredis"
-	"yun.tea/block/bright/config"
 	"yun.tea/block/bright/user/pkg/db/ent"
 )
 
@@ -500,56 +499,11 @@ func loginCheck(ctx context.Context, UserID, Token string) error {
 }
 
 func (s *Server) Authenticate(ctx context.Context, in *proto.AuthenticateRequest) (*proto.AuthenticateResponse, error) {
-	loginApis := config.GetConfig().AuthApis.LoginApis
-	NoLoginApis := config.GetConfig().AuthApis.NoLoginApis
-	publicApis := config.GetConfig().AuthApis.PublicApis
-	fmt.Println("loginApis: ", loginApis)
-	fmt.Println("NoLoginApis: ", NoLoginApis)
-	fmt.Println("publicApis: ", publicApis)
-
-	apisMap := map[string]string{}
-	for _, item := range NoLoginApis {
-		apisMap[item] = "NOLOGIN"
-	}
-	for _, item := range loginApis {
-		apisMap[item] = "LOGIN"
-	}
-	for _, item := range publicApis {
-		apisMap[item] = "PUBLICLOGIN"
-	}
-
-	if in.Resource == "" {
-		err := fmt.Errorf("invalid Resource")
+	authResult := true
+	err := loginCheck(ctx, *in.UserID, in.Token)
+	if err != nil {
 		logger.Sugar().Errorw("Authenticate", "error", err)
-		return &proto.AuthenticateResponse{}, status.Error(codes.Internal, err.Error())
-	}
-
-	apiType, ok := apisMap[in.Resource]
-	if !ok {
-		err := fmt.Errorf("invalid api: %v", in.Resource)
-		logger.Sugar().Errorw("Authenticate", "error", err)
-		return &proto.AuthenticateResponse{}, status.Error(codes.Internal, err.Error())
-	}
-	fmt.Println("apiType: ", apiType)
-
-	authResult := false
-	switch apiType {
-	case "NOLOGIN":
-		authResult = true
-	case "LOGIN":
-		err := loginCheck(ctx, *in.UserID, in.Token)
-		if err != nil {
-			logger.Sugar().Errorw("Authenticate", "error", err)
-			authResult = false
-		} else {
-			authResult = true
-		}
-	case "PUBLICLOGIN":
-		authResult = true
-	default:
-		err := fmt.Errorf("invalid api: %v, %v", in.Resource, apiType)
-		logger.Sugar().Errorw("Authenticate", "error", err)
-		return &proto.AuthenticateResponse{}, status.Error(codes.Internal, err.Error())
+		authResult = false
 	}
 
 	return &proto.AuthenticateResponse{
@@ -580,21 +534,20 @@ type AuthCodeResponseData struct {
 	} `json:"data"`
 }
 
-var tokenApiDomainMap = map[string]string{
-	"dev":  "http://220.163.224.24:8303/iop/user",
-	"fat":  "https://tenant-manage-api.fat.ennew.com/TenantManage",
-	"uat":  "https://tenant-manage-api.uat.ennew.com/TenantManage",
-	"prod": "https://authentication-center-new.ennew.com/TenantManage",
-}
-
 const tokenApiURL = "/unify/auth/authentication"
 
 func getAuthToken(authCode, authTenantID string) (string, string, error) {
+	appID := os.Getenv("SSO_APP_ID")
+	if appID == "" {
+		err := fmt.Errorf("invalid appID")
+		logger.Sugar().Errorw("AuthLogin", "error", err)
+		return "", "", fmt.Errorf("invalid appID")
+	}
 	data := AuthCodeRequestData{
 		GrantCode:  authCode,
 		RememberMe: false,
 		TenantID:   authTenantID,
-		AppID:      "mh_ncpzszxt",
+		AppID:      appID,
 	}
 
 	// 将结构体编码为JSON
@@ -605,19 +558,9 @@ func getAuthToken(authCode, authTenantID string) (string, string, error) {
 		return "", "", err
 	}
 
-	// 创建HTTP的POST请求
-	envName := os.Getenv("SYSTEM_ENV")
-	if envName == "" {
-		err := fmt.Errorf("invalid token")
-		logger.Sugar().Errorw("AuthLogin", "error", err)
-		return "", "", fmt.Errorf("invalid env")
-	}
-	// if envName == "dev" {
-	// 	return "123456", "234567", nil
-	// }
-	tokenApiDomain, ok := tokenApiDomainMap[envName]
-	if !ok {
-		err := fmt.Errorf("invalid env: %v", envName)
+	tokenApiDomain := os.Getenv("SSO_TOKEN_API_DOMAIN")
+	if tokenApiDomain == "" {
+		err := fmt.Errorf("get null sso api")
 		logger.Sugar().Errorw("AuthLogin", "error", err)
 		return "", "", err
 	}
@@ -691,13 +634,6 @@ type AuthUserResponseData struct {
 	} `json:"data"`
 }
 
-var authUserDomainMap = map[string]string{
-	"dev":  "http://220.163.224.24:8303/iop/user",
-	"fat":  "https://auth-center.fat.ennew.com/userCenter",
-	"uat":  "https://auth-center.uat.ennew.com/userCenter",
-	"prod": "https://authentication-center-new.ennew.com/userCenter",
-}
-
 const authUserApiURL = "/unify/auth/userInfoByCurrentToken"
 
 func getAuthUser(loginToken, shortToken string) (string, error) {
@@ -711,19 +647,9 @@ func getAuthUser(loginToken, shortToken string) (string, error) {
 		return "", err
 	}
 
-	// 创建HTTP的POST请求
-	envName := os.Getenv("SYSTEM_ENV")
-	if envName == "" {
-		err := fmt.Errorf("invalid env")
-		logger.Sugar().Errorw("AuthLogin", "error", err)
-		return "", err
-	}
-	// if envName == "dev" {
-	// 	return "admin3", nil
-	// }
-	authUserDomain, ok := authUserDomainMap[envName]
-	if !ok {
-		err := fmt.Errorf("invalid env: %v", envName)
+	authUserDomain := os.Getenv("SSO_AUTH_USER_API_DOMAIN")
+	if authUserDomain == "" {
+		err := fmt.Errorf("get null sso authuser api")
 		logger.Sugar().Errorw("AuthLogin", "error", err)
 		return "", err
 	}

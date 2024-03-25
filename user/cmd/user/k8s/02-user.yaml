@@ -38,11 +38,21 @@ spec:
                 secretKeyRef:
                   name: redis-cluster
                   key: redis-password
-            - name: SYSTEM_ENV
-              value: "dev"
-              # value: "fat"
-              # value: "uat"
-              # value: "prod"
+            - name: SSO_APP_ID
+              value: "mh_ncpzszxt"
+            - name: SSO_TOKEN_API_DOMAIN
+              value:  "http://220.163.224.24:8303/iop/user"
+              # value:  "https://tenant-manage-api.dev.ennew.com/TenantManage"
+              # value:  "https://tenant-manage-api.fat.ennew.com/TenantManage"
+              # value:  "https://tenant-manage-api.uat.ennew.com/TenantManage"
+              # value: "https://authentication-center-new.ennew.com/TenantManage"
+            - name: SSO_AUTH_USER_API_DOMAIN
+              value:  "http://220.163.224.24:8303/iop/user"
+              # value: "https://auth-center.dev.ennew.com/userCenter"
+              # value: "https://auth-center.fat.ennew.com/userCenter"
+              # value: "https://auth-center.uat.ennew.com/userCenter"
+              # value: "https://authentication-center-new.ennew.com/userCenter"
+              
       volumes:
         - name: service-config
           configMap:

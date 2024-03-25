@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net"
-	"os"
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
@@ -89,10 +88,6 @@ func VerifyToken(meta *Metadata, token string) error {
 	jwtToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method")
-		}
-		tokenAccessSecret := os.Getenv("LOGIN_TOKEN_ACCESS_SECRET")
-		if tokenAccessSecret == "" {
-			return "", fmt.Errorf("invalid login token access secret")
 		}
 		return []byte(tokenAccessSecret), nil
 	})
