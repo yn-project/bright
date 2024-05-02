@@ -42,6 +42,18 @@ func (s *DataFinServer) CreateDataFin(ctx context.Context, in *proto.CreateDataF
 		needCompact = true
 	}
 
+	// check infos
+	for _, v := range in.Infos {
+		if len(v.DataID) == 0 {
+			dataFinItem := &proto.DataItemReq{}
+			err := json.Unmarshal([]byte(v.Data), dataFinItem)
+			if err != nil || len(dataFinItem.DataID) == 0 {
+				return &proto.CreateDataFinResponse{}, fmt.Errorf("wrong datafin format")
+			}
+			v.DataID = dataFinItem.DataID
+		}
+	}
+
 	for _, v := range in.Infos {
 		reqItem := &proto.DataFinReq{
 			DataID:  &v.DataID,
@@ -59,7 +71,6 @@ func (s *DataFinServer) CreateDataFin(ctx context.Context, in *proto.CreateDataF
 			reqItem.DataFin = &_dfhash
 		}
 		reqList = append(reqList, reqItem)
-
 	}
 
 	infos, err := crud.CreateBulk(ctx, reqList)

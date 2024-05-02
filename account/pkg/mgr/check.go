@@ -30,6 +30,7 @@ type AccountReport struct {
 	Remark  string
 }
 
+// 检测账户状态，最终账户非管理员会设置成管理员角色
 func GetAccountReport(ctx context.Context, address string) (acc AccountReport, err error) {
 	acc = AccountReport{
 		Balance: "0",
@@ -111,6 +112,12 @@ func GetAccountReport(ctx context.Context, address string) (acc AccountReport, e
 	} else {
 		acc.State = basetype.AccountState_AccountError
 		acc.Remark = "非合约管理员"
+		go func() {
+			err = WithWriteContract(ctx, true, func(ctx context.Context, txOpts *bind.TransactOpts, contract *data_fin.DataFin, cli *ethclient.Client) error {
+				_, err = contract.AddAdmin(txOpts, common.HexToAddress(address), "auto set to admin")
+				return err
+			})
+		}()
 	}
 	return
 }

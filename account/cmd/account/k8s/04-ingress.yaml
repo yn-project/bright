@@ -7,8 +7,8 @@ metadata:
     kubernetes.io/ingress.class: "traefik-internet"
     traefik.ingress.kubernetes.io/router.entrypoints: web
     traefik.ingress.kubernetes.io/router.middlewares:
-      kube-system-strip-account-prefix@kubernetescrd,
       kube-system-head-cors@kubernetescrd,
+      kube-system-strip-account-prefix@kubernetescrd,
       kube-system-headers-userid-to-body@kubernetescrd,
       kube-system-headers-login-token-to-body@kubernetescrd,
       kube-system-user-role-rbac-auth@kubernetescrd

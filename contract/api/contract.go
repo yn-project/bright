@@ -4,6 +4,7 @@ package contract
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/Vigo-Tea/go-ethereum-ant/accounts/abi/bind"
@@ -73,7 +74,7 @@ func (s *Server) CreateContractWithAccount(ctx context.Context, in *proto.Create
 	}
 	aMGR := accountmgr.GetAccountMGR()
 	contractAddr := ""
-	endpointmgr.WithClient(ctx, func(ctx context.Context, cli *ethclient.Client) error {
+	err = endpointmgr.WithClient(ctx, func(ctx context.Context, cli *ethclient.Client) error {
 		unlockFunc, err := aMGR.GetAccount(ctx, &accountmgr.AccountKey{
 			Pri: acc.PriKey,
 			Pub: acc.Address,
@@ -106,6 +107,11 @@ func (s *Server) CreateContractWithAccount(ctx context.Context, in *proto.Create
 		return nil
 	})
 
+	if err != nil {
+		err = fmt.Errorf("failed to create contract,err: %v", err)
+		return &proto.CreateContractWithAccountResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
 	version := solcode.VERSION
 	info, err := crud.Create(ctx, &proto.ContractReq{
 		Name:    &in.Name,
@@ -126,6 +132,17 @@ func (s *Server) CreateContractWithAccount(ctx context.Context, in *proto.Create
 func (s *Server) GetContract(ctx context.Context, in *proto.GetContractRequest) (*proto.GetContractResponse, error) {
 	var err error
 	info, err := crud.Row(ctx)
+	if err != nil && strings.Contains(err.Error(), "ent: contract not found") {
+		return &proto.GetContractResponse{
+			Info: &proto.Contract{
+				ID:        "",
+				Name:      "无合约，请创建！",
+				Address:   "",
+				CreatedAt: uint64(time.Now().Unix()),
+				UpdatedAt: uint64(time.Now().Unix()),
+			},
+		}, nil
+	}
 	if err != nil {
 		logger.Sugar().Errorw("GetContract", "error", err)
 		return &proto.GetContractResponse{}, status.Error(codes.Internal, err.Error())

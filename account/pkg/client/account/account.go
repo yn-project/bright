@@ -76,6 +76,14 @@ func SetRootAccount(ctx context.Context, in *proto.SetRootAccountRequest) (resp 
 	return resp, err
 }
 
+func SetAdminAccount(ctx context.Context, in *proto.SetAdminAccountRequest) (resp *proto.SetAdminAccountResponse, err error) {
+	_, err = withCRUD(ctx, func(_ctx context.Context, cli proto.ManagerClient) (cruder.Any, error) {
+		resp, err = cli.SetAdminAccount(ctx, in)
+		return resp, err
+	})
+	return resp, err
+}
+
 func DeleteAccount(ctx context.Context, in *proto.DeleteAccountRequest) (resp *proto.DeleteAccountResponse, err error) {
 	ret, err := withCRUD(ctx, func(_ctx context.Context, cli proto.ManagerClient) (cruder.Any, error) {
 		resp, err = cli.DeleteAccount(ctx, in)

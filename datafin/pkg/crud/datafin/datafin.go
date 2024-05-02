@@ -59,6 +59,9 @@ func CreateSet(c *ent.DataFinCreate, in *proto.DataFinReq) *ent.DataFinCreate {
 	if in.State != nil {
 		c.SetState(in.GetState().String())
 	}
+	if in.Remark != nil {
+		c.SetRemark(in.GetRemark())
+	}
 	return c
 }
 
