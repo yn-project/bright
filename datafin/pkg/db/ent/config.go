@@ -30,6 +30,7 @@ type config struct {
 type hooks struct {
 	DataFin    []ent.Hook
 	FileRecord []ent.Hook
+	Mqueue     []ent.Hook
 	Topic      []ent.Hook
 }
 

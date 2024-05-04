@@ -35,6 +35,19 @@ func (f FileRecordFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, 
 	return f(ctx, mv)
 }
 
+// The MqueueFunc type is an adapter to allow the use of ordinary
+// function as Mqueue mutator.
+type MqueueFunc func(context.Context, *ent.MqueueMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f MqueueFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.MqueueMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MqueueMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The TopicFunc type is an adapter to allow the use of ordinary
 // function as Topic mutator.
 type TopicFunc func(context.Context, *ent.TopicMutation) (ent.Value, error)

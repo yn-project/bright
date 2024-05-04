@@ -18,6 +18,8 @@ type Tx struct {
 	DataFin *DataFinClient
 	// FileRecord is the client for interacting with the FileRecord builders.
 	FileRecord *FileRecordClient
+	// Mqueue is the client for interacting with the Mqueue builders.
+	Mqueue *MqueueClient
 	// Topic is the client for interacting with the Topic builders.
 	Topic *TopicClient
 
@@ -157,6 +159,7 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.DataFin = NewDataFinClient(tx.config)
 	tx.FileRecord = NewFileRecordClient(tx.config)
+	tx.Mqueue = NewMqueueClient(tx.config)
 	tx.Topic = NewTopicClient(tx.config)
 }
 

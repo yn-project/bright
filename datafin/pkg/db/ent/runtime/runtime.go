@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"yun.tea/block/bright/datafin/pkg/db/ent/datafin"
 	"yun.tea/block/bright/datafin/pkg/db/ent/filerecord"
+	"yun.tea/block/bright/datafin/pkg/db/ent/mqueue"
 	"yun.tea/block/bright/datafin/pkg/db/ent/schema"
 	"yun.tea/block/bright/datafin/pkg/db/ent/topic"
 
@@ -87,6 +88,38 @@ func init() {
 	filerecordDescID := filerecordFields[0].Descriptor()
 	// filerecord.DefaultID holds the default value on creation for the id field.
 	filerecord.DefaultID = filerecordDescID.Default.(func() uuid.UUID)
+	mqueueMixin := schema.Mqueue{}.Mixin()
+	mqueue.Policy = privacy.NewPolicies(mqueueMixin[0], schema.Mqueue{})
+	mqueue.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := mqueue.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	mqueueMixinFields0 := mqueueMixin[0].Fields()
+	_ = mqueueMixinFields0
+	mqueueFields := schema.Mqueue{}.Fields()
+	_ = mqueueFields
+	// mqueueDescCreatedAt is the schema descriptor for created_at field.
+	mqueueDescCreatedAt := mqueueMixinFields0[0].Descriptor()
+	// mqueue.DefaultCreatedAt holds the default value on creation for the created_at field.
+	mqueue.DefaultCreatedAt = mqueueDescCreatedAt.Default.(func() uint32)
+	// mqueueDescUpdatedAt is the schema descriptor for updated_at field.
+	mqueueDescUpdatedAt := mqueueMixinFields0[1].Descriptor()
+	// mqueue.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	mqueue.DefaultUpdatedAt = mqueueDescUpdatedAt.Default.(func() uint32)
+	// mqueue.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	mqueue.UpdateDefaultUpdatedAt = mqueueDescUpdatedAt.UpdateDefault.(func() uint32)
+	// mqueueDescDeletedAt is the schema descriptor for deleted_at field.
+	mqueueDescDeletedAt := mqueueMixinFields0[2].Descriptor()
+	// mqueue.DefaultDeletedAt holds the default value on creation for the deleted_at field.
+	mqueue.DefaultDeletedAt = mqueueDescDeletedAt.Default.(func() uint32)
+	// mqueueDescID is the schema descriptor for id field.
+	mqueueDescID := mqueueFields[0].Descriptor()
+	// mqueue.DefaultID holds the default value on creation for the id field.
+	mqueue.DefaultID = mqueueDescID.Default.(func() uuid.UUID)
 	topicMixin := schema.Topic{}.Mixin()
 	topic.Policy = privacy.NewPolicies(topicMixin[0], schema.Topic{})
 	topic.Hooks[0] = func(next ent.Mutator) ent.Mutator {

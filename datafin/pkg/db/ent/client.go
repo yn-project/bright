@@ -13,6 +13,7 @@ import (
 
 	"yun.tea/block/bright/datafin/pkg/db/ent/datafin"
 	"yun.tea/block/bright/datafin/pkg/db/ent/filerecord"
+	"yun.tea/block/bright/datafin/pkg/db/ent/mqueue"
 	"yun.tea/block/bright/datafin/pkg/db/ent/topic"
 
 	"entgo.io/ent/dialect"
@@ -28,6 +29,8 @@ type Client struct {
 	DataFin *DataFinClient
 	// FileRecord is the client for interacting with the FileRecord builders.
 	FileRecord *FileRecordClient
+	// Mqueue is the client for interacting with the Mqueue builders.
+	Mqueue *MqueueClient
 	// Topic is the client for interacting with the Topic builders.
 	Topic *TopicClient
 }
@@ -45,6 +48,7 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.DataFin = NewDataFinClient(c.config)
 	c.FileRecord = NewFileRecordClient(c.config)
+	c.Mqueue = NewMqueueClient(c.config)
 	c.Topic = NewTopicClient(c.config)
 }
 
@@ -81,6 +85,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		config:     cfg,
 		DataFin:    NewDataFinClient(cfg),
 		FileRecord: NewFileRecordClient(cfg),
+		Mqueue:     NewMqueueClient(cfg),
 		Topic:      NewTopicClient(cfg),
 	}, nil
 }
@@ -103,6 +108,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		config:     cfg,
 		DataFin:    NewDataFinClient(cfg),
 		FileRecord: NewFileRecordClient(cfg),
+		Mqueue:     NewMqueueClient(cfg),
 		Topic:      NewTopicClient(cfg),
 	}, nil
 }
@@ -134,6 +140,7 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	c.DataFin.Use(hooks...)
 	c.FileRecord.Use(hooks...)
+	c.Mqueue.Use(hooks...)
 	c.Topic.Use(hooks...)
 }
 
@@ -317,6 +324,97 @@ func (c *FileRecordClient) GetX(ctx context.Context, id uuid.UUID) *FileRecord {
 func (c *FileRecordClient) Hooks() []Hook {
 	hooks := c.hooks.FileRecord
 	return append(hooks[:len(hooks):len(hooks)], filerecord.Hooks[:]...)
+}
+
+// MqueueClient is a client for the Mqueue schema.
+type MqueueClient struct {
+	config
+}
+
+// NewMqueueClient returns a client for the Mqueue from the given config.
+func NewMqueueClient(c config) *MqueueClient {
+	return &MqueueClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `mqueue.Hooks(f(g(h())))`.
+func (c *MqueueClient) Use(hooks ...Hook) {
+	c.hooks.Mqueue = append(c.hooks.Mqueue, hooks...)
+}
+
+// Create returns a builder for creating a Mqueue entity.
+func (c *MqueueClient) Create() *MqueueCreate {
+	mutation := newMqueueMutation(c.config, OpCreate)
+	return &MqueueCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Mqueue entities.
+func (c *MqueueClient) CreateBulk(builders ...*MqueueCreate) *MqueueCreateBulk {
+	return &MqueueCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Mqueue.
+func (c *MqueueClient) Update() *MqueueUpdate {
+	mutation := newMqueueMutation(c.config, OpUpdate)
+	return &MqueueUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *MqueueClient) UpdateOne(m *Mqueue) *MqueueUpdateOne {
+	mutation := newMqueueMutation(c.config, OpUpdateOne, withMqueue(m))
+	return &MqueueUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *MqueueClient) UpdateOneID(id uuid.UUID) *MqueueUpdateOne {
+	mutation := newMqueueMutation(c.config, OpUpdateOne, withMqueueID(id))
+	return &MqueueUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Mqueue.
+func (c *MqueueClient) Delete() *MqueueDelete {
+	mutation := newMqueueMutation(c.config, OpDelete)
+	return &MqueueDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *MqueueClient) DeleteOne(m *Mqueue) *MqueueDeleteOne {
+	return c.DeleteOneID(m.ID)
+}
+
+// DeleteOne returns a builder for deleting the given entity by its id.
+func (c *MqueueClient) DeleteOneID(id uuid.UUID) *MqueueDeleteOne {
+	builder := c.Delete().Where(mqueue.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &MqueueDeleteOne{builder}
+}
+
+// Query returns a query builder for Mqueue.
+func (c *MqueueClient) Query() *MqueueQuery {
+	return &MqueueQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a Mqueue entity by its id.
+func (c *MqueueClient) Get(ctx context.Context, id uuid.UUID) (*Mqueue, error) {
+	return c.Query().Where(mqueue.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *MqueueClient) GetX(ctx context.Context, id uuid.UUID) *Mqueue {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *MqueueClient) Hooks() []Hook {
+	hooks := c.hooks.Mqueue
+	return append(hooks[:len(hooks):len(hooks)], mqueue.Hooks[:]...)
 }
 
 // TopicClient is a client for the Topic schema.

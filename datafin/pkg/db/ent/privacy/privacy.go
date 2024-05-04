@@ -198,6 +198,30 @@ func (f FileRecordMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Muta
 	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.FileRecordMutation", m)
 }
 
+// The MqueueQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type MqueueQueryRuleFunc func(context.Context, *ent.MqueueQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f MqueueQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.MqueueQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.MqueueQuery", q)
+}
+
+// The MqueueMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type MqueueMutationRuleFunc func(context.Context, *ent.MqueueMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f MqueueMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.MqueueMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.MqueueMutation", m)
+}
+
 // The TopicQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type TopicQueryRuleFunc func(context.Context, *ent.TopicQuery) error
@@ -261,6 +285,8 @@ func queryFilter(q ent.Query) (Filter, error) {
 		return q.Filter(), nil
 	case *ent.FileRecordQuery:
 		return q.Filter(), nil
+	case *ent.MqueueQuery:
+		return q.Filter(), nil
 	case *ent.TopicQuery:
 		return q.Filter(), nil
 	default:
@@ -273,6 +299,8 @@ func mutationFilter(m ent.Mutation) (Filter, error) {
 	case *ent.DataFinMutation:
 		return m.Filter(), nil
 	case *ent.FileRecordMutation:
+		return m.Filter(), nil
+	case *ent.MqueueMutation:
 		return m.Filter(), nil
 	case *ent.TopicMutation:
 		return m.Filter(), nil

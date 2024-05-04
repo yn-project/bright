@@ -67,6 +67,22 @@ var (
 			},
 		},
 	}
+	// MqueuesColumns holds the columns for the "mqueues" table.
+	MqueuesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "created_at", Type: field.TypeUint32},
+		{Name: "updated_at", Type: field.TypeUint32},
+		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "name", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString},
+		{Name: "topic_name", Type: field.TypeString},
+	}
+	// MqueuesTable holds the schema information for the "mqueues" table.
+	MqueuesTable = &schema.Table{
+		Name:       "mqueues",
+		Columns:    MqueuesColumns,
+		PrimaryKey: []*schema.Column{MqueuesColumns[0]},
+	}
 	// TopicsColumns holds the columns for the "topics" table.
 	TopicsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
@@ -97,6 +113,7 @@ var (
 	Tables = []*schema.Table{
 		DataFinsTable,
 		FileRecordsTable,
+		MqueuesTable,
 		TopicsTable,
 	}
 )

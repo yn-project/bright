@@ -44,6 +44,35 @@ func (s *Server) CreateEndpoint(ctx context.Context, in *proto.CreateEndpointReq
 	}, nil
 }
 
+func (s *Server) UpdateEndpoint(ctx context.Context, in *proto.UpdateEndpointRequest) (*proto.UpdateEndpointResponse, error) {
+	if in.RPS != nil && (*in.RPS > 10000 || *in.RPS < 1) {
+		return &proto.UpdateEndpointResponse{}, status.Error(codes.Internal, "wrong rps range,allow [1,10000]")
+	}
+	var err error
+	info, err := crud.Update(ctx, &proto.EndpointReq{
+		ID:      &in.ID,
+		State:   basetype.EndpointState_EndpointDefault.Enum(),
+		Name:    in.Name,
+		Address: in.Address,
+		RPS:     in.RPS,
+		Remark:  in.Remark,
+	})
+	if err != nil {
+		logger.Sugar().Errorw("UpdateEndpoint", "error", err)
+		return &proto.UpdateEndpointResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	info, err = mgr.CheckAndUpdateEndpoint(ctx, info)
+	if err != nil {
+		logger.Sugar().Warnw("UpdateEndpoint", "warning", err)
+	}
+
+	logger.Sugar().Infof("success to update endpoint,name: %v,address: %v", info.Name, info.Address)
+	return &proto.UpdateEndpointResponse{
+		Info: converter.Ent2Grpc(info),
+	}, nil
+}
+
 func (s *Server) GetEndpoint(ctx context.Context, in *proto.GetEndpointRequest) (*proto.GetEndpointResponse, error) {
 	var err error
 

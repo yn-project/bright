@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package bright.mqueue;
+
+option go_package = "yun.tea/block/bright/proto/bright/mqueue";
+import "bright/bright.proto";
+import "bright/basetype/basetype.proto";
+import "google/api/annotations.proto";
+
+service Manager {
+  rpc CreateMqueue(CreateMqueueRequest) returns (CreateMqueueResponse) {
+    option (google.api.http) = {
+      post:"/create/mqueue"
+      body:"*"
+    };
+  }
+  rpc GetMqueue(GetMqueueRequest) returns (GetMqueueResponse) {
+    option (google.api.http) = {
+      post:"/get/mqueue"
+      body:"*"
+    };
+  }
+  rpc GetMqueues(GetMqueuesRequest) returns (GetMqueuesResponse) {
+    option (google.api.http) = {
+      post:"/get/mqueues"
+      body:"*"
+    };
+  }
+  rpc DeleteMqueue(DeleteMqueueRequest) returns (DeleteMqueueResponse) {
+    option (google.api.http) = {
+      post:"/delete/mqueue"
+      body:"*"
+    };
+  }
+}
+
+message MqueueReq {
+  optional string ID = 10;
+  optional string Name = 11;
+  optional string Description = 20;
+  optional string TopicName = 30;
+}
+
+message Mqueue {
+  string ID = 10;
+  string Name = 11;
+  string Description = 20;
+  string TopicName = 30;
+  uint32 CreatedAt = 60;
+  uint32 UpdatedAt = 70;
+}
+
+message Conds {
+  bright.StringVal ID = 10;
+  bright.StringVal Name = 11;
+  bright.StringVal Description = 20;
+  bright.StringVal TopicName = 30;
+  bright.StringSliceVal IDs = 100;
+}
+
+message CreateMqueueRequest { MqueueReq Info = 10; }
+message CreateMqueueResponse { Mqueue Info = 10; }
+
+message GetMqueueRequest { string ID = 10; }
+message GetMqueueResponse { Mqueue Info = 10; }
+
+message GetMqueuesRequest {
+  Conds Conds = 10;
+  int32 Offset = 20;
+  int32 Limit = 30;
+}
+
+message GetMqueuesResponse {
+  repeated Mqueue Infos = 10;
+  uint32 Total = 20;
+}
+
+message DeleteMqueueRequest { string ID = 10; }
+message DeleteMqueueResponse { Mqueue Info = 10; }

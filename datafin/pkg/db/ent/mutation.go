@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 	"yun.tea/block/bright/datafin/pkg/db/ent/datafin"
 	"yun.tea/block/bright/datafin/pkg/db/ent/filerecord"
+	"yun.tea/block/bright/datafin/pkg/db/ent/mqueue"
 	"yun.tea/block/bright/datafin/pkg/db/ent/predicate"
 	"yun.tea/block/bright/datafin/pkg/db/ent/topic"
 
@@ -28,6 +29,7 @@ const (
 	// Node types.
 	TypeDataFin    = "DataFin"
 	TypeFileRecord = "FileRecord"
+	TypeMqueue     = "Mqueue"
 	TypeTopic      = "Topic"
 )
 
@@ -2021,6 +2023,695 @@ func (m *FileRecordMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *FileRecordMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown FileRecord edge %s", name)
+}
+
+// MqueueMutation represents an operation that mutates the Mqueue nodes in the graph.
+type MqueueMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *uuid.UUID
+	created_at    *uint32
+	addcreated_at *int32
+	updated_at    *uint32
+	addupdated_at *int32
+	deleted_at    *uint32
+	adddeleted_at *int32
+	name          *string
+	description   *string
+	topic_name    *string
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*Mqueue, error)
+	predicates    []predicate.Mqueue
+}
+
+var _ ent.Mutation = (*MqueueMutation)(nil)
+
+// mqueueOption allows management of the mutation configuration using functional options.
+type mqueueOption func(*MqueueMutation)
+
+// newMqueueMutation creates new mutation for the Mqueue entity.
+func newMqueueMutation(c config, op Op, opts ...mqueueOption) *MqueueMutation {
+	m := &MqueueMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeMqueue,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withMqueueID sets the ID field of the mutation.
+func withMqueueID(id uuid.UUID) mqueueOption {
+	return func(m *MqueueMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Mqueue
+		)
+		m.oldValue = func(ctx context.Context) (*Mqueue, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Mqueue.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withMqueue sets the old Mqueue of the mutation.
+func withMqueue(node *Mqueue) mqueueOption {
+	return func(m *MqueueMutation) {
+		m.oldValue = func(context.Context) (*Mqueue, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m MqueueMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m MqueueMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Mqueue entities.
+func (m *MqueueMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *MqueueMutation) ID() (id uuid.UUID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *MqueueMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uuid.UUID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Mqueue.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *MqueueMutation) SetCreatedAt(u uint32) {
+	m.created_at = &u
+	m.addcreated_at = nil
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *MqueueMutation) CreatedAt() (r uint32, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Mqueue entity.
+// If the Mqueue object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MqueueMutation) OldCreatedAt(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// AddCreatedAt adds u to the "created_at" field.
+func (m *MqueueMutation) AddCreatedAt(u int32) {
+	if m.addcreated_at != nil {
+		*m.addcreated_at += u
+	} else {
+		m.addcreated_at = &u
+	}
+}
+
+// AddedCreatedAt returns the value that was added to the "created_at" field in this mutation.
+func (m *MqueueMutation) AddedCreatedAt() (r int32, exists bool) {
+	v := m.addcreated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *MqueueMutation) ResetCreatedAt() {
+	m.created_at = nil
+	m.addcreated_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *MqueueMutation) SetUpdatedAt(u uint32) {
+	m.updated_at = &u
+	m.addupdated_at = nil
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *MqueueMutation) UpdatedAt() (r uint32, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Mqueue entity.
+// If the Mqueue object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MqueueMutation) OldUpdatedAt(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// AddUpdatedAt adds u to the "updated_at" field.
+func (m *MqueueMutation) AddUpdatedAt(u int32) {
+	if m.addupdated_at != nil {
+		*m.addupdated_at += u
+	} else {
+		m.addupdated_at = &u
+	}
+}
+
+// AddedUpdatedAt returns the value that was added to the "updated_at" field in this mutation.
+func (m *MqueueMutation) AddedUpdatedAt() (r int32, exists bool) {
+	v := m.addupdated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *MqueueMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+	m.addupdated_at = nil
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *MqueueMutation) SetDeletedAt(u uint32) {
+	m.deleted_at = &u
+	m.adddeleted_at = nil
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *MqueueMutation) DeletedAt() (r uint32, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the Mqueue entity.
+// If the Mqueue object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MqueueMutation) OldDeletedAt(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// AddDeletedAt adds u to the "deleted_at" field.
+func (m *MqueueMutation) AddDeletedAt(u int32) {
+	if m.adddeleted_at != nil {
+		*m.adddeleted_at += u
+	} else {
+		m.adddeleted_at = &u
+	}
+}
+
+// AddedDeletedAt returns the value that was added to the "deleted_at" field in this mutation.
+func (m *MqueueMutation) AddedDeletedAt() (r int32, exists bool) {
+	v := m.adddeleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *MqueueMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	m.adddeleted_at = nil
+}
+
+// SetName sets the "name" field.
+func (m *MqueueMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *MqueueMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Mqueue entity.
+// If the Mqueue object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MqueueMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *MqueueMutation) ResetName() {
+	m.name = nil
+}
+
+// SetDescription sets the "description" field.
+func (m *MqueueMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *MqueueMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the Mqueue entity.
+// If the Mqueue object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MqueueMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *MqueueMutation) ResetDescription() {
+	m.description = nil
+}
+
+// SetTopicName sets the "topic_name" field.
+func (m *MqueueMutation) SetTopicName(s string) {
+	m.topic_name = &s
+}
+
+// TopicName returns the value of the "topic_name" field in the mutation.
+func (m *MqueueMutation) TopicName() (r string, exists bool) {
+	v := m.topic_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTopicName returns the old "topic_name" field's value of the Mqueue entity.
+// If the Mqueue object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MqueueMutation) OldTopicName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTopicName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTopicName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTopicName: %w", err)
+	}
+	return oldValue.TopicName, nil
+}
+
+// ResetTopicName resets all changes to the "topic_name" field.
+func (m *MqueueMutation) ResetTopicName() {
+	m.topic_name = nil
+}
+
+// Where appends a list predicates to the MqueueMutation builder.
+func (m *MqueueMutation) Where(ps ...predicate.Mqueue) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *MqueueMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (Mqueue).
+func (m *MqueueMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *MqueueMutation) Fields() []string {
+	fields := make([]string, 0, 6)
+	if m.created_at != nil {
+		fields = append(fields, mqueue.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, mqueue.FieldUpdatedAt)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, mqueue.FieldDeletedAt)
+	}
+	if m.name != nil {
+		fields = append(fields, mqueue.FieldName)
+	}
+	if m.description != nil {
+		fields = append(fields, mqueue.FieldDescription)
+	}
+	if m.topic_name != nil {
+		fields = append(fields, mqueue.FieldTopicName)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *MqueueMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case mqueue.FieldCreatedAt:
+		return m.CreatedAt()
+	case mqueue.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case mqueue.FieldDeletedAt:
+		return m.DeletedAt()
+	case mqueue.FieldName:
+		return m.Name()
+	case mqueue.FieldDescription:
+		return m.Description()
+	case mqueue.FieldTopicName:
+		return m.TopicName()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *MqueueMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case mqueue.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case mqueue.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case mqueue.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case mqueue.FieldName:
+		return m.OldName(ctx)
+	case mqueue.FieldDescription:
+		return m.OldDescription(ctx)
+	case mqueue.FieldTopicName:
+		return m.OldTopicName(ctx)
+	}
+	return nil, fmt.Errorf("unknown Mqueue field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *MqueueMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case mqueue.FieldCreatedAt:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case mqueue.FieldUpdatedAt:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case mqueue.FieldDeletedAt:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case mqueue.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case mqueue.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case mqueue.FieldTopicName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTopicName(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Mqueue field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *MqueueMutation) AddedFields() []string {
+	var fields []string
+	if m.addcreated_at != nil {
+		fields = append(fields, mqueue.FieldCreatedAt)
+	}
+	if m.addupdated_at != nil {
+		fields = append(fields, mqueue.FieldUpdatedAt)
+	}
+	if m.adddeleted_at != nil {
+		fields = append(fields, mqueue.FieldDeletedAt)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *MqueueMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case mqueue.FieldCreatedAt:
+		return m.AddedCreatedAt()
+	case mqueue.FieldUpdatedAt:
+		return m.AddedUpdatedAt()
+	case mqueue.FieldDeletedAt:
+		return m.AddedDeletedAt()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *MqueueMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case mqueue.FieldCreatedAt:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCreatedAt(v)
+		return nil
+	case mqueue.FieldUpdatedAt:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUpdatedAt(v)
+		return nil
+	case mqueue.FieldDeletedAt:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDeletedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Mqueue numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *MqueueMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *MqueueMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *MqueueMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Mqueue nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *MqueueMutation) ResetField(name string) error {
+	switch name {
+	case mqueue.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case mqueue.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case mqueue.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case mqueue.FieldName:
+		m.ResetName()
+		return nil
+	case mqueue.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case mqueue.FieldTopicName:
+		m.ResetTopicName()
+		return nil
+	}
+	return fmt.Errorf("unknown Mqueue field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *MqueueMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *MqueueMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *MqueueMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *MqueueMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *MqueueMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *MqueueMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *MqueueMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown Mqueue unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *MqueueMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown Mqueue edge %s", name)
 }
 
 // TopicMutation represents an operation that mutates the Topic nodes in the graph.

@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "bright/endpoint/endpoint.proto",
+    "title": "bright/mqueue/mqueue.proto",
     "version": "version not set"
   },
   "tags": [
@@ -16,14 +16,14 @@
     "application/json"
   ],
   "paths": {
-    "/create/endpoint": {
+    "/create/mqueue": {
       "post": {
-        "operationId": "Manager_CreateEndpoint",
+        "operationId": "Manager_CreateMqueue",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/endpointCreateEndpointResponse"
+              "$ref": "#/definitions/mqueueCreateMqueueResponse"
             }
           },
           "default": {
@@ -39,7 +39,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/endpointCreateEndpointRequest"
+              "$ref": "#/definitions/mqueueCreateMqueueRequest"
             }
           }
         ],
@@ -48,14 +48,14 @@
         ]
       }
     },
-    "/delete/endpoint": {
+    "/delete/mqueue": {
       "post": {
-        "operationId": "Manager_DeleteEndpoint",
+        "operationId": "Manager_DeleteMqueue",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/endpointDeleteEndpointResponse"
+              "$ref": "#/definitions/mqueueDeleteMqueueResponse"
             }
           },
           "default": {
@@ -71,7 +71,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/endpointDeleteEndpointRequest"
+              "$ref": "#/definitions/mqueueDeleteMqueueRequest"
             }
           }
         ],
@@ -80,14 +80,14 @@
         ]
       }
     },
-    "/get/endpoint": {
+    "/get/mqueue": {
       "post": {
-        "operationId": "Manager_GetEndpoint",
+        "operationId": "Manager_GetMqueue",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/endpointGetEndpointResponse"
+              "$ref": "#/definitions/mqueueGetMqueueResponse"
             }
           },
           "default": {
@@ -103,7 +103,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/endpointGetEndpointRequest"
+              "$ref": "#/definitions/mqueueGetMqueueRequest"
             }
           }
         ],
@@ -112,14 +112,14 @@
         ]
       }
     },
-    "/get/endpoints": {
+    "/get/mqueues": {
       "post": {
-        "operationId": "Manager_GetEndpoints",
+        "operationId": "Manager_GetMqueues",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/endpointGetEndpointsResponse"
+              "$ref": "#/definitions/mqueueGetMqueuesResponse"
             }
           },
           "default": {
@@ -135,39 +135,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/endpointGetEndpointsRequest"
-            }
-          }
-        ],
-        "tags": [
-          "Manager"
-        ]
-      }
-    },
-    "/update/endpoint": {
-      "post": {
-        "operationId": "Manager_UpdateEndpoint",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/endpointUpdateEndpointResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/endpointUpdateEndpointRequest"
+              "$ref": "#/definitions/mqueueGetMqueuesRequest"
             }
           }
         ],
@@ -178,16 +146,6 @@
     }
   },
   "definitions": {
-    "basetypeEndpointState": {
-      "type": "string",
-      "enum": [
-        "EndpointDefault",
-        "EndpointAvailable",
-        "EndpointParse",
-        "EndpointError"
-      ],
-      "default": "EndpointDefault"
-    },
     "brightStringSliceVal": {
       "type": "object",
       "properties": {
@@ -213,19 +171,7 @@
         }
       }
     },
-    "brightUint32Val": {
-      "type": "object",
-      "properties": {
-        "Op": {
-          "type": "string"
-        },
-        "Value": {
-          "type": "integer",
-          "format": "int64"
-        }
-      }
-    },
-    "endpointConds": {
+    "mqueueConds": {
       "type": "object",
       "properties": {
         "ID": {
@@ -234,37 +180,34 @@
         "Name": {
           "$ref": "#/definitions/brightStringVal"
         },
-        "Address": {
+        "Description": {
           "$ref": "#/definitions/brightStringVal"
         },
-        "State": {
+        "TopicName": {
           "$ref": "#/definitions/brightStringVal"
-        },
-        "RPS": {
-          "$ref": "#/definitions/brightUint32Val"
         },
         "IDs": {
           "$ref": "#/definitions/brightStringSliceVal"
         }
       }
     },
-    "endpointCreateEndpointRequest": {
+    "mqueueCreateMqueueRequest": {
       "type": "object",
       "properties": {
         "Info": {
-          "$ref": "#/definitions/endpointEndpointReq"
+          "$ref": "#/definitions/mqueueMqueueReq"
         }
       }
     },
-    "endpointCreateEndpointResponse": {
+    "mqueueCreateMqueueResponse": {
       "type": "object",
       "properties": {
         "Info": {
-          "$ref": "#/definitions/endpointEndpoint"
+          "$ref": "#/definitions/mqueueMqueue"
         }
       }
     },
-    "endpointDeleteEndpointRequest": {
+    "mqueueDeleteMqueueRequest": {
       "type": "object",
       "properties": {
         "ID": {
@@ -272,71 +215,15 @@
         }
       }
     },
-    "endpointDeleteEndpointResponse": {
+    "mqueueDeleteMqueueResponse": {
       "type": "object",
       "properties": {
         "Info": {
-          "$ref": "#/definitions/endpointEndpoint"
+          "$ref": "#/definitions/mqueueMqueue"
         }
       }
     },
-    "endpointEndpoint": {
-      "type": "object",
-      "properties": {
-        "ID": {
-          "type": "string"
-        },
-        "Name": {
-          "type": "string"
-        },
-        "Address": {
-          "type": "string"
-        },
-        "State": {
-          "$ref": "#/definitions/basetypeEndpointState"
-        },
-        "RPS": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "Remark": {
-          "type": "string"
-        },
-        "CreatedAt": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "UpdatedAt": {
-          "type": "string",
-          "format": "uint64"
-        }
-      }
-    },
-    "endpointEndpointReq": {
-      "type": "object",
-      "properties": {
-        "ID": {
-          "type": "string"
-        },
-        "Name": {
-          "type": "string"
-        },
-        "Address": {
-          "type": "string"
-        },
-        "State": {
-          "$ref": "#/definitions/basetypeEndpointState"
-        },
-        "RPS": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "Remark": {
-          "type": "string"
-        }
-      }
-    },
-    "endpointGetEndpointRequest": {
+    "mqueueGetMqueueRequest": {
       "type": "object",
       "properties": {
         "ID": {
@@ -344,19 +231,19 @@
         }
       }
     },
-    "endpointGetEndpointResponse": {
+    "mqueueGetMqueueResponse": {
       "type": "object",
       "properties": {
         "Info": {
-          "$ref": "#/definitions/endpointEndpoint"
+          "$ref": "#/definitions/mqueueMqueue"
         }
       }
     },
-    "endpointGetEndpointsRequest": {
+    "mqueueGetMqueuesRequest": {
       "type": "object",
       "properties": {
         "Conds": {
-          "$ref": "#/definitions/endpointConds"
+          "$ref": "#/definitions/mqueueConds"
         },
         "Offset": {
           "type": "integer",
@@ -368,14 +255,14 @@
         }
       }
     },
-    "endpointGetEndpointsResponse": {
+    "mqueueGetMqueuesResponse": {
       "type": "object",
       "properties": {
         "Infos": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/endpointEndpoint"
+            "$ref": "#/definitions/mqueueMqueue"
           }
         },
         "Total": {
@@ -384,7 +271,7 @@
         }
       }
     },
-    "endpointUpdateEndpointRequest": {
+    "mqueueMqueue": {
       "type": "object",
       "properties": {
         "ID": {
@@ -393,23 +280,36 @@
         "Name": {
           "type": "string"
         },
-        "Address": {
+        "Description": {
           "type": "string"
         },
-        "RPS": {
+        "TopicName": {
+          "type": "string"
+        },
+        "CreatedAt": {
           "type": "integer",
           "format": "int64"
         },
-        "Remark": {
-          "type": "string"
+        "UpdatedAt": {
+          "type": "integer",
+          "format": "int64"
         }
       }
     },
-    "endpointUpdateEndpointResponse": {
+    "mqueueMqueueReq": {
       "type": "object",
       "properties": {
-        "Info": {
-          "$ref": "#/definitions/endpointEndpoint"
+        "ID": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "Description": {
+          "type": "string"
+        },
+        "TopicName": {
+          "type": "string"
         }
       }
     },

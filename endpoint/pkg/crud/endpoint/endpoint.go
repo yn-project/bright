@@ -107,6 +107,9 @@ func UpdateSet(u *ent.EndpointUpdateOne, in *proto.EndpointReq) *ent.EndpointUpd
 	if in.Remark != nil {
 		u.SetRemark(in.GetRemark())
 	}
+	if in.RPS != nil {
+		u.SetRps(in.GetRPS())
+	}
 	return u
 }
 

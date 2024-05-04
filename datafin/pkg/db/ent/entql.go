@@ -5,6 +5,7 @@ package ent
 import (
 	"yun.tea/block/bright/datafin/pkg/db/ent/datafin"
 	"yun.tea/block/bright/datafin/pkg/db/ent/filerecord"
+	"yun.tea/block/bright/datafin/pkg/db/ent/mqueue"
 	"yun.tea/block/bright/datafin/pkg/db/ent/topic"
 
 	"entgo.io/ent/dialect/sql"
@@ -15,7 +16,7 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 3)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 4)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   datafin.Table,
@@ -63,6 +64,25 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 	}
 	graph.Nodes[2] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   mqueue.Table,
+			Columns: mqueue.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeUUID,
+				Column: mqueue.FieldID,
+			},
+		},
+		Type: "Mqueue",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			mqueue.FieldCreatedAt:   {Type: field.TypeUint32, Column: mqueue.FieldCreatedAt},
+			mqueue.FieldUpdatedAt:   {Type: field.TypeUint32, Column: mqueue.FieldUpdatedAt},
+			mqueue.FieldDeletedAt:   {Type: field.TypeUint32, Column: mqueue.FieldDeletedAt},
+			mqueue.FieldName:        {Type: field.TypeString, Column: mqueue.FieldName},
+			mqueue.FieldDescription: {Type: field.TypeString, Column: mqueue.FieldDescription},
+			mqueue.FieldTopicName:   {Type: field.TypeString, Column: mqueue.FieldTopicName},
+		},
+	}
+	graph.Nodes[3] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   topic.Table,
 			Columns: topic.Columns,
@@ -274,6 +294,76 @@ func (f *FileRecordFilter) WhereRemark(p entql.StringP) {
 }
 
 // addPredicate implements the predicateAdder interface.
+func (mq *MqueueQuery) addPredicate(pred func(s *sql.Selector)) {
+	mq.predicates = append(mq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the MqueueQuery builder.
+func (mq *MqueueQuery) Filter() *MqueueFilter {
+	return &MqueueFilter{config: mq.config, predicateAdder: mq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *MqueueMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the MqueueMutation builder.
+func (m *MqueueMutation) Filter() *MqueueFilter {
+	return &MqueueFilter{config: m.config, predicateAdder: m}
+}
+
+// MqueueFilter provides a generic filtering capability at runtime for MqueueQuery.
+type MqueueFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *MqueueFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[2].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql [16]byte predicate on the id field.
+func (f *MqueueFilter) WhereID(p entql.ValueP) {
+	f.Where(p.Field(mqueue.FieldID))
+}
+
+// WhereCreatedAt applies the entql uint32 predicate on the created_at field.
+func (f *MqueueFilter) WhereCreatedAt(p entql.Uint32P) {
+	f.Where(p.Field(mqueue.FieldCreatedAt))
+}
+
+// WhereUpdatedAt applies the entql uint32 predicate on the updated_at field.
+func (f *MqueueFilter) WhereUpdatedAt(p entql.Uint32P) {
+	f.Where(p.Field(mqueue.FieldUpdatedAt))
+}
+
+// WhereDeletedAt applies the entql uint32 predicate on the deleted_at field.
+func (f *MqueueFilter) WhereDeletedAt(p entql.Uint32P) {
+	f.Where(p.Field(mqueue.FieldDeletedAt))
+}
+
+// WhereName applies the entql string predicate on the name field.
+func (f *MqueueFilter) WhereName(p entql.StringP) {
+	f.Where(p.Field(mqueue.FieldName))
+}
+
+// WhereDescription applies the entql string predicate on the description field.
+func (f *MqueueFilter) WhereDescription(p entql.StringP) {
+	f.Where(p.Field(mqueue.FieldDescription))
+}
+
+// WhereTopicName applies the entql string predicate on the topic_name field.
+func (f *MqueueFilter) WhereTopicName(p entql.StringP) {
+	f.Where(p.Field(mqueue.FieldTopicName))
+}
+
+// addPredicate implements the predicateAdder interface.
 func (tq *TopicQuery) addPredicate(pred func(s *sql.Selector)) {
 	tq.predicates = append(tq.predicates, pred)
 }
@@ -302,7 +392,7 @@ type TopicFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *TopicFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[2].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[3].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})

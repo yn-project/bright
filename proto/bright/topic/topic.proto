@@ -3,8 +3,6 @@ syntax = "proto3";
 package bright.topic;
 
 option go_package = "yun.tea/block/bright/proto/bright/proto/topic";
-import "bright/bright.proto";
-import "bright/basetype/basetype.proto";
 import "google/api/annotations.proto";
 
 service Manager {
