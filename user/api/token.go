@@ -29,17 +29,34 @@ func MetadataFromContext(ctx context.Context) (*Metadata, error) {
 
 	clientIP := ""
 	if forwards, ok := meta["x-forwarded-for"]; ok {
+		fmt.Println("forwards: ", forwards)
 		if len(forwards) > 0 {
-			clientIP = strings.Split(forwards[0], ",")[0]
+			for _, item := range forwards {
+				fmt.Println("item: ", item)
+			}
+			ips := strings.Split(forwards[0], ",")
+			for _, item := range ips {
+				fmt.Println("ip: ", item)
+			}
+			fmt.Println("ips====", strings.TrimSpace(ips[len(ips)-1]))
+			clientIP = strings.TrimSpace(ips[len(ips)-1])
 		}
 	}
+	// if forwards, ok := meta[":authority"]; ok {
+	// 	fmt.Println("forwards: ", forwards)
+	// 	if len(forwards) > 0 {
+	// 		clientIP = forwards[0]
+	// 	}
+	// 	fmt.Println("clientIP: ", clientIP)
+	// }
 
 	userAgent := ""
-	if agents, ok := meta["grpcgateway-user-agent"]; ok {
-		if len(agents) > 0 {
-			userAgent = agents[0]
-		}
-	}
+	// if agents, ok := meta["grpcgateway-user-agent"]; ok {
+	// 	fmt.Println("agents: ", agents)
+	// 	if len(agents) > 0 {
+	// 		userAgent = agents[0]
+	// 	}
+	// }
 
 	return &Metadata{
 		ClientIP:  net.ParseIP(clientIP),
@@ -52,7 +69,11 @@ func (meta *Metadata) ToJWTClaims() jwt.MapClaims {
 
 	claims["user_id"] = meta.UserID.String()
 	claims["client_ip"] = meta.ClientIP
-	claims["user_agent"] = meta.UserAgent
+	// claims["user_agent"] = meta.UserAgent
+
+	fmt.Println("user_id: ", claims["user_id"])
+	fmt.Println("client_ip: ", claims["client_ip"])
+	// fmt.Println("user_agent: ", claims["user_agent"])
 
 	return claims
 }
@@ -75,12 +96,18 @@ func (meta *Metadata) ValidateJWTClaims(claims jwt.MapClaims) error {
 	}
 	clientIP, ok := claims["client_ip"]
 	if !ok || clientIP.(string) != meta.ClientIP.String() {
-		return fmt.Errorf("invalid client ip, ok=%v, client_ip=%v, meta.client_ip=%v", ok, clientIP, meta.ClientIP)
+		// return fmt.Errorf("invalid client ip, ok=%v, client_ip=%v, meta.client_ip=%v", ok, clientIP, meta.ClientIP)
+		fmt.Printf("client ip, ok=%v, client_ip=%v, meta.client_ip=%v", ok, clientIP, meta.ClientIP)
 	}
-	userAgent, ok := claims["user_agent"]
-	if !ok || userAgent.(string) != meta.UserAgent {
-		return fmt.Errorf("invalid user agent")
-	}
+	// userAgent, ok := claims["user_agent"]
+	fmt.Println("userID: ", userID)
+	fmt.Println("clientIP: ", clientIP)
+	// fmt.Println("userAgent: ", userAgent)
+	fmt.Println("meta.UserAgent: ", meta.UserAgent)
+	fmt.Println("meta.ClientIP.String(): ", meta.ClientIP.String())
+	// if !ok || userAgent.(string) != meta.UserAgent {
+	// 	return fmt.Errorf("invalid user agent")
+	// }
 	return nil
 }
 

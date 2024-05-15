@@ -23,6 +23,7 @@ import (
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/grpc/metadata"
 	"yun.tea/block/bright/common/ctredis"
 	"yun.tea/block/bright/user/pkg/db/ent"
 )
@@ -447,7 +448,7 @@ func loginCheck(ctx context.Context, UserID, Token string) error {
 
 	info, err := crud.Row(ctx, id)
 	if err != nil {
-		err := fmt.Errorf("invalid user")
+		err := fmt.Errorf("invalid user: %v", id)
 		logger.Sugar().Errorw("Authenticate", "error", err)
 		return err
 	}
@@ -466,12 +467,6 @@ func loginCheck(ctx context.Context, UserID, Token string) error {
 		return err
 	}
 
-	if Token != token {
-		err = fmt.Errorf("invalid logined")
-		logger.Sugar().Errorw("Logined", "input token", Token, "session token", token, "error", err)
-		return err
-	}
-
 	metadata, err := MetadataFromContext(ctx)
 	if err != nil {
 		logger.Sugar().Errorw("Logined", "error", err)
@@ -480,6 +475,12 @@ func loginCheck(ctx context.Context, UserID, Token string) error {
 	}
 	metadata.UserID = info.ID
 	metadata.User = converter.Ent2Grpc(info)
+
+	if Token != token {
+		err = fmt.Errorf("invalid logined")
+		logger.Sugar().Errorw("Logined", "input token", Token, "session token", token, "error", err)
+		return err
+	}
 
 	err = VerifyToken(metadata, token)
 	if err != nil {
@@ -499,6 +500,16 @@ func loginCheck(ctx context.Context, UserID, Token string) error {
 }
 
 func (s *Server) Authenticate(ctx context.Context, in *proto.AuthenticateRequest) (*proto.AuthenticateResponse, error) {
+	fmt.Println("Authenticate==========")
+	md, ok := metadata.FromIncomingContext(ctx)
+	if ok {
+		for key, item := range md {
+			fmt.Println("md------: ", key, " ------value: ", item)
+		}
+	}
+	if !ok {
+		fmt.Println("MATEDATA== NULL")
+	}
 	authResult := true
 	err := loginCheck(ctx, *in.UserID, in.Token)
 	if err != nil {
@@ -714,6 +725,15 @@ func getAuthUser(loginToken, shortToken string) (string, error) {
 }
 
 func (s *Server) AuthLogin(ctx context.Context, in *proto.AuthLoginRequest) (*proto.AuthLoginResponse, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if ok {
+		for key, item := range md {
+			fmt.Println("md------: ", key, " ------value: ", item)
+		}
+	}
+	if !ok {
+		fmt.Println("MATEDATA== NULL")
+	}
 	if in.AuthCode == "" {
 		err := fmt.Errorf("invalid token")
 		logger.Sugar().Errorw("AuthLogin", "error", err)
