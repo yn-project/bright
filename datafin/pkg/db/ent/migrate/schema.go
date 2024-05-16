@@ -74,7 +74,7 @@ var (
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
 		{Name: "name", Type: field.TypeString, Unique: true},
-		{Name: "remark", Type: field.TypeString, Nullable: true},
+		{Name: "remark", Type: field.TypeString, Nullable: true, Default: ""},
 		{Name: "topic_name", Type: field.TypeString, Unique: true},
 	}
 	// MqueuesTable holds the schema information for the "mqueues" table.

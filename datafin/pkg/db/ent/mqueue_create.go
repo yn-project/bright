@@ -205,6 +205,10 @@ func (mc *MqueueCreate) defaults() error {
 		v := mqueue.DefaultDeletedAt()
 		mc.mutation.SetDeletedAt(v)
 	}
+	if _, ok := mc.mutation.Remark(); !ok {
+		v := mqueue.DefaultRemark
+		mc.mutation.SetRemark(v)
+	}
 	if _, ok := mc.mutation.ID(); !ok {
 		if mqueue.DefaultID == nil {
 			return fmt.Errorf("ent: uninitialized mqueue.DefaultID (forgotten import ent/runtime?)")

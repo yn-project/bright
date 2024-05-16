@@ -116,6 +116,10 @@ func init() {
 	mqueueDescDeletedAt := mqueueMixinFields0[2].Descriptor()
 	// mqueue.DefaultDeletedAt holds the default value on creation for the deleted_at field.
 	mqueue.DefaultDeletedAt = mqueueDescDeletedAt.Default.(func() uint32)
+	// mqueueDescRemark is the schema descriptor for remark field.
+	mqueueDescRemark := mqueueFields[2].Descriptor()
+	// mqueue.DefaultRemark holds the default value on creation for the remark field.
+	mqueue.DefaultRemark = mqueueDescRemark.Default.(string)
 	// mqueueDescID is the schema descriptor for id field.
 	mqueueDescID := mqueueFields[0].Descriptor()
 	// mqueue.DefaultID holds the default value on creation for the id field.
