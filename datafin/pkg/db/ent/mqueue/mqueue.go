@@ -20,8 +20,8 @@ const (
 	FieldDeletedAt = "deleted_at"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// FieldDescription holds the string denoting the description field in the database.
-	FieldDescription = "description"
+	// FieldRemark holds the string denoting the remark field in the database.
+	FieldRemark = "remark"
 	// FieldTopicName holds the string denoting the topic_name field in the database.
 	FieldTopicName = "topic_name"
 	// Table holds the table name of the mqueue in the database.
@@ -35,7 +35,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldDeletedAt,
 	FieldName,
-	FieldDescription,
+	FieldRemark,
 	FieldTopicName,
 }
 

@@ -11,12 +11,12 @@ func Ent2Grpc(row *ent.Mqueue) *proto.Mqueue {
 	}
 
 	return &proto.Mqueue{
-		ID:          row.ID.String(),
-		Name:        row.Name,
-		Description: row.Description,
-		TopicName:   row.TopicName,
-		CreatedAt:   row.CreatedAt,
-		UpdatedAt:   row.UpdatedAt,
+		ID:        row.ID.String(),
+		Name:      row.Name,
+		Remark:    row.Remark,
+		TopicName: row.TopicName,
+		CreatedAt: row.CreatedAt,
+		UpdatedAt: row.UpdatedAt,
 	}
 }
 

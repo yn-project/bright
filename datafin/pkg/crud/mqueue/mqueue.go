@@ -39,8 +39,8 @@ func CreateSet(c *ent.MqueueCreate, in *proto.MqueueReq) *ent.MqueueCreate {
 	if in.Name != nil {
 		c.SetName(*in.Name)
 	}
-	if in.Description != nil {
-		c.SetDescription(*in.Description)
+	if in.Remark != nil {
+		c.SetRemark(*in.Remark)
 	}
 	if in.TopicName != nil {
 		c.SetTopicName(*in.TopicName)
@@ -99,10 +99,10 @@ func setQueryConds(conds *proto.Conds, cli *ent.Client) (*ent.MqueueQuery, error
 			return nil, fmt.Errorf("invalid name field")
 		}
 	}
-	if conds.Description != nil {
-		switch conds.GetDescription().GetOp() {
+	if conds.Remark != nil {
+		switch conds.GetRemark().GetOp() {
 		case cruder.EQ:
-			stm.Where(mqueue.Description(conds.GetDescription().GetValue()))
+			stm.Where(mqueue.Remark(conds.GetRemark().GetValue()))
 		default:
 			return nil, fmt.Errorf("invalid description field")
 		}

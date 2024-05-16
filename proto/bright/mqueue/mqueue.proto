@@ -37,14 +37,14 @@ service Manager {
 message MqueueReq {
   optional string ID = 10;
   optional string Name = 11;
-  optional string Description = 20;
+  optional string Remark = 20;
   optional string TopicName = 30;
 }
 
 message Mqueue {
   string ID = 10;
   string Name = 11;
-  string Description = 20;
+  string Remark = 20;
   string TopicName = 30;
   uint32 CreatedAt = 60;
   uint32 UpdatedAt = 70;
@@ -53,7 +53,7 @@ message Mqueue {
 message Conds {
   bright.StringVal ID = 10;
   bright.StringVal Name = 11;
-  bright.StringVal Description = 20;
+  bright.StringVal Remark = 20;
   bright.StringVal TopicName = 30;
   bright.StringSliceVal IDs = 100;
 }

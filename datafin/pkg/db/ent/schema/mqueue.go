@@ -24,7 +24,7 @@ func (Mqueue) Fields() []ent.Field {
 			Default(uuid.New).
 			Unique(),
 		field.String("name").Unique(),
-		field.String("description").Optional(),
+		field.String("remark").Optional(),
 		field.String("topic_name").Unique(),
 	}
 }

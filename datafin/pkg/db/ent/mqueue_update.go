@@ -89,9 +89,23 @@ func (mu *MqueueUpdate) SetName(s string) *MqueueUpdate {
 	return mu
 }
 
-// SetDescription sets the "description" field.
-func (mu *MqueueUpdate) SetDescription(s string) *MqueueUpdate {
-	mu.mutation.SetDescription(s)
+// SetRemark sets the "remark" field.
+func (mu *MqueueUpdate) SetRemark(s string) *MqueueUpdate {
+	mu.mutation.SetRemark(s)
+	return mu
+}
+
+// SetNillableRemark sets the "remark" field if the given value is not nil.
+func (mu *MqueueUpdate) SetNillableRemark(s *string) *MqueueUpdate {
+	if s != nil {
+		mu.SetRemark(*s)
+	}
+	return mu
+}
+
+// ClearRemark clears the value of the "remark" field.
+func (mu *MqueueUpdate) ClearRemark() *MqueueUpdate {
+	mu.mutation.ClearRemark()
 	return mu
 }
 
@@ -248,11 +262,17 @@ func (mu *MqueueUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: mqueue.FieldName,
 		})
 	}
-	if value, ok := mu.mutation.Description(); ok {
+	if value, ok := mu.mutation.Remark(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: mqueue.FieldDescription,
+			Column: mqueue.FieldRemark,
+		})
+	}
+	if mu.mutation.RemarkCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: mqueue.FieldRemark,
 		})
 	}
 	if value, ok := mu.mutation.TopicName(); ok {
@@ -344,9 +364,23 @@ func (muo *MqueueUpdateOne) SetName(s string) *MqueueUpdateOne {
 	return muo
 }
 
-// SetDescription sets the "description" field.
-func (muo *MqueueUpdateOne) SetDescription(s string) *MqueueUpdateOne {
-	muo.mutation.SetDescription(s)
+// SetRemark sets the "remark" field.
+func (muo *MqueueUpdateOne) SetRemark(s string) *MqueueUpdateOne {
+	muo.mutation.SetRemark(s)
+	return muo
+}
+
+// SetNillableRemark sets the "remark" field if the given value is not nil.
+func (muo *MqueueUpdateOne) SetNillableRemark(s *string) *MqueueUpdateOne {
+	if s != nil {
+		muo.SetRemark(*s)
+	}
+	return muo
+}
+
+// ClearRemark clears the value of the "remark" field.
+func (muo *MqueueUpdateOne) ClearRemark() *MqueueUpdateOne {
+	muo.mutation.ClearRemark()
 	return muo
 }
 
@@ -533,11 +567,17 @@ func (muo *MqueueUpdateOne) sqlSave(ctx context.Context) (_node *Mqueue, err err
 			Column: mqueue.FieldName,
 		})
 	}
-	if value, ok := muo.mutation.Description(); ok {
+	if value, ok := muo.mutation.Remark(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: mqueue.FieldDescription,
+			Column: mqueue.FieldRemark,
+		})
+	}
+	if muo.mutation.RemarkCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: mqueue.FieldRemark,
 		})
 	}
 	if value, ok := muo.mutation.TopicName(); ok {

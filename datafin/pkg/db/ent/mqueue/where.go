@@ -107,10 +107,10 @@ func Name(v string) predicate.Mqueue {
 	})
 }
 
-// Description applies equality check predicate on the "description" field. It's identical to DescriptionEQ.
-func Description(v string) predicate.Mqueue {
+// Remark applies equality check predicate on the "remark" field. It's identical to RemarkEQ.
+func Remark(v string) predicate.Mqueue {
 	return predicate.Mqueue(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldDescription), v))
+		s.Where(sql.EQ(s.C(FieldRemark), v))
 	})
 }
 
@@ -412,102 +412,116 @@ func NameContainsFold(v string) predicate.Mqueue {
 	})
 }
 
-// DescriptionEQ applies the EQ predicate on the "description" field.
-func DescriptionEQ(v string) predicate.Mqueue {
+// RemarkEQ applies the EQ predicate on the "remark" field.
+func RemarkEQ(v string) predicate.Mqueue {
 	return predicate.Mqueue(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldDescription), v))
+		s.Where(sql.EQ(s.C(FieldRemark), v))
 	})
 }
 
-// DescriptionNEQ applies the NEQ predicate on the "description" field.
-func DescriptionNEQ(v string) predicate.Mqueue {
+// RemarkNEQ applies the NEQ predicate on the "remark" field.
+func RemarkNEQ(v string) predicate.Mqueue {
 	return predicate.Mqueue(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldDescription), v))
+		s.Where(sql.NEQ(s.C(FieldRemark), v))
 	})
 }
 
-// DescriptionIn applies the In predicate on the "description" field.
-func DescriptionIn(vs ...string) predicate.Mqueue {
+// RemarkIn applies the In predicate on the "remark" field.
+func RemarkIn(vs ...string) predicate.Mqueue {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
 	return predicate.Mqueue(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldDescription), v...))
+		s.Where(sql.In(s.C(FieldRemark), v...))
 	})
 }
 
-// DescriptionNotIn applies the NotIn predicate on the "description" field.
-func DescriptionNotIn(vs ...string) predicate.Mqueue {
+// RemarkNotIn applies the NotIn predicate on the "remark" field.
+func RemarkNotIn(vs ...string) predicate.Mqueue {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
 	return predicate.Mqueue(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldDescription), v...))
+		s.Where(sql.NotIn(s.C(FieldRemark), v...))
 	})
 }
 
-// DescriptionGT applies the GT predicate on the "description" field.
-func DescriptionGT(v string) predicate.Mqueue {
+// RemarkGT applies the GT predicate on the "remark" field.
+func RemarkGT(v string) predicate.Mqueue {
 	return predicate.Mqueue(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldDescription), v))
+		s.Where(sql.GT(s.C(FieldRemark), v))
 	})
 }
 
-// DescriptionGTE applies the GTE predicate on the "description" field.
-func DescriptionGTE(v string) predicate.Mqueue {
+// RemarkGTE applies the GTE predicate on the "remark" field.
+func RemarkGTE(v string) predicate.Mqueue {
 	return predicate.Mqueue(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldDescription), v))
+		s.Where(sql.GTE(s.C(FieldRemark), v))
 	})
 }
 
-// DescriptionLT applies the LT predicate on the "description" field.
-func DescriptionLT(v string) predicate.Mqueue {
+// RemarkLT applies the LT predicate on the "remark" field.
+func RemarkLT(v string) predicate.Mqueue {
 	return predicate.Mqueue(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldDescription), v))
+		s.Where(sql.LT(s.C(FieldRemark), v))
 	})
 }
 
-// DescriptionLTE applies the LTE predicate on the "description" field.
-func DescriptionLTE(v string) predicate.Mqueue {
+// RemarkLTE applies the LTE predicate on the "remark" field.
+func RemarkLTE(v string) predicate.Mqueue {
 	return predicate.Mqueue(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldDescription), v))
+		s.Where(sql.LTE(s.C(FieldRemark), v))
 	})
 }
 
-// DescriptionContains applies the Contains predicate on the "description" field.
-func DescriptionContains(v string) predicate.Mqueue {
+// RemarkContains applies the Contains predicate on the "remark" field.
+func RemarkContains(v string) predicate.Mqueue {
 	return predicate.Mqueue(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldDescription), v))
+		s.Where(sql.Contains(s.C(FieldRemark), v))
 	})
 }
 
-// DescriptionHasPrefix applies the HasPrefix predicate on the "description" field.
-func DescriptionHasPrefix(v string) predicate.Mqueue {
+// RemarkHasPrefix applies the HasPrefix predicate on the "remark" field.
+func RemarkHasPrefix(v string) predicate.Mqueue {
 	return predicate.Mqueue(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldDescription), v))
+		s.Where(sql.HasPrefix(s.C(FieldRemark), v))
 	})
 }
 
-// DescriptionHasSuffix applies the HasSuffix predicate on the "description" field.
-func DescriptionHasSuffix(v string) predicate.Mqueue {
+// RemarkHasSuffix applies the HasSuffix predicate on the "remark" field.
+func RemarkHasSuffix(v string) predicate.Mqueue {
 	return predicate.Mqueue(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldDescription), v))
+		s.Where(sql.HasSuffix(s.C(FieldRemark), v))
 	})
 }
 
-// DescriptionEqualFold applies the EqualFold predicate on the "description" field.
-func DescriptionEqualFold(v string) predicate.Mqueue {
+// RemarkIsNil applies the IsNil predicate on the "remark" field.
+func RemarkIsNil() predicate.Mqueue {
 	return predicate.Mqueue(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldDescription), v))
+		s.Where(sql.IsNull(s.C(FieldRemark)))
 	})
 }
 
-// DescriptionContainsFold applies the ContainsFold predicate on the "description" field.
-func DescriptionContainsFold(v string) predicate.Mqueue {
+// RemarkNotNil applies the NotNil predicate on the "remark" field.
+func RemarkNotNil() predicate.Mqueue {
 	return predicate.Mqueue(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldDescription), v))
+		s.Where(sql.NotNull(s.C(FieldRemark)))
+	})
+}
+
+// RemarkEqualFold applies the EqualFold predicate on the "remark" field.
+func RemarkEqualFold(v string) predicate.Mqueue {
+	return predicate.Mqueue(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldRemark), v))
+	})
+}
+
+// RemarkContainsFold applies the ContainsFold predicate on the "remark" field.
+func RemarkContainsFold(v string) predicate.Mqueue {
+	return predicate.Mqueue(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldRemark), v))
 	})
 }
 

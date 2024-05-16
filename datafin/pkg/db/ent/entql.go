@@ -74,12 +74,12 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "Mqueue",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			mqueue.FieldCreatedAt:   {Type: field.TypeUint32, Column: mqueue.FieldCreatedAt},
-			mqueue.FieldUpdatedAt:   {Type: field.TypeUint32, Column: mqueue.FieldUpdatedAt},
-			mqueue.FieldDeletedAt:   {Type: field.TypeUint32, Column: mqueue.FieldDeletedAt},
-			mqueue.FieldName:        {Type: field.TypeString, Column: mqueue.FieldName},
-			mqueue.FieldDescription: {Type: field.TypeString, Column: mqueue.FieldDescription},
-			mqueue.FieldTopicName:   {Type: field.TypeString, Column: mqueue.FieldTopicName},
+			mqueue.FieldCreatedAt: {Type: field.TypeUint32, Column: mqueue.FieldCreatedAt},
+			mqueue.FieldUpdatedAt: {Type: field.TypeUint32, Column: mqueue.FieldUpdatedAt},
+			mqueue.FieldDeletedAt: {Type: field.TypeUint32, Column: mqueue.FieldDeletedAt},
+			mqueue.FieldName:      {Type: field.TypeString, Column: mqueue.FieldName},
+			mqueue.FieldRemark:    {Type: field.TypeString, Column: mqueue.FieldRemark},
+			mqueue.FieldTopicName: {Type: field.TypeString, Column: mqueue.FieldTopicName},
 		},
 	}
 	graph.Nodes[3] = &sqlgraph.Node{
@@ -353,9 +353,9 @@ func (f *MqueueFilter) WhereName(p entql.StringP) {
 	f.Where(p.Field(mqueue.FieldName))
 }
 
-// WhereDescription applies the entql string predicate on the description field.
-func (f *MqueueFilter) WhereDescription(p entql.StringP) {
-	f.Where(p.Field(mqueue.FieldDescription))
+// WhereRemark applies the entql string predicate on the remark field.
+func (f *MqueueFilter) WhereRemark(p entql.StringP) {
+	f.Where(p.Field(mqueue.FieldRemark))
 }
 
 // WhereTopicName applies the entql string predicate on the topic_name field.

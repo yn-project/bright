@@ -180,7 +180,7 @@
         "Name": {
           "$ref": "#/definitions/brightStringVal"
         },
-        "Description": {
+        "Remark": {
           "$ref": "#/definitions/brightStringVal"
         },
         "TopicName": {
@@ -280,7 +280,7 @@
         "Name": {
           "type": "string"
         },
-        "Description": {
+        "Remark": {
           "type": "string"
         },
         "TopicName": {
@@ -305,7 +305,7 @@
         "Name": {
           "type": "string"
         },
-        "Description": {
+        "Remark": {
           "type": "string"
         },
         "TopicName": {

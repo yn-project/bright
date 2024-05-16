@@ -24,8 +24,8 @@ type Mqueue struct {
 	DeletedAt uint32 `json:"deleted_at,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
-	// Description holds the value of the "description" field.
-	Description string `json:"description,omitempty"`
+	// Remark holds the value of the "remark" field.
+	Remark string `json:"remark,omitempty"`
 	// TopicName holds the value of the "topic_name" field.
 	TopicName string `json:"topic_name,omitempty"`
 }
@@ -37,7 +37,7 @@ func (*Mqueue) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case mqueue.FieldCreatedAt, mqueue.FieldUpdatedAt, mqueue.FieldDeletedAt:
 			values[i] = new(sql.NullInt64)
-		case mqueue.FieldName, mqueue.FieldDescription, mqueue.FieldTopicName:
+		case mqueue.FieldName, mqueue.FieldRemark, mqueue.FieldTopicName:
 			values[i] = new(sql.NullString)
 		case mqueue.FieldID:
 			values[i] = new(uuid.UUID)
@@ -86,11 +86,11 @@ func (m *Mqueue) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				m.Name = value.String
 			}
-		case mqueue.FieldDescription:
+		case mqueue.FieldRemark:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field description", values[i])
+				return fmt.Errorf("unexpected type %T for field remark", values[i])
 			} else if value.Valid {
-				m.Description = value.String
+				m.Remark = value.String
 			}
 		case mqueue.FieldTopicName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -138,8 +138,8 @@ func (m *Mqueue) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(m.Name)
 	builder.WriteString(", ")
-	builder.WriteString("description=")
-	builder.WriteString(m.Description)
+	builder.WriteString("remark=")
+	builder.WriteString(m.Remark)
 	builder.WriteString(", ")
 	builder.WriteString("topic_name=")
 	builder.WriteString(m.TopicName)

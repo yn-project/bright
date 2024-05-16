@@ -71,9 +71,17 @@ func (mc *MqueueCreate) SetName(s string) *MqueueCreate {
 	return mc
 }
 
-// SetDescription sets the "description" field.
-func (mc *MqueueCreate) SetDescription(s string) *MqueueCreate {
-	mc.mutation.SetDescription(s)
+// SetRemark sets the "remark" field.
+func (mc *MqueueCreate) SetRemark(s string) *MqueueCreate {
+	mc.mutation.SetRemark(s)
+	return mc
+}
+
+// SetNillableRemark sets the "remark" field if the given value is not nil.
+func (mc *MqueueCreate) SetNillableRemark(s *string) *MqueueCreate {
+	if s != nil {
+		mc.SetRemark(*s)
+	}
 	return mc
 }
 
@@ -221,9 +229,6 @@ func (mc *MqueueCreate) check() error {
 	if _, ok := mc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Mqueue.name"`)}
 	}
-	if _, ok := mc.mutation.Description(); !ok {
-		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "Mqueue.description"`)}
-	}
 	if _, ok := mc.mutation.TopicName(); !ok {
 		return &ValidationError{Name: "topic_name", err: errors.New(`ent: missing required field "Mqueue.topic_name"`)}
 	}
@@ -296,13 +301,13 @@ func (mc *MqueueCreate) createSpec() (*Mqueue, *sqlgraph.CreateSpec) {
 		})
 		_node.Name = value
 	}
-	if value, ok := mc.mutation.Description(); ok {
+	if value, ok := mc.mutation.Remark(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: mqueue.FieldDescription,
+			Column: mqueue.FieldRemark,
 		})
-		_node.Description = value
+		_node.Remark = value
 	}
 	if value, ok := mc.mutation.TopicName(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -430,15 +435,21 @@ func (u *MqueueUpsert) UpdateName() *MqueueUpsert {
 	return u
 }
 
-// SetDescription sets the "description" field.
-func (u *MqueueUpsert) SetDescription(v string) *MqueueUpsert {
-	u.Set(mqueue.FieldDescription, v)
+// SetRemark sets the "remark" field.
+func (u *MqueueUpsert) SetRemark(v string) *MqueueUpsert {
+	u.Set(mqueue.FieldRemark, v)
 	return u
 }
 
-// UpdateDescription sets the "description" field to the value that was provided on create.
-func (u *MqueueUpsert) UpdateDescription() *MqueueUpsert {
-	u.SetExcluded(mqueue.FieldDescription)
+// UpdateRemark sets the "remark" field to the value that was provided on create.
+func (u *MqueueUpsert) UpdateRemark() *MqueueUpsert {
+	u.SetExcluded(mqueue.FieldRemark)
+	return u
+}
+
+// ClearRemark clears the value of the "remark" field.
+func (u *MqueueUpsert) ClearRemark() *MqueueUpsert {
+	u.SetNull(mqueue.FieldRemark)
 	return u
 }
 
@@ -579,17 +590,24 @@ func (u *MqueueUpsertOne) UpdateName() *MqueueUpsertOne {
 	})
 }
 
-// SetDescription sets the "description" field.
-func (u *MqueueUpsertOne) SetDescription(v string) *MqueueUpsertOne {
+// SetRemark sets the "remark" field.
+func (u *MqueueUpsertOne) SetRemark(v string) *MqueueUpsertOne {
 	return u.Update(func(s *MqueueUpsert) {
-		s.SetDescription(v)
+		s.SetRemark(v)
 	})
 }
 
-// UpdateDescription sets the "description" field to the value that was provided on create.
-func (u *MqueueUpsertOne) UpdateDescription() *MqueueUpsertOne {
+// UpdateRemark sets the "remark" field to the value that was provided on create.
+func (u *MqueueUpsertOne) UpdateRemark() *MqueueUpsertOne {
 	return u.Update(func(s *MqueueUpsert) {
-		s.UpdateDescription()
+		s.UpdateRemark()
+	})
+}
+
+// ClearRemark clears the value of the "remark" field.
+func (u *MqueueUpsertOne) ClearRemark() *MqueueUpsertOne {
+	return u.Update(func(s *MqueueUpsert) {
+		s.ClearRemark()
 	})
 }
 
@@ -896,17 +914,24 @@ func (u *MqueueUpsertBulk) UpdateName() *MqueueUpsertBulk {
 	})
 }
 
-// SetDescription sets the "description" field.
-func (u *MqueueUpsertBulk) SetDescription(v string) *MqueueUpsertBulk {
+// SetRemark sets the "remark" field.
+func (u *MqueueUpsertBulk) SetRemark(v string) *MqueueUpsertBulk {
 	return u.Update(func(s *MqueueUpsert) {
-		s.SetDescription(v)
+		s.SetRemark(v)
 	})
 }
 
-// UpdateDescription sets the "description" field to the value that was provided on create.
-func (u *MqueueUpsertBulk) UpdateDescription() *MqueueUpsertBulk {
+// UpdateRemark sets the "remark" field to the value that was provided on create.
+func (u *MqueueUpsertBulk) UpdateRemark() *MqueueUpsertBulk {
 	return u.Update(func(s *MqueueUpsert) {
-		s.UpdateDescription()
+		s.UpdateRemark()
+	})
+}
+
+// ClearRemark clears the value of the "remark" field.
+func (u *MqueueUpsertBulk) ClearRemark() *MqueueUpsertBulk {
+	return u.Update(func(s *MqueueUpsert) {
+		s.ClearRemark()
 	})
 }
 

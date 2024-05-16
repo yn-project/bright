@@ -2038,7 +2038,7 @@ type MqueueMutation struct {
 	deleted_at    *uint32
 	adddeleted_at *int32
 	name          *string
-	description   *string
+	remark        *string
 	topic_name    *string
 	clearedFields map[string]struct{}
 	done          bool
@@ -2354,40 +2354,53 @@ func (m *MqueueMutation) ResetName() {
 	m.name = nil
 }
 
-// SetDescription sets the "description" field.
-func (m *MqueueMutation) SetDescription(s string) {
-	m.description = &s
+// SetRemark sets the "remark" field.
+func (m *MqueueMutation) SetRemark(s string) {
+	m.remark = &s
 }
 
-// Description returns the value of the "description" field in the mutation.
-func (m *MqueueMutation) Description() (r string, exists bool) {
-	v := m.description
+// Remark returns the value of the "remark" field in the mutation.
+func (m *MqueueMutation) Remark() (r string, exists bool) {
+	v := m.remark
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldDescription returns the old "description" field's value of the Mqueue entity.
+// OldRemark returns the old "remark" field's value of the Mqueue entity.
 // If the Mqueue object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MqueueMutation) OldDescription(ctx context.Context) (v string, err error) {
+func (m *MqueueMutation) OldRemark(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+		return v, errors.New("OldRemark is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDescription requires an ID field in the mutation")
+		return v, errors.New("OldRemark requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+		return v, fmt.Errorf("querying old value for OldRemark: %w", err)
 	}
-	return oldValue.Description, nil
+	return oldValue.Remark, nil
 }
 
-// ResetDescription resets all changes to the "description" field.
-func (m *MqueueMutation) ResetDescription() {
-	m.description = nil
+// ClearRemark clears the value of the "remark" field.
+func (m *MqueueMutation) ClearRemark() {
+	m.remark = nil
+	m.clearedFields[mqueue.FieldRemark] = struct{}{}
+}
+
+// RemarkCleared returns if the "remark" field was cleared in this mutation.
+func (m *MqueueMutation) RemarkCleared() bool {
+	_, ok := m.clearedFields[mqueue.FieldRemark]
+	return ok
+}
+
+// ResetRemark resets all changes to the "remark" field.
+func (m *MqueueMutation) ResetRemark() {
+	m.remark = nil
+	delete(m.clearedFields, mqueue.FieldRemark)
 }
 
 // SetTopicName sets the "topic_name" field.
@@ -2458,8 +2471,8 @@ func (m *MqueueMutation) Fields() []string {
 	if m.name != nil {
 		fields = append(fields, mqueue.FieldName)
 	}
-	if m.description != nil {
-		fields = append(fields, mqueue.FieldDescription)
+	if m.remark != nil {
+		fields = append(fields, mqueue.FieldRemark)
 	}
 	if m.topic_name != nil {
 		fields = append(fields, mqueue.FieldTopicName)
@@ -2480,8 +2493,8 @@ func (m *MqueueMutation) Field(name string) (ent.Value, bool) {
 		return m.DeletedAt()
 	case mqueue.FieldName:
 		return m.Name()
-	case mqueue.FieldDescription:
-		return m.Description()
+	case mqueue.FieldRemark:
+		return m.Remark()
 	case mqueue.FieldTopicName:
 		return m.TopicName()
 	}
@@ -2501,8 +2514,8 @@ func (m *MqueueMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldDeletedAt(ctx)
 	case mqueue.FieldName:
 		return m.OldName(ctx)
-	case mqueue.FieldDescription:
-		return m.OldDescription(ctx)
+	case mqueue.FieldRemark:
+		return m.OldRemark(ctx)
 	case mqueue.FieldTopicName:
 		return m.OldTopicName(ctx)
 	}
@@ -2542,12 +2555,12 @@ func (m *MqueueMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetName(v)
 		return nil
-	case mqueue.FieldDescription:
+	case mqueue.FieldRemark:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetDescription(v)
+		m.SetRemark(v)
 		return nil
 	case mqueue.FieldTopicName:
 		v, ok := value.(string)
@@ -2624,7 +2637,11 @@ func (m *MqueueMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *MqueueMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(mqueue.FieldRemark) {
+		fields = append(fields, mqueue.FieldRemark)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -2637,6 +2654,11 @@ func (m *MqueueMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *MqueueMutation) ClearField(name string) error {
+	switch name {
+	case mqueue.FieldRemark:
+		m.ClearRemark()
+		return nil
+	}
 	return fmt.Errorf("unknown Mqueue nullable field %s", name)
 }
 
@@ -2656,8 +2678,8 @@ func (m *MqueueMutation) ResetField(name string) error {
 	case mqueue.FieldName:
 		m.ResetName()
 		return nil
-	case mqueue.FieldDescription:
-		m.ResetDescription()
+	case mqueue.FieldRemark:
+		m.ResetRemark()
 		return nil
 	case mqueue.FieldTopicName:
 		m.ResetTopicName()
