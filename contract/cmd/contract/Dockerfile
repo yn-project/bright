@@ -1,6 +1,6 @@
 FROM debian:stable-slim
 
-RUN sed -i 's@//.*archive.ubuntu.com@//mirrors.aliyun.com@g' /etc/apt/sources.list
+RUN echo "deb https://mirrors.aliyun.com/debian bullseye main non-free contrib" > /etc/apt/sources.list
 RUN apt-get update
 COPY contract /usr/local/bin/contract
 COPY Contract.viper.yaml /etc/contract/Contract.viper.yaml
