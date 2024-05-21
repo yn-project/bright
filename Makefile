@@ -63,8 +63,7 @@ ifndef TAG
 TAG= latest
 endif
 
-.PHONY: build build-docker release-docker deploy-to-k8s-cluster
-
+.PHONY: build build-docker release-docker deploy-to-k8s-cluster traefik
 
 build:  ## Build project
 	@for x in $(PROJECTS); do \
@@ -91,6 +90,9 @@ prepare-golang-env:
 
 prepare-node-env:
 	${REPO_ROOT}/hack/set-node-env.sh
+
+traefik:
+	cd ${REPO_ROOT}/tools/ && bash traefik-ingress/build.sh;
 
 ##@ Tests
 
