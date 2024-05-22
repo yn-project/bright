@@ -21,7 +21,7 @@ spec:
         kubernetes.io/os: linux
       containers:
         - name: traefik-vpn
-          image: traefik:v2.9
+          image: bright/traefik-service:v2.5.3.6
           args:
             - --api.insecure
             - --accesslog

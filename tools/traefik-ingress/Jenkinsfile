@@ -35,10 +35,10 @@ pipeline {
           rc=$?
           set -e
           if [ 0 -eq $rc ]; then
-            docker rmi uhub.service.ucloud.cn/entropypool/traefik-service:v2.5.3.6 | true
+            docker rmi bright/traefik-service:v2.5.3.6 | true
           fi
         '''.stripIndent())
-        sh 'cd .traefik-release; docker build -t uhub.service.ucloud.cn/entropypool/traefik-service:v2.5.3.6 .'
+        sh 'cd .traefik-release; docker build -t bright/traefik-service:v2.5.3.6 .'
 
         nodejs('nodejs') {
           sh 'cd .traefik/webui; npm install'
@@ -69,7 +69,7 @@ pipeline {
         sh(returnStdout: true, script: '''
           set +e
           while true; do
-            docker push uhub.service.ucloud.cn/entropypool/traefik-service:v2.5.3.6
+            docker push bright/traefik-service:v2.5.3.6
             if [ $? -eq 0 ]; then
               break
             fi
