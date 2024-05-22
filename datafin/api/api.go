@@ -8,6 +8,7 @@ import (
 	datafinproto "yun.tea/block/bright/proto/bright/datafin"
 	filerecordproto "yun.tea/block/bright/proto/bright/filerecord"
 	mqueueproto "yun.tea/block/bright/proto/bright/mqueue"
+	overviewproto "yun.tea/block/bright/proto/bright/overview"
 	topicproto "yun.tea/block/bright/proto/bright/topic"
 )
 
@@ -27,11 +28,16 @@ type MqueueServer struct {
 	mqueueproto.UnimplementedManagerServer
 }
 
+type OverviewServer struct {
+	overviewproto.UnimplementedManagerServer
+}
+
 func Register(server grpc.ServiceRegistrar) {
 	topicproto.RegisterManagerServer(server, &TopicServer{})
 	datafinproto.RegisterManagerServer(server, &DataFinServer{})
 	filerecordproto.RegisterManagerServer(server, &FileRecordServer{})
 	mqueueproto.RegisterManagerServer(server, &MqueueServer{})
+	overviewproto.RegisterManagerServer(server, &OverviewServer{})
 }
 
 func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
@@ -48,6 +54,10 @@ func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOpt
 		return err
 	}
 	err = mqueueproto.RegisterManagerHandlerFromEndpoint(context.Background(), mux, endpoint, opts)
+	if err != nil {
+		return err
+	}
+	err = overviewproto.RegisterManagerHandlerFromEndpoint(context.Background(), mux, endpoint, opts)
 	if err != nil {
 		return err
 	}

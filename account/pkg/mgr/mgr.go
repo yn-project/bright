@@ -2,11 +2,11 @@ package mgr
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"math/rand"
 	"time"
 
+	"yun.tea/block/bright/account/pkg/crud/txnum"
 	"yun.tea/block/bright/common/ctredis"
 )
 
@@ -79,6 +79,7 @@ func (aMGR *accountsMGR) GetRootAccountPub(ctx context.Context) (pubKey string, 
 	if err != nil {
 		return "", fmt.Errorf("have no available root account")
 	}
+	txnum.UpsertAddNum(context.Background(), 1)
 	return address.Pub, nil
 }
 
@@ -147,11 +148,11 @@ func (aMGR *accountsMGR) LockUsingAccount(address *AccountKey, expire time.Durat
 	if err != nil {
 		return "", "", err
 	}
+	txnum.UpsertAddNum(context.Background(), 1)
 	return lockKey, unlockID, err
 }
 
 func (aMGR *accountsMGR) GetTreeAccountPub(ctx context.Context) (pubKeys []string, err error) {
-
 	_addresses := &AccountKeyList{}
 	err = ctredis.Get(treeAccountsStoreKey, _addresses)
 	if err != nil {
@@ -166,23 +167,6 @@ func (aMGR *accountsMGR) GetTreeAccountPub(ctx context.Context) (pubKeys []strin
 	for _, v := range addresses {
 		pubKeys = append(pubKeys, v.Pub)
 	}
+	txnum.UpsertAddNum(context.Background(), 1)
 	return pubKeys, nil
-}
-
-func (e *AccountKey) MarshalBinary() (data []byte, err error) {
-	data, err = json.Marshal(e)
-	return data, err
-}
-
-func (e *AccountKey) UnmarshalBinary(data []byte) error {
-	return json.Unmarshal(data, e)
-}
-
-func (e *AccountKeyList) MarshalBinary() (data []byte, err error) {
-	data, err = json.Marshal(e)
-	return data, err
-}
-
-func (e *AccountKeyList) UnmarshalBinary(data []byte) error {
-	return json.Unmarshal(data, e)
 }

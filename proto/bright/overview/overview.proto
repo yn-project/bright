@@ -19,7 +19,7 @@ service Manager {
 
 message TimeNum {
   uint32 TimeAt = 10;
-  uint64 Height = 20;
+  uint64 Num = 20;
 }
   
 message Overview {

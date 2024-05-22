@@ -11,7 +11,7 @@ import (
 
 func main() {
 	fmt.Println(db.Init())
-	rows, err := txnum.Rows(context.Background(), 5)
+	rows, err := txnum.Rows(context.Background(), 3)
 	fmt.Println(err)
 	for _, row := range rows {
 		fmt.Println(row)

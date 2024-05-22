@@ -263,7 +263,7 @@ func (s *Server) DeleteAccount(ctx context.Context, in *proto.DeleteAccountReque
 		logger.Sugar().Errorw("DeleteAccount", "ID", in.GetID(), "error", err)
 		return &proto.DeleteAccountResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
-	
+
 	acc, err := crud.Row(ctx, id)
 	if err != nil {
 		logger.Sugar().Errorw("DeleteAccount", "ID", in.GetID(), "error", err)

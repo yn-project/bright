@@ -129,7 +129,7 @@
           "type": "integer",
           "format": "int64"
         },
-        "Height": {
+        "Num": {
           "type": "string",
           "format": "uint64"
         }

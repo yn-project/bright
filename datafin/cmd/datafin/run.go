@@ -22,6 +22,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
+	accountdb "yun.tea/block/bright/account/pkg/db"
 	"yun.tea/block/bright/datafin/pkg/db"
 	"yun.tea/block/bright/datafin/pkg/mgr"
 	"yun.tea/block/bright/datafin/pkg/servicename"
@@ -43,7 +44,10 @@ var runCmd = &cli.Command{
 		if err != nil {
 			return err
 		}
-
+		err = accountdb.Init()
+		if err != nil {
+			return err
+		}
 		return db.Init()
 	},
 	Action: func(c *cli.Context) error {
