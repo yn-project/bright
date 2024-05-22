@@ -35,9 +35,55 @@ var (
 			},
 		},
 	}
+	// BlockNumsColumns holds the columns for the "block_nums" table.
+	BlockNumsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint32, Increment: true},
+		{Name: "created_at", Type: field.TypeUint32},
+		{Name: "updated_at", Type: field.TypeUint32},
+		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "time_at", Type: field.TypeUint32, Unique: true},
+		{Name: "height", Type: field.TypeUint64},
+	}
+	// BlockNumsTable holds the schema information for the "block_nums" table.
+	BlockNumsTable = &schema.Table{
+		Name:       "block_nums",
+		Columns:    BlockNumsColumns,
+		PrimaryKey: []*schema.Column{BlockNumsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "blocknum_time_at",
+				Unique:  false,
+				Columns: []*schema.Column{BlockNumsColumns[4]},
+			},
+		},
+	}
+	// TxNumsColumns holds the columns for the "tx_nums" table.
+	TxNumsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint32, Increment: true},
+		{Name: "created_at", Type: field.TypeUint32},
+		{Name: "updated_at", Type: field.TypeUint32},
+		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "time_at", Type: field.TypeUint32, Unique: true},
+		{Name: "num", Type: field.TypeUint32},
+	}
+	// TxNumsTable holds the schema information for the "tx_nums" table.
+	TxNumsTable = &schema.Table{
+		Name:       "tx_nums",
+		Columns:    TxNumsColumns,
+		PrimaryKey: []*schema.Column{TxNumsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "txnum_time_at",
+				Unique:  false,
+				Columns: []*schema.Column{TxNumsColumns[4]},
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AccountsTable,
+		BlockNumsTable,
+		TxNumsTable,
 	}
 )
 

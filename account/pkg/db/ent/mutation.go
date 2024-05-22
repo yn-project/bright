@@ -10,7 +10,9 @@ import (
 
 	"github.com/google/uuid"
 	"yun.tea/block/bright/account/pkg/db/ent/account"
+	"yun.tea/block/bright/account/pkg/db/ent/blocknum"
 	"yun.tea/block/bright/account/pkg/db/ent/predicate"
+	"yun.tea/block/bright/account/pkg/db/ent/txnum"
 
 	"entgo.io/ent"
 )
@@ -24,7 +26,9 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeAccount = "Account"
+	TypeAccount  = "Account"
+	TypeBlockNum = "BlockNum"
+	TypeTxNum    = "TxNum"
 )
 
 // AccountMutation represents an operation that mutates the Account nodes in the graph.
@@ -1024,4 +1028,1406 @@ func (m *AccountMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *AccountMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Account edge %s", name)
+}
+
+// BlockNumMutation represents an operation that mutates the BlockNum nodes in the graph.
+type BlockNumMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *uint32
+	created_at    *uint32
+	addcreated_at *int32
+	updated_at    *uint32
+	addupdated_at *int32
+	deleted_at    *uint32
+	adddeleted_at *int32
+	time_at       *uint32
+	addtime_at    *int32
+	height        *uint64
+	addheight     *int64
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*BlockNum, error)
+	predicates    []predicate.BlockNum
+}
+
+var _ ent.Mutation = (*BlockNumMutation)(nil)
+
+// blocknumOption allows management of the mutation configuration using functional options.
+type blocknumOption func(*BlockNumMutation)
+
+// newBlockNumMutation creates new mutation for the BlockNum entity.
+func newBlockNumMutation(c config, op Op, opts ...blocknumOption) *BlockNumMutation {
+	m := &BlockNumMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeBlockNum,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withBlockNumID sets the ID field of the mutation.
+func withBlockNumID(id uint32) blocknumOption {
+	return func(m *BlockNumMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *BlockNum
+		)
+		m.oldValue = func(ctx context.Context) (*BlockNum, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().BlockNum.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withBlockNum sets the old BlockNum of the mutation.
+func withBlockNum(node *BlockNum) blocknumOption {
+	return func(m *BlockNumMutation) {
+		m.oldValue = func(context.Context) (*BlockNum, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m BlockNumMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m BlockNumMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of BlockNum entities.
+func (m *BlockNumMutation) SetID(id uint32) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *BlockNumMutation) ID() (id uint32, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *BlockNumMutation) IDs(ctx context.Context) ([]uint32, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uint32{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().BlockNum.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *BlockNumMutation) SetCreatedAt(u uint32) {
+	m.created_at = &u
+	m.addcreated_at = nil
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *BlockNumMutation) CreatedAt() (r uint32, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the BlockNum entity.
+// If the BlockNum object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BlockNumMutation) OldCreatedAt(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// AddCreatedAt adds u to the "created_at" field.
+func (m *BlockNumMutation) AddCreatedAt(u int32) {
+	if m.addcreated_at != nil {
+		*m.addcreated_at += u
+	} else {
+		m.addcreated_at = &u
+	}
+}
+
+// AddedCreatedAt returns the value that was added to the "created_at" field in this mutation.
+func (m *BlockNumMutation) AddedCreatedAt() (r int32, exists bool) {
+	v := m.addcreated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *BlockNumMutation) ResetCreatedAt() {
+	m.created_at = nil
+	m.addcreated_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *BlockNumMutation) SetUpdatedAt(u uint32) {
+	m.updated_at = &u
+	m.addupdated_at = nil
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *BlockNumMutation) UpdatedAt() (r uint32, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the BlockNum entity.
+// If the BlockNum object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BlockNumMutation) OldUpdatedAt(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// AddUpdatedAt adds u to the "updated_at" field.
+func (m *BlockNumMutation) AddUpdatedAt(u int32) {
+	if m.addupdated_at != nil {
+		*m.addupdated_at += u
+	} else {
+		m.addupdated_at = &u
+	}
+}
+
+// AddedUpdatedAt returns the value that was added to the "updated_at" field in this mutation.
+func (m *BlockNumMutation) AddedUpdatedAt() (r int32, exists bool) {
+	v := m.addupdated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *BlockNumMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+	m.addupdated_at = nil
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *BlockNumMutation) SetDeletedAt(u uint32) {
+	m.deleted_at = &u
+	m.adddeleted_at = nil
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *BlockNumMutation) DeletedAt() (r uint32, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the BlockNum entity.
+// If the BlockNum object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BlockNumMutation) OldDeletedAt(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// AddDeletedAt adds u to the "deleted_at" field.
+func (m *BlockNumMutation) AddDeletedAt(u int32) {
+	if m.adddeleted_at != nil {
+		*m.adddeleted_at += u
+	} else {
+		m.adddeleted_at = &u
+	}
+}
+
+// AddedDeletedAt returns the value that was added to the "deleted_at" field in this mutation.
+func (m *BlockNumMutation) AddedDeletedAt() (r int32, exists bool) {
+	v := m.adddeleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *BlockNumMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	m.adddeleted_at = nil
+}
+
+// SetTimeAt sets the "time_at" field.
+func (m *BlockNumMutation) SetTimeAt(u uint32) {
+	m.time_at = &u
+	m.addtime_at = nil
+}
+
+// TimeAt returns the value of the "time_at" field in the mutation.
+func (m *BlockNumMutation) TimeAt() (r uint32, exists bool) {
+	v := m.time_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTimeAt returns the old "time_at" field's value of the BlockNum entity.
+// If the BlockNum object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BlockNumMutation) OldTimeAt(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTimeAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTimeAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTimeAt: %w", err)
+	}
+	return oldValue.TimeAt, nil
+}
+
+// AddTimeAt adds u to the "time_at" field.
+func (m *BlockNumMutation) AddTimeAt(u int32) {
+	if m.addtime_at != nil {
+		*m.addtime_at += u
+	} else {
+		m.addtime_at = &u
+	}
+}
+
+// AddedTimeAt returns the value that was added to the "time_at" field in this mutation.
+func (m *BlockNumMutation) AddedTimeAt() (r int32, exists bool) {
+	v := m.addtime_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTimeAt resets all changes to the "time_at" field.
+func (m *BlockNumMutation) ResetTimeAt() {
+	m.time_at = nil
+	m.addtime_at = nil
+}
+
+// SetHeight sets the "height" field.
+func (m *BlockNumMutation) SetHeight(u uint64) {
+	m.height = &u
+	m.addheight = nil
+}
+
+// Height returns the value of the "height" field in the mutation.
+func (m *BlockNumMutation) Height() (r uint64, exists bool) {
+	v := m.height
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldHeight returns the old "height" field's value of the BlockNum entity.
+// If the BlockNum object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BlockNumMutation) OldHeight(ctx context.Context) (v uint64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldHeight is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldHeight requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldHeight: %w", err)
+	}
+	return oldValue.Height, nil
+}
+
+// AddHeight adds u to the "height" field.
+func (m *BlockNumMutation) AddHeight(u int64) {
+	if m.addheight != nil {
+		*m.addheight += u
+	} else {
+		m.addheight = &u
+	}
+}
+
+// AddedHeight returns the value that was added to the "height" field in this mutation.
+func (m *BlockNumMutation) AddedHeight() (r int64, exists bool) {
+	v := m.addheight
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetHeight resets all changes to the "height" field.
+func (m *BlockNumMutation) ResetHeight() {
+	m.height = nil
+	m.addheight = nil
+}
+
+// Where appends a list predicates to the BlockNumMutation builder.
+func (m *BlockNumMutation) Where(ps ...predicate.BlockNum) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *BlockNumMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (BlockNum).
+func (m *BlockNumMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *BlockNumMutation) Fields() []string {
+	fields := make([]string, 0, 5)
+	if m.created_at != nil {
+		fields = append(fields, blocknum.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, blocknum.FieldUpdatedAt)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, blocknum.FieldDeletedAt)
+	}
+	if m.time_at != nil {
+		fields = append(fields, blocknum.FieldTimeAt)
+	}
+	if m.height != nil {
+		fields = append(fields, blocknum.FieldHeight)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *BlockNumMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case blocknum.FieldCreatedAt:
+		return m.CreatedAt()
+	case blocknum.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case blocknum.FieldDeletedAt:
+		return m.DeletedAt()
+	case blocknum.FieldTimeAt:
+		return m.TimeAt()
+	case blocknum.FieldHeight:
+		return m.Height()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *BlockNumMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case blocknum.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case blocknum.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case blocknum.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case blocknum.FieldTimeAt:
+		return m.OldTimeAt(ctx)
+	case blocknum.FieldHeight:
+		return m.OldHeight(ctx)
+	}
+	return nil, fmt.Errorf("unknown BlockNum field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *BlockNumMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case blocknum.FieldCreatedAt:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case blocknum.FieldUpdatedAt:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case blocknum.FieldDeletedAt:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case blocknum.FieldTimeAt:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTimeAt(v)
+		return nil
+	case blocknum.FieldHeight:
+		v, ok := value.(uint64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetHeight(v)
+		return nil
+	}
+	return fmt.Errorf("unknown BlockNum field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *BlockNumMutation) AddedFields() []string {
+	var fields []string
+	if m.addcreated_at != nil {
+		fields = append(fields, blocknum.FieldCreatedAt)
+	}
+	if m.addupdated_at != nil {
+		fields = append(fields, blocknum.FieldUpdatedAt)
+	}
+	if m.adddeleted_at != nil {
+		fields = append(fields, blocknum.FieldDeletedAt)
+	}
+	if m.addtime_at != nil {
+		fields = append(fields, blocknum.FieldTimeAt)
+	}
+	if m.addheight != nil {
+		fields = append(fields, blocknum.FieldHeight)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *BlockNumMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case blocknum.FieldCreatedAt:
+		return m.AddedCreatedAt()
+	case blocknum.FieldUpdatedAt:
+		return m.AddedUpdatedAt()
+	case blocknum.FieldDeletedAt:
+		return m.AddedDeletedAt()
+	case blocknum.FieldTimeAt:
+		return m.AddedTimeAt()
+	case blocknum.FieldHeight:
+		return m.AddedHeight()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *BlockNumMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case blocknum.FieldCreatedAt:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCreatedAt(v)
+		return nil
+	case blocknum.FieldUpdatedAt:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUpdatedAt(v)
+		return nil
+	case blocknum.FieldDeletedAt:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDeletedAt(v)
+		return nil
+	case blocknum.FieldTimeAt:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTimeAt(v)
+		return nil
+	case blocknum.FieldHeight:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddHeight(v)
+		return nil
+	}
+	return fmt.Errorf("unknown BlockNum numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *BlockNumMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *BlockNumMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *BlockNumMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown BlockNum nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *BlockNumMutation) ResetField(name string) error {
+	switch name {
+	case blocknum.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case blocknum.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case blocknum.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case blocknum.FieldTimeAt:
+		m.ResetTimeAt()
+		return nil
+	case blocknum.FieldHeight:
+		m.ResetHeight()
+		return nil
+	}
+	return fmt.Errorf("unknown BlockNum field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *BlockNumMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *BlockNumMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *BlockNumMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *BlockNumMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *BlockNumMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *BlockNumMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *BlockNumMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown BlockNum unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *BlockNumMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown BlockNum edge %s", name)
+}
+
+// TxNumMutation represents an operation that mutates the TxNum nodes in the graph.
+type TxNumMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *uint32
+	created_at    *uint32
+	addcreated_at *int32
+	updated_at    *uint32
+	addupdated_at *int32
+	deleted_at    *uint32
+	adddeleted_at *int32
+	time_at       *uint32
+	addtime_at    *int32
+	num           *uint32
+	addnum        *int32
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*TxNum, error)
+	predicates    []predicate.TxNum
+}
+
+var _ ent.Mutation = (*TxNumMutation)(nil)
+
+// txnumOption allows management of the mutation configuration using functional options.
+type txnumOption func(*TxNumMutation)
+
+// newTxNumMutation creates new mutation for the TxNum entity.
+func newTxNumMutation(c config, op Op, opts ...txnumOption) *TxNumMutation {
+	m := &TxNumMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeTxNum,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withTxNumID sets the ID field of the mutation.
+func withTxNumID(id uint32) txnumOption {
+	return func(m *TxNumMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *TxNum
+		)
+		m.oldValue = func(ctx context.Context) (*TxNum, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().TxNum.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withTxNum sets the old TxNum of the mutation.
+func withTxNum(node *TxNum) txnumOption {
+	return func(m *TxNumMutation) {
+		m.oldValue = func(context.Context) (*TxNum, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m TxNumMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m TxNumMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of TxNum entities.
+func (m *TxNumMutation) SetID(id uint32) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *TxNumMutation) ID() (id uint32, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *TxNumMutation) IDs(ctx context.Context) ([]uint32, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uint32{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().TxNum.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *TxNumMutation) SetCreatedAt(u uint32) {
+	m.created_at = &u
+	m.addcreated_at = nil
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *TxNumMutation) CreatedAt() (r uint32, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the TxNum entity.
+// If the TxNum object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TxNumMutation) OldCreatedAt(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// AddCreatedAt adds u to the "created_at" field.
+func (m *TxNumMutation) AddCreatedAt(u int32) {
+	if m.addcreated_at != nil {
+		*m.addcreated_at += u
+	} else {
+		m.addcreated_at = &u
+	}
+}
+
+// AddedCreatedAt returns the value that was added to the "created_at" field in this mutation.
+func (m *TxNumMutation) AddedCreatedAt() (r int32, exists bool) {
+	v := m.addcreated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *TxNumMutation) ResetCreatedAt() {
+	m.created_at = nil
+	m.addcreated_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *TxNumMutation) SetUpdatedAt(u uint32) {
+	m.updated_at = &u
+	m.addupdated_at = nil
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *TxNumMutation) UpdatedAt() (r uint32, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the TxNum entity.
+// If the TxNum object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TxNumMutation) OldUpdatedAt(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// AddUpdatedAt adds u to the "updated_at" field.
+func (m *TxNumMutation) AddUpdatedAt(u int32) {
+	if m.addupdated_at != nil {
+		*m.addupdated_at += u
+	} else {
+		m.addupdated_at = &u
+	}
+}
+
+// AddedUpdatedAt returns the value that was added to the "updated_at" field in this mutation.
+func (m *TxNumMutation) AddedUpdatedAt() (r int32, exists bool) {
+	v := m.addupdated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *TxNumMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+	m.addupdated_at = nil
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *TxNumMutation) SetDeletedAt(u uint32) {
+	m.deleted_at = &u
+	m.adddeleted_at = nil
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *TxNumMutation) DeletedAt() (r uint32, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the TxNum entity.
+// If the TxNum object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TxNumMutation) OldDeletedAt(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// AddDeletedAt adds u to the "deleted_at" field.
+func (m *TxNumMutation) AddDeletedAt(u int32) {
+	if m.adddeleted_at != nil {
+		*m.adddeleted_at += u
+	} else {
+		m.adddeleted_at = &u
+	}
+}
+
+// AddedDeletedAt returns the value that was added to the "deleted_at" field in this mutation.
+func (m *TxNumMutation) AddedDeletedAt() (r int32, exists bool) {
+	v := m.adddeleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *TxNumMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	m.adddeleted_at = nil
+}
+
+// SetTimeAt sets the "time_at" field.
+func (m *TxNumMutation) SetTimeAt(u uint32) {
+	m.time_at = &u
+	m.addtime_at = nil
+}
+
+// TimeAt returns the value of the "time_at" field in the mutation.
+func (m *TxNumMutation) TimeAt() (r uint32, exists bool) {
+	v := m.time_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTimeAt returns the old "time_at" field's value of the TxNum entity.
+// If the TxNum object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TxNumMutation) OldTimeAt(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTimeAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTimeAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTimeAt: %w", err)
+	}
+	return oldValue.TimeAt, nil
+}
+
+// AddTimeAt adds u to the "time_at" field.
+func (m *TxNumMutation) AddTimeAt(u int32) {
+	if m.addtime_at != nil {
+		*m.addtime_at += u
+	} else {
+		m.addtime_at = &u
+	}
+}
+
+// AddedTimeAt returns the value that was added to the "time_at" field in this mutation.
+func (m *TxNumMutation) AddedTimeAt() (r int32, exists bool) {
+	v := m.addtime_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTimeAt resets all changes to the "time_at" field.
+func (m *TxNumMutation) ResetTimeAt() {
+	m.time_at = nil
+	m.addtime_at = nil
+}
+
+// SetNum sets the "num" field.
+func (m *TxNumMutation) SetNum(u uint32) {
+	m.num = &u
+	m.addnum = nil
+}
+
+// Num returns the value of the "num" field in the mutation.
+func (m *TxNumMutation) Num() (r uint32, exists bool) {
+	v := m.num
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNum returns the old "num" field's value of the TxNum entity.
+// If the TxNum object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TxNumMutation) OldNum(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNum is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNum requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNum: %w", err)
+	}
+	return oldValue.Num, nil
+}
+
+// AddNum adds u to the "num" field.
+func (m *TxNumMutation) AddNum(u int32) {
+	if m.addnum != nil {
+		*m.addnum += u
+	} else {
+		m.addnum = &u
+	}
+}
+
+// AddedNum returns the value that was added to the "num" field in this mutation.
+func (m *TxNumMutation) AddedNum() (r int32, exists bool) {
+	v := m.addnum
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetNum resets all changes to the "num" field.
+func (m *TxNumMutation) ResetNum() {
+	m.num = nil
+	m.addnum = nil
+}
+
+// Where appends a list predicates to the TxNumMutation builder.
+func (m *TxNumMutation) Where(ps ...predicate.TxNum) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *TxNumMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (TxNum).
+func (m *TxNumMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *TxNumMutation) Fields() []string {
+	fields := make([]string, 0, 5)
+	if m.created_at != nil {
+		fields = append(fields, txnum.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, txnum.FieldUpdatedAt)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, txnum.FieldDeletedAt)
+	}
+	if m.time_at != nil {
+		fields = append(fields, txnum.FieldTimeAt)
+	}
+	if m.num != nil {
+		fields = append(fields, txnum.FieldNum)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *TxNumMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case txnum.FieldCreatedAt:
+		return m.CreatedAt()
+	case txnum.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case txnum.FieldDeletedAt:
+		return m.DeletedAt()
+	case txnum.FieldTimeAt:
+		return m.TimeAt()
+	case txnum.FieldNum:
+		return m.Num()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *TxNumMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case txnum.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case txnum.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case txnum.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case txnum.FieldTimeAt:
+		return m.OldTimeAt(ctx)
+	case txnum.FieldNum:
+		return m.OldNum(ctx)
+	}
+	return nil, fmt.Errorf("unknown TxNum field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TxNumMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case txnum.FieldCreatedAt:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case txnum.FieldUpdatedAt:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case txnum.FieldDeletedAt:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case txnum.FieldTimeAt:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTimeAt(v)
+		return nil
+	case txnum.FieldNum:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNum(v)
+		return nil
+	}
+	return fmt.Errorf("unknown TxNum field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *TxNumMutation) AddedFields() []string {
+	var fields []string
+	if m.addcreated_at != nil {
+		fields = append(fields, txnum.FieldCreatedAt)
+	}
+	if m.addupdated_at != nil {
+		fields = append(fields, txnum.FieldUpdatedAt)
+	}
+	if m.adddeleted_at != nil {
+		fields = append(fields, txnum.FieldDeletedAt)
+	}
+	if m.addtime_at != nil {
+		fields = append(fields, txnum.FieldTimeAt)
+	}
+	if m.addnum != nil {
+		fields = append(fields, txnum.FieldNum)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *TxNumMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case txnum.FieldCreatedAt:
+		return m.AddedCreatedAt()
+	case txnum.FieldUpdatedAt:
+		return m.AddedUpdatedAt()
+	case txnum.FieldDeletedAt:
+		return m.AddedDeletedAt()
+	case txnum.FieldTimeAt:
+		return m.AddedTimeAt()
+	case txnum.FieldNum:
+		return m.AddedNum()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TxNumMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case txnum.FieldCreatedAt:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCreatedAt(v)
+		return nil
+	case txnum.FieldUpdatedAt:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUpdatedAt(v)
+		return nil
+	case txnum.FieldDeletedAt:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDeletedAt(v)
+		return nil
+	case txnum.FieldTimeAt:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTimeAt(v)
+		return nil
+	case txnum.FieldNum:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddNum(v)
+		return nil
+	}
+	return fmt.Errorf("unknown TxNum numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *TxNumMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *TxNumMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *TxNumMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown TxNum nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *TxNumMutation) ResetField(name string) error {
+	switch name {
+	case txnum.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case txnum.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case txnum.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case txnum.FieldTimeAt:
+		m.ResetTimeAt()
+		return nil
+	case txnum.FieldNum:
+		m.ResetNum()
+		return nil
+	}
+	return fmt.Errorf("unknown TxNum field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *TxNumMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *TxNumMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *TxNumMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *TxNumMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *TxNumMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *TxNumMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *TxNumMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown TxNum unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *TxNumMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown TxNum edge %s", name)
 }

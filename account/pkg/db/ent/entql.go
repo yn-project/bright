@@ -4,6 +4,8 @@ package ent
 
 import (
 	"yun.tea/block/bright/account/pkg/db/ent/account"
+	"yun.tea/block/bright/account/pkg/db/ent/blocknum"
+	"yun.tea/block/bright/account/pkg/db/ent/txnum"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -13,7 +15,7 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 1)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 3)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   account.Table,
@@ -35,6 +37,42 @@ var schemaGraph = func() *sqlgraph.Schema {
 			account.FieldState:     {Type: field.TypeString, Column: account.FieldState},
 			account.FieldIsRoot:    {Type: field.TypeBool, Column: account.FieldIsRoot},
 			account.FieldRemark:    {Type: field.TypeString, Column: account.FieldRemark},
+		},
+	}
+	graph.Nodes[1] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   blocknum.Table,
+			Columns: blocknum.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeUint32,
+				Column: blocknum.FieldID,
+			},
+		},
+		Type: "BlockNum",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			blocknum.FieldCreatedAt: {Type: field.TypeUint32, Column: blocknum.FieldCreatedAt},
+			blocknum.FieldUpdatedAt: {Type: field.TypeUint32, Column: blocknum.FieldUpdatedAt},
+			blocknum.FieldDeletedAt: {Type: field.TypeUint32, Column: blocknum.FieldDeletedAt},
+			blocknum.FieldTimeAt:    {Type: field.TypeUint32, Column: blocknum.FieldTimeAt},
+			blocknum.FieldHeight:    {Type: field.TypeUint64, Column: blocknum.FieldHeight},
+		},
+	}
+	graph.Nodes[2] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   txnum.Table,
+			Columns: txnum.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeUint32,
+				Column: txnum.FieldID,
+			},
+		},
+		Type: "TxNum",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			txnum.FieldCreatedAt: {Type: field.TypeUint32, Column: txnum.FieldCreatedAt},
+			txnum.FieldUpdatedAt: {Type: field.TypeUint32, Column: txnum.FieldUpdatedAt},
+			txnum.FieldDeletedAt: {Type: field.TypeUint32, Column: txnum.FieldDeletedAt},
+			txnum.FieldTimeAt:    {Type: field.TypeUint32, Column: txnum.FieldTimeAt},
+			txnum.FieldNum:       {Type: field.TypeUint32, Column: txnum.FieldNum},
 		},
 	}
 	return graph
@@ -134,4 +172,134 @@ func (f *AccountFilter) WhereIsRoot(p entql.BoolP) {
 // WhereRemark applies the entql string predicate on the remark field.
 func (f *AccountFilter) WhereRemark(p entql.StringP) {
 	f.Where(p.Field(account.FieldRemark))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (bnq *BlockNumQuery) addPredicate(pred func(s *sql.Selector)) {
+	bnq.predicates = append(bnq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the BlockNumQuery builder.
+func (bnq *BlockNumQuery) Filter() *BlockNumFilter {
+	return &BlockNumFilter{config: bnq.config, predicateAdder: bnq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *BlockNumMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the BlockNumMutation builder.
+func (m *BlockNumMutation) Filter() *BlockNumFilter {
+	return &BlockNumFilter{config: m.config, predicateAdder: m}
+}
+
+// BlockNumFilter provides a generic filtering capability at runtime for BlockNumQuery.
+type BlockNumFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *BlockNumFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[1].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql uint32 predicate on the id field.
+func (f *BlockNumFilter) WhereID(p entql.Uint32P) {
+	f.Where(p.Field(blocknum.FieldID))
+}
+
+// WhereCreatedAt applies the entql uint32 predicate on the created_at field.
+func (f *BlockNumFilter) WhereCreatedAt(p entql.Uint32P) {
+	f.Where(p.Field(blocknum.FieldCreatedAt))
+}
+
+// WhereUpdatedAt applies the entql uint32 predicate on the updated_at field.
+func (f *BlockNumFilter) WhereUpdatedAt(p entql.Uint32P) {
+	f.Where(p.Field(blocknum.FieldUpdatedAt))
+}
+
+// WhereDeletedAt applies the entql uint32 predicate on the deleted_at field.
+func (f *BlockNumFilter) WhereDeletedAt(p entql.Uint32P) {
+	f.Where(p.Field(blocknum.FieldDeletedAt))
+}
+
+// WhereTimeAt applies the entql uint32 predicate on the time_at field.
+func (f *BlockNumFilter) WhereTimeAt(p entql.Uint32P) {
+	f.Where(p.Field(blocknum.FieldTimeAt))
+}
+
+// WhereHeight applies the entql uint64 predicate on the height field.
+func (f *BlockNumFilter) WhereHeight(p entql.Uint64P) {
+	f.Where(p.Field(blocknum.FieldHeight))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (tnq *TxNumQuery) addPredicate(pred func(s *sql.Selector)) {
+	tnq.predicates = append(tnq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the TxNumQuery builder.
+func (tnq *TxNumQuery) Filter() *TxNumFilter {
+	return &TxNumFilter{config: tnq.config, predicateAdder: tnq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *TxNumMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the TxNumMutation builder.
+func (m *TxNumMutation) Filter() *TxNumFilter {
+	return &TxNumFilter{config: m.config, predicateAdder: m}
+}
+
+// TxNumFilter provides a generic filtering capability at runtime for TxNumQuery.
+type TxNumFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *TxNumFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[2].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql uint32 predicate on the id field.
+func (f *TxNumFilter) WhereID(p entql.Uint32P) {
+	f.Where(p.Field(txnum.FieldID))
+}
+
+// WhereCreatedAt applies the entql uint32 predicate on the created_at field.
+func (f *TxNumFilter) WhereCreatedAt(p entql.Uint32P) {
+	f.Where(p.Field(txnum.FieldCreatedAt))
+}
+
+// WhereUpdatedAt applies the entql uint32 predicate on the updated_at field.
+func (f *TxNumFilter) WhereUpdatedAt(p entql.Uint32P) {
+	f.Where(p.Field(txnum.FieldUpdatedAt))
+}
+
+// WhereDeletedAt applies the entql uint32 predicate on the deleted_at field.
+func (f *TxNumFilter) WhereDeletedAt(p entql.Uint32P) {
+	f.Where(p.Field(txnum.FieldDeletedAt))
+}
+
+// WhereTimeAt applies the entql uint32 predicate on the time_at field.
+func (f *TxNumFilter) WhereTimeAt(p entql.Uint32P) {
+	f.Where(p.Field(txnum.FieldTimeAt))
+}
+
+// WhereNum applies the entql uint32 predicate on the num field.
+func (f *TxNumFilter) WhereNum(p entql.Uint32P) {
+	f.Where(p.Field(txnum.FieldNum))
 }

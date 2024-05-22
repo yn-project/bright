@@ -7,7 +7,9 @@ import (
 
 	"github.com/google/uuid"
 	"yun.tea/block/bright/account/pkg/db/ent/account"
+	"yun.tea/block/bright/account/pkg/db/ent/blocknum"
 	"yun.tea/block/bright/account/pkg/db/ent/schema"
+	"yun.tea/block/bright/account/pkg/db/ent/txnum"
 
 	"entgo.io/ent"
 	"entgo.io/ent/privacy"
@@ -61,6 +63,62 @@ func init() {
 	accountDescID := accountFields[0].Descriptor()
 	// account.DefaultID holds the default value on creation for the id field.
 	account.DefaultID = accountDescID.Default.(func() uuid.UUID)
+	blocknumMixin := schema.BlockNum{}.Mixin()
+	blocknum.Policy = privacy.NewPolicies(blocknumMixin[0], schema.BlockNum{})
+	blocknum.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := blocknum.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	blocknumMixinFields0 := blocknumMixin[0].Fields()
+	_ = blocknumMixinFields0
+	blocknumFields := schema.BlockNum{}.Fields()
+	_ = blocknumFields
+	// blocknumDescCreatedAt is the schema descriptor for created_at field.
+	blocknumDescCreatedAt := blocknumMixinFields0[0].Descriptor()
+	// blocknum.DefaultCreatedAt holds the default value on creation for the created_at field.
+	blocknum.DefaultCreatedAt = blocknumDescCreatedAt.Default.(func() uint32)
+	// blocknumDescUpdatedAt is the schema descriptor for updated_at field.
+	blocknumDescUpdatedAt := blocknumMixinFields0[1].Descriptor()
+	// blocknum.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	blocknum.DefaultUpdatedAt = blocknumDescUpdatedAt.Default.(func() uint32)
+	// blocknum.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	blocknum.UpdateDefaultUpdatedAt = blocknumDescUpdatedAt.UpdateDefault.(func() uint32)
+	// blocknumDescDeletedAt is the schema descriptor for deleted_at field.
+	blocknumDescDeletedAt := blocknumMixinFields0[2].Descriptor()
+	// blocknum.DefaultDeletedAt holds the default value on creation for the deleted_at field.
+	blocknum.DefaultDeletedAt = blocknumDescDeletedAt.Default.(func() uint32)
+	txnumMixin := schema.TxNum{}.Mixin()
+	txnum.Policy = privacy.NewPolicies(txnumMixin[0], schema.TxNum{})
+	txnum.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := txnum.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	txnumMixinFields0 := txnumMixin[0].Fields()
+	_ = txnumMixinFields0
+	txnumFields := schema.TxNum{}.Fields()
+	_ = txnumFields
+	// txnumDescCreatedAt is the schema descriptor for created_at field.
+	txnumDescCreatedAt := txnumMixinFields0[0].Descriptor()
+	// txnum.DefaultCreatedAt holds the default value on creation for the created_at field.
+	txnum.DefaultCreatedAt = txnumDescCreatedAt.Default.(func() uint32)
+	// txnumDescUpdatedAt is the schema descriptor for updated_at field.
+	txnumDescUpdatedAt := txnumMixinFields0[1].Descriptor()
+	// txnum.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	txnum.DefaultUpdatedAt = txnumDescUpdatedAt.Default.(func() uint32)
+	// txnum.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	txnum.UpdateDefaultUpdatedAt = txnumDescUpdatedAt.UpdateDefault.(func() uint32)
+	// txnumDescDeletedAt is the schema descriptor for deleted_at field.
+	txnumDescDeletedAt := txnumMixinFields0[2].Descriptor()
+	// txnum.DefaultDeletedAt holds the default value on creation for the deleted_at field.
+	txnum.DefaultDeletedAt = txnumDescDeletedAt.Default.(func() uint32)
 }
 
 const (

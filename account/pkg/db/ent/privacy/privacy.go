@@ -174,6 +174,54 @@ func (f AccountMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutatio
 	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.AccountMutation", m)
 }
 
+// The BlockNumQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type BlockNumQueryRuleFunc func(context.Context, *ent.BlockNumQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f BlockNumQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.BlockNumQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.BlockNumQuery", q)
+}
+
+// The BlockNumMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type BlockNumMutationRuleFunc func(context.Context, *ent.BlockNumMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f BlockNumMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.BlockNumMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.BlockNumMutation", m)
+}
+
+// The TxNumQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type TxNumQueryRuleFunc func(context.Context, *ent.TxNumQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f TxNumQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.TxNumQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.TxNumQuery", q)
+}
+
+// The TxNumMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type TxNumMutationRuleFunc func(context.Context, *ent.TxNumMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f TxNumMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.TxNumMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.TxNumMutation", m)
+}
+
 type (
 	// Filter is the interface that wraps the Where function
 	// for filtering nodes in queries and mutations.
@@ -211,6 +259,10 @@ func queryFilter(q ent.Query) (Filter, error) {
 	switch q := q.(type) {
 	case *ent.AccountQuery:
 		return q.Filter(), nil
+	case *ent.BlockNumQuery:
+		return q.Filter(), nil
+	case *ent.TxNumQuery:
+		return q.Filter(), nil
 	default:
 		return nil, Denyf("ent/privacy: unexpected query type %T for query filter", q)
 	}
@@ -219,6 +271,10 @@ func queryFilter(q ent.Query) (Filter, error) {
 func mutationFilter(m ent.Mutation) (Filter, error) {
 	switch m := m.(type) {
 	case *ent.AccountMutation:
+		return m.Filter(), nil
+	case *ent.BlockNumMutation:
+		return m.Filter(), nil
+	case *ent.TxNumMutation:
 		return m.Filter(), nil
 	default:
 		return nil, Denyf("ent/privacy: unexpected mutation type %T for mutation filter", m)

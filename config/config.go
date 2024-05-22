@@ -25,6 +25,7 @@ type Config struct {
 	Pulsar   Pulsar   `toml:"pulsar" env:"pulsar"`
 	Redis    Redis    `toml:"redis" env:"redis"`
 	Minio    Minio    `toml:"minio" env:"minio"`
+	Chain    Chain    `toml:"chain" env:"chain"`
 }
 
 type Contract struct {
@@ -97,6 +98,13 @@ type Minio struct {
 	SecretKey        string `toml:"secret-key" env:"secret_key"`
 	Region           string `toml:"region" env:"region"`
 	TokenImageBucket string `toml:"token-image-bucket" env:"token_image_bucket"`
+}
+
+type Chain struct {
+	Name    string `toml:"name" env:"name"`
+	ID      string `toml:"id" env:"id"`
+	Explore string `toml:"explore" env:"explore"`
+	Lang    string `toml:"lang" env:"lang"`
 }
 
 // set default config

@@ -1,0 +1,167 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "bright/overview/overview.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Manager"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/get/mqueue": {
+      "post": {
+        "operationId": "Manager_GetOverview",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/overviewGetOverviewResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/overviewGetOverviewRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Manager"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "overviewGetOverviewRequest": {
+      "type": "object"
+    },
+    "overviewGetOverviewResponse": {
+      "type": "object",
+      "properties": {
+        "Info": {
+          "$ref": "#/definitions/overviewOverview"
+        }
+      }
+    },
+    "overviewOverview": {
+      "type": "object",
+      "properties": {
+        "OverviewAt": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "ChainName": {
+          "type": "string"
+        },
+        "ChainID": {
+          "type": "string"
+        },
+        "ChainExplore": {
+          "type": "string"
+        },
+        "ContractLang": {
+          "type": "string"
+        },
+        "EndpointNum": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "EndpointStatesNum": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "AccountNum": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "AccountStatesNum": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "ContractTopicNum": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "BlockNums": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/overviewTimeNum"
+          }
+        },
+        "TxNums": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/overviewTimeNum"
+          }
+        }
+      }
+    },
+    "overviewTimeNum": {
+      "type": "object",
+      "properties": {
+        "TimeAt": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "Height": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

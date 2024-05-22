@@ -11,6 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"yun.tea/block/bright/account/pkg/db/ent/account"
+	"yun.tea/block/bright/account/pkg/db/ent/blocknum"
+	"yun.tea/block/bright/account/pkg/db/ent/txnum"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -31,7 +33,9 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
-		account.Table: account.ValidColumn,
+		account.Table:  account.ValidColumn,
+		blocknum.Table: blocknum.ValidColumn,
+		txnum.Table:    txnum.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

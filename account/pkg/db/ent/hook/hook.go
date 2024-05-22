@@ -22,6 +22,32 @@ func (f AccountFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 	return f(ctx, mv)
 }
 
+// The BlockNumFunc type is an adapter to allow the use of ordinary
+// function as BlockNum mutator.
+type BlockNumFunc func(context.Context, *ent.BlockNumMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f BlockNumFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.BlockNumMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BlockNumMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The TxNumFunc type is an adapter to allow the use of ordinary
+// function as TxNum mutator.
+type TxNumFunc func(context.Context, *ent.TxNumMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TxNumFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.TxNumMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TxNumMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // Condition is a hook condition function.
 type Condition func(context.Context, ent.Mutation) bool
 

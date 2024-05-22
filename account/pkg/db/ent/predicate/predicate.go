@@ -8,3 +8,9 @@ import (
 
 // Account is the predicate function for account builders.
 type Account func(*sql.Selector)
+
+// BlockNum is the predicate function for blocknum builders.
+type BlockNum func(*sql.Selector)
+
+// TxNum is the predicate function for txnum builders.
+type TxNum func(*sql.Selector)

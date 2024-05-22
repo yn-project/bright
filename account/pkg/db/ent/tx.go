@@ -16,6 +16,10 @@ type Tx struct {
 	config
 	// Account is the client for interacting with the Account builders.
 	Account *AccountClient
+	// BlockNum is the client for interacting with the BlockNum builders.
+	BlockNum *BlockNumClient
+	// TxNum is the client for interacting with the TxNum builders.
+	TxNum *TxNumClient
 
 	// lazily loaded.
 	client     *Client
@@ -152,6 +156,8 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Account = NewAccountClient(tx.config)
+	tx.BlockNum = NewBlockNumClient(tx.config)
+	tx.TxNum = NewTxNumClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package bright.overview;
+
+option go_package = "yun.tea/block/bright/overview";
+import "bright/bright.proto";
+import "bright/basetype/basetype.proto";
+import "google/api/annotations.proto";
+
+
+service Manager {
+    rpc GetOverview(GetOverviewRequest) returns (GetOverviewResponse) {
+      option (google.api.http) = {
+        post:"/get/mqueue"
+        body:"*"
+      };
+    }
+}
+
+message TimeNum {
+  uint32 TimeAt = 10;
+  uint64 Height = 20;
+}
+  
+message Overview {
+  uint32 OverviewAt = 10;
+  string ChainName = 20;
+  string ChainID = 30;
+  string ChainExplore = 40;
+  string ContractLang = 50;
+  uint32 EndpointNum = 60;
+  map<string,uint32> EndpointStatesNum = 70;
+  uint32 AccountNum = 80;
+  map<string,uint32> AccountStatesNum = 90;
+  uint32 ContractTopicNum = 100;
+  repeated TimeNum BlockNums = 110;
+  repeated TimeNum TxNums = 120;
+}
+
+message GetOverviewRequest { }
+message GetOverviewResponse { Overview Info = 10; }

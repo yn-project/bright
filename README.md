@@ -223,3 +223,6 @@ mycli -uroot -hmysql
 # json中的Bytes
 
 golang转成json时[]byte类型会用base64编码转换成string
+
+
+gEb88EFa4x

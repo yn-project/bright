@@ -49,3 +49,9 @@ operation-timeout=30
 connection-timeout=30
 topic-sync-task="topic_sync_task"
 topic-transform-image="topic_transform_image"
+
+[chain]
+name="Ant Chain"
+id="a00e36c5"
+explore="https://chaininsight.antdigital.com/"
+lang="Solidity 0.8.0"

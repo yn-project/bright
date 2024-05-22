@@ -12,6 +12,8 @@ import (
 	"yun.tea/block/bright/account/pkg/db/ent/migrate"
 
 	"yun.tea/block/bright/account/pkg/db/ent/account"
+	"yun.tea/block/bright/account/pkg/db/ent/blocknum"
+	"yun.tea/block/bright/account/pkg/db/ent/txnum"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -24,6 +26,10 @@ type Client struct {
 	Schema *migrate.Schema
 	// Account is the client for interacting with the Account builders.
 	Account *AccountClient
+	// BlockNum is the client for interacting with the BlockNum builders.
+	BlockNum *BlockNumClient
+	// TxNum is the client for interacting with the TxNum builders.
+	TxNum *TxNumClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -38,6 +44,8 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Account = NewAccountClient(c.config)
+	c.BlockNum = NewBlockNumClient(c.config)
+	c.TxNum = NewTxNumClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -69,9 +77,11 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:     ctx,
-		config:  cfg,
-		Account: NewAccountClient(cfg),
+		ctx:      ctx,
+		config:   cfg,
+		Account:  NewAccountClient(cfg),
+		BlockNum: NewBlockNumClient(cfg),
+		TxNum:    NewTxNumClient(cfg),
 	}, nil
 }
 
@@ -89,9 +99,11 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:     ctx,
-		config:  cfg,
-		Account: NewAccountClient(cfg),
+		ctx:      ctx,
+		config:   cfg,
+		Account:  NewAccountClient(cfg),
+		BlockNum: NewBlockNumClient(cfg),
+		TxNum:    NewTxNumClient(cfg),
 	}, nil
 }
 
@@ -121,6 +133,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Account.Use(hooks...)
+	c.BlockNum.Use(hooks...)
+	c.TxNum.Use(hooks...)
 }
 
 // AccountClient is a client for the Account schema.
@@ -212,4 +226,186 @@ func (c *AccountClient) GetX(ctx context.Context, id uuid.UUID) *Account {
 func (c *AccountClient) Hooks() []Hook {
 	hooks := c.hooks.Account
 	return append(hooks[:len(hooks):len(hooks)], account.Hooks[:]...)
+}
+
+// BlockNumClient is a client for the BlockNum schema.
+type BlockNumClient struct {
+	config
+}
+
+// NewBlockNumClient returns a client for the BlockNum from the given config.
+func NewBlockNumClient(c config) *BlockNumClient {
+	return &BlockNumClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `blocknum.Hooks(f(g(h())))`.
+func (c *BlockNumClient) Use(hooks ...Hook) {
+	c.hooks.BlockNum = append(c.hooks.BlockNum, hooks...)
+}
+
+// Create returns a builder for creating a BlockNum entity.
+func (c *BlockNumClient) Create() *BlockNumCreate {
+	mutation := newBlockNumMutation(c.config, OpCreate)
+	return &BlockNumCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of BlockNum entities.
+func (c *BlockNumClient) CreateBulk(builders ...*BlockNumCreate) *BlockNumCreateBulk {
+	return &BlockNumCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for BlockNum.
+func (c *BlockNumClient) Update() *BlockNumUpdate {
+	mutation := newBlockNumMutation(c.config, OpUpdate)
+	return &BlockNumUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *BlockNumClient) UpdateOne(bn *BlockNum) *BlockNumUpdateOne {
+	mutation := newBlockNumMutation(c.config, OpUpdateOne, withBlockNum(bn))
+	return &BlockNumUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *BlockNumClient) UpdateOneID(id uint32) *BlockNumUpdateOne {
+	mutation := newBlockNumMutation(c.config, OpUpdateOne, withBlockNumID(id))
+	return &BlockNumUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for BlockNum.
+func (c *BlockNumClient) Delete() *BlockNumDelete {
+	mutation := newBlockNumMutation(c.config, OpDelete)
+	return &BlockNumDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *BlockNumClient) DeleteOne(bn *BlockNum) *BlockNumDeleteOne {
+	return c.DeleteOneID(bn.ID)
+}
+
+// DeleteOne returns a builder for deleting the given entity by its id.
+func (c *BlockNumClient) DeleteOneID(id uint32) *BlockNumDeleteOne {
+	builder := c.Delete().Where(blocknum.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &BlockNumDeleteOne{builder}
+}
+
+// Query returns a query builder for BlockNum.
+func (c *BlockNumClient) Query() *BlockNumQuery {
+	return &BlockNumQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a BlockNum entity by its id.
+func (c *BlockNumClient) Get(ctx context.Context, id uint32) (*BlockNum, error) {
+	return c.Query().Where(blocknum.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *BlockNumClient) GetX(ctx context.Context, id uint32) *BlockNum {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *BlockNumClient) Hooks() []Hook {
+	hooks := c.hooks.BlockNum
+	return append(hooks[:len(hooks):len(hooks)], blocknum.Hooks[:]...)
+}
+
+// TxNumClient is a client for the TxNum schema.
+type TxNumClient struct {
+	config
+}
+
+// NewTxNumClient returns a client for the TxNum from the given config.
+func NewTxNumClient(c config) *TxNumClient {
+	return &TxNumClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `txnum.Hooks(f(g(h())))`.
+func (c *TxNumClient) Use(hooks ...Hook) {
+	c.hooks.TxNum = append(c.hooks.TxNum, hooks...)
+}
+
+// Create returns a builder for creating a TxNum entity.
+func (c *TxNumClient) Create() *TxNumCreate {
+	mutation := newTxNumMutation(c.config, OpCreate)
+	return &TxNumCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of TxNum entities.
+func (c *TxNumClient) CreateBulk(builders ...*TxNumCreate) *TxNumCreateBulk {
+	return &TxNumCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for TxNum.
+func (c *TxNumClient) Update() *TxNumUpdate {
+	mutation := newTxNumMutation(c.config, OpUpdate)
+	return &TxNumUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TxNumClient) UpdateOne(tn *TxNum) *TxNumUpdateOne {
+	mutation := newTxNumMutation(c.config, OpUpdateOne, withTxNum(tn))
+	return &TxNumUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TxNumClient) UpdateOneID(id uint32) *TxNumUpdateOne {
+	mutation := newTxNumMutation(c.config, OpUpdateOne, withTxNumID(id))
+	return &TxNumUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for TxNum.
+func (c *TxNumClient) Delete() *TxNumDelete {
+	mutation := newTxNumMutation(c.config, OpDelete)
+	return &TxNumDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TxNumClient) DeleteOne(tn *TxNum) *TxNumDeleteOne {
+	return c.DeleteOneID(tn.ID)
+}
+
+// DeleteOne returns a builder for deleting the given entity by its id.
+func (c *TxNumClient) DeleteOneID(id uint32) *TxNumDeleteOne {
+	builder := c.Delete().Where(txnum.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TxNumDeleteOne{builder}
+}
+
+// Query returns a query builder for TxNum.
+func (c *TxNumClient) Query() *TxNumQuery {
+	return &TxNumQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a TxNum entity by its id.
+func (c *TxNumClient) Get(ctx context.Context, id uint32) (*TxNum, error) {
+	return c.Query().Where(txnum.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TxNumClient) GetX(ctx context.Context, id uint32) *TxNum {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *TxNumClient) Hooks() []Hook {
+	hooks := c.hooks.TxNum
+	return append(hooks[:len(hooks):len(hooks)], txnum.Hooks[:]...)
 }
