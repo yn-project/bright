@@ -28,12 +28,15 @@ const (
 var overviewData *overview.Overview
 
 func GetOverviewData() *overview.Overview {
+	if overviewData == nil {
+		return &overview.Overview{}
+	}
 	return overviewData
 }
 
 func OverviewRun(ctx context.Context) {
 	for {
-		overviewData = &overview.Overview{
+		_overviewData := &overview.Overview{
 			OverviewAt:   uint32(time.Now().Unix()),
 			ChainName:    config.GetConfig().Chain.Name,
 			ChainID:      config.GetConfig().Chain.ID,
@@ -51,7 +54,7 @@ func OverviewRun(ctx context.Context) {
 			return err
 		})
 
-		overviewData.EndpointStatesNum = map[string]uint32{}
+		_overviewData.EndpointStatesNum = map[string]uint32{}
 		for _, v := range basetype.EndpointState_name {
 			resp, err := endpoint.GetEndpoints(ctx, &endpointproto.GetEndpointsRequest{Conds: &endpointproto.Conds{
 				State: &bright.StringVal{
@@ -60,14 +63,14 @@ func OverviewRun(ctx context.Context) {
 				},
 			}})
 			if err == nil && resp != nil {
-				overviewData.EndpointStatesNum[v] = resp.Total
-				overviewData.EndpointNum += resp.Total
+				_overviewData.EndpointStatesNum[v] = resp.Total
+				_overviewData.EndpointNum += resp.Total
 			} else {
-				overviewData.EndpointStatesNum[v] = 0
+				_overviewData.EndpointStatesNum[v] = 0
 			}
 		}
 
-		overviewData.AccountStatesNum = map[string]uint32{}
+		_overviewData.AccountStatesNum = map[string]uint32{}
 		for _, v := range basetype.AccountState_name {
 			resp, err := account.GetAccounts(ctx, &accountproto.GetAccountsRequest{Conds: &accountproto.Conds{
 				State: &bright.StringVal{
@@ -76,47 +79,48 @@ func OverviewRun(ctx context.Context) {
 				},
 			}})
 			if err == nil && resp != nil {
-				overviewData.AccountStatesNum[v] = resp.Total
-				overviewData.AccountNum += resp.Total
+				_overviewData.AccountStatesNum[v] = resp.Total
+				_overviewData.AccountNum += resp.Total
 			} else {
-				overviewData.AccountStatesNum[v] = 0
+				_overviewData.AccountStatesNum[v] = 0
 			}
 		}
 
 		resp, err := topic.GetTopics(ctx, &topicproto.GetTopicsRequest{})
 		if err == nil && resp != nil {
-			overviewData.ContractTopicNum = resp.Total
+			_overviewData.ContractTopicNum = resp.Total
 		}
 
 		nums := 20
-		overviewData.TxNums = []*overview.TimeNum{}
+		_overviewData.TxNums = []*overview.TimeNum{}
 		txnums, err := txnum.Rows(ctx, nums)
 		if err == nil {
 			for i := 0; i < nums; i++ {
 				if i >= len(txnums) {
 					break
 				}
-				overviewData.TxNums = append(overviewData.TxNums, &overview.TimeNum{
+				_overviewData.TxNums = append(_overviewData.TxNums, &overview.TimeNum{
 					TimeAt: txnums[i].TimeAt,
 					Num:    uint64(txnums[i].Num),
 				})
 			}
 		}
 
-		overviewData.BlockNums = []*overview.TimeNum{}
+		_overviewData.BlockNums = []*overview.TimeNum{}
 		blocknums, err := blocknum.Rows(ctx, nums)
 		if err == nil {
 			for i := 0; i < nums; i++ {
 				if i >= len(blocknums) {
 					break
 				}
-				overviewData.BlockNums = append(overviewData.BlockNums, &overview.TimeNum{
+				_overviewData.BlockNums = append(_overviewData.BlockNums, &overview.TimeNum{
 					TimeAt: blocknums[i].TimeAt,
 					Num:    blocknums[i].Height,
 				})
 			}
 		}
 
+		overviewData = _overviewData
 		<-time.NewTicker(refreshInterval).C
 	}
 }
