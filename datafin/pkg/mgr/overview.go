@@ -51,6 +51,7 @@ func OverviewRun(ctx context.Context) {
 			return err
 		})
 
+		overviewData.EndpointStatesNum = map[string]uint32{}
 		for _, v := range basetype.EndpointState_name {
 			resp, err := endpoint.GetEndpoints(ctx, &endpointproto.GetEndpointsRequest{Conds: &endpointproto.Conds{
 				State: &bright.StringVal{
@@ -66,6 +67,7 @@ func OverviewRun(ctx context.Context) {
 			}
 		}
 
+		overviewData.AccountStatesNum = map[string]uint32{}
 		for _, v := range basetype.AccountState_name {
 			resp, err := account.GetAccounts(ctx, &accountproto.GetAccountsRequest{Conds: &accountproto.Conds{
 				State: &bright.StringVal{
@@ -94,10 +96,10 @@ func OverviewRun(ctx context.Context) {
 				if i >= len(txnums) {
 					break
 				}
-				overviewData.TxNums[i] = &overview.TimeNum{
+				overviewData.TxNums = append(overviewData.TxNums, &overview.TimeNum{
 					TimeAt: txnums[i].TimeAt,
 					Num:    uint64(txnums[i].Num),
-				}
+				})
 			}
 		}
 
@@ -108,10 +110,10 @@ func OverviewRun(ctx context.Context) {
 				if i >= len(blocknums) {
 					break
 				}
-				overviewData.BlockNums[i] = &overview.TimeNum{
+				overviewData.BlockNums = append(overviewData.BlockNums, &overview.TimeNum{
 					TimeAt: blocknums[i].TimeAt,
 					Num:    blocknums[i].Height,
-				}
+				})
 			}
 		}
 

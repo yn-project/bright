@@ -16,7 +16,7 @@
     "application/json"
   ],
   "paths": {
-    "/get/mqueue": {
+    "/get/overview": {
       "post": {
         "operationId": "Manager_GetOverview",
         "responses": {

@@ -11,7 +11,7 @@ import "google/api/annotations.proto";
 service Manager {
     rpc GetOverview(GetOverviewRequest) returns (GetOverviewResponse) {
       option (google.api.http) = {
-        post:"/get/mqueue"
+        post:"/get/overview"
         body:"*"
       };
     }
