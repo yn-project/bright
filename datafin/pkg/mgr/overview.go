@@ -9,6 +9,7 @@ import (
 	"yun.tea/block/bright/account/pkg/crud/blocknum"
 	"yun.tea/block/bright/account/pkg/crud/txnum"
 	"yun.tea/block/bright/common/cruder"
+	"yun.tea/block/bright/common/ctredis"
 	"yun.tea/block/bright/config"
 	"yun.tea/block/bright/datafin/pkg/client/topic"
 	"yun.tea/block/bright/endpoint/pkg/client/endpoint"
@@ -45,6 +46,11 @@ func OverviewRun(ctx context.Context) {
 		}
 
 		mgr.WithClient(ctx, func(ctx context.Context, cli *ethclient.Client) error {
+			ok, err := ctredis.TryPubLock("overview_update_lock", refreshInterval)
+			if !ok || err != nil {
+				return err
+			}
+
 			height, err := cli.BlockNumber(ctx)
 			if err != nil {
 				return err
