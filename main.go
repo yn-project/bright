@@ -3,18 +3,18 @@ package main
 import (
 	"context"
 	"fmt"
-	"time"
 
-	"yun.tea/block/bright/account/pkg/crud/txnum"
-	"yun.tea/block/bright/account/pkg/db"
+	"yun.tea/block/bright/account/pkg/client/account"
+	"yun.tea/block/bright/common/utils"
+	proto "yun.tea/block/bright/proto/bright/account"
 )
 
 func main() {
-	fmt.Println(db.Init())
-	rows, err := txnum.Rows(context.Background(), 3)
-	fmt.Println(err)
-	for _, row := range rows {
-		fmt.Println(row)
-		fmt.Println(time.Unix(int64(row.TimeAt), 0))
+	resp, err := account.CreateAccount(context.Background(), &proto.CreateAccountRequest{
+		Remark: "ssss",
+	})
+	if err != nil {
+		fmt.Println(err)
 	}
+	fmt.Println(utils.PrettyStruct(resp))
 }
