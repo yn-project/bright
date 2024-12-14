@@ -5,6 +5,9 @@ import (
 	"log"
 	"os"
 
+	"net/http"
+	_ "net/http/pprof"
+
 	banner "github.com/common-nighthawk/go-figure"
 	cli "github.com/urfave/cli/v2"
 	"yun.tea/block/bright/common/logger"
@@ -18,6 +21,9 @@ const (
 )
 
 func main() {
+	go func() {
+		http.ListenAndServe("0.0.0.0:6063", nil)
+	}()
 	commands := cli.Commands{runCmd}
 
 	description := fmt.Sprintf(
