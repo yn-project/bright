@@ -13,4 +13,4 @@ set -o nounset
 set -o pipefail
 
 helm uninstall  -n kube-system  mysql
-kubectl delete pvc data-mysql-0
+kubectl delete  -n kube-system pvc data-mysql-0

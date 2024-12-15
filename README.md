@@ -226,3 +226,14 @@ golang转成json时[]byte类型会用base64编码转换成string
 
 
 gEb88EFa4x
+
+## 怎么构建traefik镜像
+如果存在docker和containerd双平台的情况，需要将镜像从docker中导出再导入到nerdctl（containerd）中
+```Shell
+cd tools/traefik-ingress
+bash build.sh
+\docker save $traefik_docker_image_id -o tmp_traefik.tar
+docker load -i tmp_traefik.tar
+docker images
+docker tag $tmp_traefik_image_id bright/traefik-service:v2.5.3.6
+```

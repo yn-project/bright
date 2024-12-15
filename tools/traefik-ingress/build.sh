@@ -28,4 +28,4 @@ set -e
 if [ 0 -eq $rc ]; then
 docker rmi bright/traefik-service:v2.5.3.6 | true
 fi
-cd ${MY_FOLDER}/.traefik/.traefik-release; nerdctl -n k8s.io build -t bright/traefik-service:v2.5.3.6 .
+cd ${MY_FOLDER}/.traefik/.traefik-release; docker build -t bright/traefik-service:v2.5.3.6 .

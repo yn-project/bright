@@ -11,16 +11,7 @@ import (
 
 	"github.com/Vigo-Tea/go-ethereum-ant/ethclient"
 	"yun.tea/block/bright/common/ctredis"
-	"yun.tea/block/bright/common/logger"
-	"yun.tea/block/bright/endpoint/pkg/db"
 )
-
-func init() {
-	err := db.Init()
-	if err != nil {
-		logger.Sugar().Error(err)
-	}
-}
 
 type endpointIntervalMGR struct {
 	RedisExpireTime time.Duration

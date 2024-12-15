@@ -1,4 +1,4 @@
-FROM centos:centos7.9.2009
+FROM ubuntu:jammy
 
 COPY user /usr/local/bin/user
 COPY User.viper.yaml /etc/User/User.viper.yaml

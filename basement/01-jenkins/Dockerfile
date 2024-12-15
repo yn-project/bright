@@ -4,6 +4,8 @@ USER root
 
 ARG ALL_PROXY
 
+# RUN curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.163.com/.help/CentOS7-Base-163.repo
+# RUN yum clean all && yum makecache
 # RUN curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
 
 RUN all_proxy= yum update -y
