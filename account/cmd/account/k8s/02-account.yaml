@@ -59,5 +59,8 @@ spec:
     - name: healthz
       port: 30132
       targetPort: 30132
+    - name: pprof
+      port: 6060
+      targetPort: 6060
   selector:
     app: account
