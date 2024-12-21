@@ -101,6 +101,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			topic.FieldContract:   {Type: field.TypeString, Column: topic.FieldContract},
 			topic.FieldType:       {Type: field.TypeString, Column: topic.FieldType},
 			topic.FieldChangeAble: {Type: field.TypeBool, Column: topic.FieldChangeAble},
+			topic.FieldOnChain:    {Type: field.TypeBool, Column: topic.FieldOnChain},
 			topic.FieldRemark:     {Type: field.TypeString, Column: topic.FieldRemark},
 		},
 	}
@@ -441,6 +442,11 @@ func (f *TopicFilter) WhereType(p entql.StringP) {
 // WhereChangeAble applies the entql bool predicate on the change_able field.
 func (f *TopicFilter) WhereChangeAble(p entql.BoolP) {
 	f.Where(p.Field(topic.FieldChangeAble))
+}
+
+// WhereOnChain applies the entql bool predicate on the on_chain field.
+func (f *TopicFilter) WhereOnChain(p entql.BoolP) {
+	f.Where(p.Field(topic.FieldOnChain))
 }
 
 // WhereRemark applies the entql string predicate on the remark field.

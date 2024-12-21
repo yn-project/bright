@@ -113,6 +113,12 @@ func (tu *TopicUpdate) SetChangeAble(b bool) *TopicUpdate {
 	return tu
 }
 
+// SetOnChain sets the "on_chain" field.
+func (tu *TopicUpdate) SetOnChain(b bool) *TopicUpdate {
+	tu.mutation.SetOnChain(b)
+	return tu
+}
+
 // SetRemark sets the "remark" field.
 func (tu *TopicUpdate) SetRemark(s string) *TopicUpdate {
 	tu.mutation.SetRemark(s)
@@ -308,6 +314,13 @@ func (tu *TopicUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: topic.FieldChangeAble,
 		})
 	}
+	if value, ok := tu.mutation.OnChain(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: topic.FieldOnChain,
+		})
+	}
 	if value, ok := tu.mutation.Remark(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -424,6 +437,12 @@ func (tuo *TopicUpdateOne) SetType(s string) *TopicUpdateOne {
 // SetChangeAble sets the "change_able" field.
 func (tuo *TopicUpdateOne) SetChangeAble(b bool) *TopicUpdateOne {
 	tuo.mutation.SetChangeAble(b)
+	return tuo
+}
+
+// SetOnChain sets the "on_chain" field.
+func (tuo *TopicUpdateOne) SetOnChain(b bool) *TopicUpdateOne {
+	tuo.mutation.SetOnChain(b)
 	return tuo
 }
 
@@ -650,6 +669,13 @@ func (tuo *TopicUpdateOne) sqlSave(ctx context.Context) (_node *Topic, err error
 			Type:   field.TypeBool,
 			Value:  value,
 			Column: topic.FieldChangeAble,
+		})
+	}
+	if value, ok := tuo.mutation.OnChain(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: topic.FieldOnChain,
 		})
 	}
 	if value, ok := tuo.mutation.Remark(); ok {

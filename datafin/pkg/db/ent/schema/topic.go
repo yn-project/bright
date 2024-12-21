@@ -29,6 +29,7 @@ func (Topic) Fields() []ent.Field {
 		field.String("contract"),
 		field.String("type"),
 		field.Bool("change_able"),
+		field.Bool("on_chain"),
 		field.String("remark").Optional(),
 	}
 }

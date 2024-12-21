@@ -135,6 +135,13 @@ func ChangeAble(v bool) predicate.Topic {
 	})
 }
 
+// OnChain applies equality check predicate on the "on_chain" field. It's identical to OnChainEQ.
+func OnChain(v bool) predicate.Topic {
+	return predicate.Topic(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldOnChain), v))
+	})
+}
+
 // Remark applies equality check predicate on the "remark" field. It's identical to RemarkEQ.
 func Remark(v string) predicate.Topic {
 	return predicate.Topic(func(s *sql.Selector) {
@@ -741,6 +748,20 @@ func ChangeAbleEQ(v bool) predicate.Topic {
 func ChangeAbleNEQ(v bool) predicate.Topic {
 	return predicate.Topic(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldChangeAble), v))
+	})
+}
+
+// OnChainEQ applies the EQ predicate on the "on_chain" field.
+func OnChainEQ(v bool) predicate.Topic {
+	return predicate.Topic(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldOnChain), v))
+	})
+}
+
+// OnChainNEQ applies the NEQ predicate on the "on_chain" field.
+func OnChainNEQ(v bool) predicate.Topic {
+	return predicate.Topic(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldOnChain), v))
 	})
 }
 

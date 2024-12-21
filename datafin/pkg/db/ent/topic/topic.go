@@ -28,6 +28,8 @@ const (
 	FieldType = "type"
 	// FieldChangeAble holds the string denoting the change_able field in the database.
 	FieldChangeAble = "change_able"
+	// FieldOnChain holds the string denoting the on_chain field in the database.
+	FieldOnChain = "on_chain"
 	// FieldRemark holds the string denoting the remark field in the database.
 	FieldRemark = "remark"
 	// Table holds the table name of the topic in the database.
@@ -45,6 +47,7 @@ var Columns = []string{
 	FieldContract,
 	FieldType,
 	FieldChangeAble,
+	FieldOnChain,
 	FieldRemark,
 }
 

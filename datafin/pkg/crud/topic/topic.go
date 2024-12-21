@@ -46,6 +46,9 @@ func CreateSet(c *ent.TopicCreate, in *proto.TopicReq) *ent.TopicCreate {
 	if in.ChangeAble != nil {
 		c.SetChangeAble(*in.ChangeAble)
 	}
+	if in.OnChain != nil {
+		c.SetOnChain(*in.OnChain)
+	}
 	if in.Contract != nil {
 		c.SetContract(*in.Contract)
 	}

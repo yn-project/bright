@@ -2753,6 +2753,7 @@ type TopicMutation struct {
 	contract      *string
 	_type         *string
 	change_able   *bool
+	on_chain      *bool
 	remark        *string
 	clearedFields map[string]struct{}
 	done          bool
@@ -3212,6 +3213,42 @@ func (m *TopicMutation) ResetChangeAble() {
 	m.change_able = nil
 }
 
+// SetOnChain sets the "on_chain" field.
+func (m *TopicMutation) SetOnChain(b bool) {
+	m.on_chain = &b
+}
+
+// OnChain returns the value of the "on_chain" field in the mutation.
+func (m *TopicMutation) OnChain() (r bool, exists bool) {
+	v := m.on_chain
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOnChain returns the old "on_chain" field's value of the Topic entity.
+// If the Topic object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TopicMutation) OldOnChain(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOnChain is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOnChain requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOnChain: %w", err)
+	}
+	return oldValue.OnChain, nil
+}
+
+// ResetOnChain resets all changes to the "on_chain" field.
+func (m *TopicMutation) ResetOnChain() {
+	m.on_chain = nil
+}
+
 // SetRemark sets the "remark" field.
 func (m *TopicMutation) SetRemark(s string) {
 	m.remark = &s
@@ -3280,7 +3317,7 @@ func (m *TopicMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TopicMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 10)
 	if m.created_at != nil {
 		fields = append(fields, topic.FieldCreatedAt)
 	}
@@ -3304,6 +3341,9 @@ func (m *TopicMutation) Fields() []string {
 	}
 	if m.change_able != nil {
 		fields = append(fields, topic.FieldChangeAble)
+	}
+	if m.on_chain != nil {
+		fields = append(fields, topic.FieldOnChain)
 	}
 	if m.remark != nil {
 		fields = append(fields, topic.FieldRemark)
@@ -3332,6 +3372,8 @@ func (m *TopicMutation) Field(name string) (ent.Value, bool) {
 		return m.GetType()
 	case topic.FieldChangeAble:
 		return m.ChangeAble()
+	case topic.FieldOnChain:
+		return m.OnChain()
 	case topic.FieldRemark:
 		return m.Remark()
 	}
@@ -3359,6 +3401,8 @@ func (m *TopicMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldType(ctx)
 	case topic.FieldChangeAble:
 		return m.OldChangeAble(ctx)
+	case topic.FieldOnChain:
+		return m.OldOnChain(ctx)
 	case topic.FieldRemark:
 		return m.OldRemark(ctx)
 	}
@@ -3425,6 +3469,13 @@ func (m *TopicMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetChangeAble(v)
+		return nil
+	case topic.FieldOnChain:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOnChain(v)
 		return nil
 	case topic.FieldRemark:
 		v, ok := value.(string)
@@ -3553,6 +3604,9 @@ func (m *TopicMutation) ResetField(name string) error {
 		return nil
 	case topic.FieldChangeAble:
 		m.ResetChangeAble()
+		return nil
+	case topic.FieldOnChain:
+		m.ResetOnChain()
 		return nil
 	case topic.FieldRemark:
 		m.ResetRemark()

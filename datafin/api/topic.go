@@ -26,6 +26,7 @@ import (
 func (s *TopicServer) CreateTopic(ctx context.Context, in *proto.CreateTopicRequest) (*proto.CreateTopicResponse, error) {
 	topicID := ""
 	contractAddr := ""
+	onChain := false
 	err := accountmgr.WithWriteContract(ctx, false, func(ctx context.Context, txOpts *bind.TransactOpts, contract *data_fin.DataFin, cli *ethclient.Client) error {
 		var tx *types.Transaction
 		var err error
@@ -60,6 +61,7 @@ func (s *TopicServer) CreateTopic(ctx context.Context, in *proto.CreateTopicRequ
 		}
 
 		contractAddr = tx.To().Hex()
+		onChain = true
 		return nil
 	})
 	if err != nil {
@@ -72,6 +74,7 @@ func (s *TopicServer) CreateTopic(ctx context.Context, in *proto.CreateTopicRequ
 		Name:       &in.Name,
 		Type:       &in.Type,
 		Contract:   &contractAddr,
+		OnChain:    &onChain,
 		ChangeAble: &in.ChangeAble,
 		Remark:     &in.Remark,
 	})
@@ -86,6 +89,7 @@ func (s *TopicServer) CreateTopic(ctx context.Context, in *proto.CreateTopicRequ
 		Name:       info.Name,
 		Type:       proto.TopicType(proto.TopicType_value[info.Type]),
 		ChangeAble: info.ChangeAble,
+		OnChain:    info.OnChain,
 		Remark:     info.Remark,
 		CreatedAt:  info.CreatedAt,
 	}, nil
@@ -110,6 +114,7 @@ func (s *TopicServer) GetTopic(ctx context.Context, in *proto.GetTopicRequest) (
 		Name:       info.Name,
 		Type:       proto.TopicType(proto.TopicType_value[info.Type]),
 		ChangeAble: info.ChangeAble,
+		OnChain:    info.OnChain,
 		Remark:     info.Remark,
 		CreatedAt:  info.CreatedAt,
 	}, nil

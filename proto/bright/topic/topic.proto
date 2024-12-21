@@ -46,6 +46,7 @@ message CreateTopicResponse{
   string    Name = 20 [json_name="name"];
   TopicType Type = 30 [json_name="type"];
   bool      ChangeAble = 40 [json_name="changeAble"];
+  bool      OnChain = 41 [json_name="onChain"];
   string    Remark = 50 [json_name="remark"];
   uint32    CreatedAt = 60 [json_name="createdAt"];
 }
@@ -56,6 +57,7 @@ message TopicReq {
   optional string    Name = 30;
   optional TopicType Type = 40;
   optional bool      ChangeAble = 50;
+  optional bool      OnChain = 51;
   optional string    Contract = 60;
   optional string    Remark = 70;
 }
@@ -65,6 +67,7 @@ message TopicInfo {
   string    Name = 20 [json_name="name"];
   TopicType Type = 30 [json_name="type"];
   bool      ChangeAble = 40 [json_name="changeAble"];
+  bool      OnChain = 41 [json_name="onChain"];
   string    Remark = 50 [json_name="remark"];
   uint32    CreatedAt = 60 [json_name="createdAt"];
 }
@@ -77,6 +80,7 @@ message GetTopicResponse {
   string    Name = 20 [json_name="name"];
   TopicType Type = 30 [json_name="type"];
   bool      ChangeAble = 40 [json_name="changeAble"];
+  bool      OnChain = 41 [json_name="onChain"];
   string    Remark = 50 [json_name="remark"];
   uint32    CreatedAt = 60 [json_name="createdAt"];
 }

@@ -94,6 +94,7 @@ var (
 		{Name: "contract", Type: field.TypeString},
 		{Name: "type", Type: field.TypeString},
 		{Name: "change_able", Type: field.TypeBool},
+		{Name: "on_chain", Type: field.TypeBool},
 		{Name: "remark", Type: field.TypeString, Nullable: true},
 	}
 	// TopicsTable holds the schema information for the "topics" table.

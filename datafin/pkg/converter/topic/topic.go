@@ -14,6 +14,7 @@ func Ent2Grpc(row *ent.Topic) *proto.TopicInfo {
 		TopicID:    row.TopicID,
 		Name:       row.Name,
 		Type:       proto.TopicType(proto.TopicType_value[row.Type]),
+		OnChain:    row.OnChain,
 		ChangeAble: row.ChangeAble,
 		Remark:     row.Remark,
 		CreatedAt:  row.CreatedAt,

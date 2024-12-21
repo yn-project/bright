@@ -32,6 +32,8 @@ type Topic struct {
 	Type string `json:"type,omitempty"`
 	// ChangeAble holds the value of the "change_able" field.
 	ChangeAble bool `json:"change_able,omitempty"`
+	// OnChain holds the value of the "on_chain" field.
+	OnChain bool `json:"on_chain,omitempty"`
 	// Remark holds the value of the "remark" field.
 	Remark string `json:"remark,omitempty"`
 }
@@ -41,7 +43,7 @@ func (*Topic) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case topic.FieldChangeAble:
+		case topic.FieldChangeAble, topic.FieldOnChain:
 			values[i] = new(sql.NullBool)
 		case topic.FieldCreatedAt, topic.FieldUpdatedAt, topic.FieldDeletedAt:
 			values[i] = new(sql.NullInt64)
@@ -118,6 +120,12 @@ func (t *Topic) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				t.ChangeAble = value.Bool
 			}
+		case topic.FieldOnChain:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field on_chain", values[i])
+			} else if value.Valid {
+				t.OnChain = value.Bool
+			}
 		case topic.FieldRemark:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field remark", values[i])
@@ -175,6 +183,9 @@ func (t *Topic) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("change_able=")
 	builder.WriteString(fmt.Sprintf("%v", t.ChangeAble))
+	builder.WriteString(", ")
+	builder.WriteString("on_chain=")
+	builder.WriteString(fmt.Sprintf("%v", t.OnChain))
 	builder.WriteString(", ")
 	builder.WriteString("remark=")
 	builder.WriteString(t.Remark)

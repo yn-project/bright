@@ -95,6 +95,12 @@ func (tc *TopicCreate) SetChangeAble(b bool) *TopicCreate {
 	return tc
 }
 
+// SetOnChain sets the "on_chain" field.
+func (tc *TopicCreate) SetOnChain(b bool) *TopicCreate {
+	tc.mutation.SetOnChain(b)
+	return tc
+}
+
 // SetRemark sets the "remark" field.
 func (tc *TopicCreate) SetRemark(s string) *TopicCreate {
 	tc.mutation.SetRemark(s)
@@ -259,6 +265,9 @@ func (tc *TopicCreate) check() error {
 	if _, ok := tc.mutation.ChangeAble(); !ok {
 		return &ValidationError{Name: "change_able", err: errors.New(`ent: missing required field "Topic.change_able"`)}
 	}
+	if _, ok := tc.mutation.OnChain(); !ok {
+		return &ValidationError{Name: "on_chain", err: errors.New(`ent: missing required field "Topic.on_chain"`)}
+	}
 	return nil
 }
 
@@ -359,6 +368,14 @@ func (tc *TopicCreate) createSpec() (*Topic, *sqlgraph.CreateSpec) {
 			Column: topic.FieldChangeAble,
 		})
 		_node.ChangeAble = value
+	}
+	if value, ok := tc.mutation.OnChain(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: topic.FieldOnChain,
+		})
+		_node.OnChain = value
 	}
 	if value, ok := tc.mutation.Remark(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -531,6 +548,18 @@ func (u *TopicUpsert) SetChangeAble(v bool) *TopicUpsert {
 // UpdateChangeAble sets the "change_able" field to the value that was provided on create.
 func (u *TopicUpsert) UpdateChangeAble() *TopicUpsert {
 	u.SetExcluded(topic.FieldChangeAble)
+	return u
+}
+
+// SetOnChain sets the "on_chain" field.
+func (u *TopicUpsert) SetOnChain(v bool) *TopicUpsert {
+	u.Set(topic.FieldOnChain, v)
+	return u
+}
+
+// UpdateOnChain sets the "on_chain" field to the value that was provided on create.
+func (u *TopicUpsert) UpdateOnChain() *TopicUpsert {
+	u.SetExcluded(topic.FieldOnChain)
 	return u
 }
 
@@ -730,6 +759,20 @@ func (u *TopicUpsertOne) SetChangeAble(v bool) *TopicUpsertOne {
 func (u *TopicUpsertOne) UpdateChangeAble() *TopicUpsertOne {
 	return u.Update(func(s *TopicUpsert) {
 		s.UpdateChangeAble()
+	})
+}
+
+// SetOnChain sets the "on_chain" field.
+func (u *TopicUpsertOne) SetOnChain(v bool) *TopicUpsertOne {
+	return u.Update(func(s *TopicUpsert) {
+		s.SetOnChain(v)
+	})
+}
+
+// UpdateOnChain sets the "on_chain" field to the value that was provided on create.
+func (u *TopicUpsertOne) UpdateOnChain() *TopicUpsertOne {
+	return u.Update(func(s *TopicUpsert) {
+		s.UpdateOnChain()
 	})
 }
 
@@ -1096,6 +1139,20 @@ func (u *TopicUpsertBulk) SetChangeAble(v bool) *TopicUpsertBulk {
 func (u *TopicUpsertBulk) UpdateChangeAble() *TopicUpsertBulk {
 	return u.Update(func(s *TopicUpsert) {
 		s.UpdateChangeAble()
+	})
+}
+
+// SetOnChain sets the "on_chain" field.
+func (u *TopicUpsertBulk) SetOnChain(v bool) *TopicUpsertBulk {
+	return u.Update(func(s *TopicUpsert) {
+		s.SetOnChain(v)
+	})
+}
+
+// UpdateOnChain sets the "on_chain" field to the value that was provided on create.
+func (u *TopicUpsertBulk) UpdateOnChain() *TopicUpsertBulk {
+	return u.Update(func(s *TopicUpsert) {
+		s.UpdateOnChain()
 	})
 }
 
