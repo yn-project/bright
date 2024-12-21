@@ -264,25 +264,25 @@ func (s *Server) DeleteAccount(ctx context.Context, in *proto.DeleteAccountReque
 		return &proto.DeleteAccountResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	acc, err := crud.Row(ctx, id)
-	if err != nil {
-		logger.Sugar().Errorw("DeleteAccount", "ID", in.GetID(), "error", err)
-		return &proto.DeleteAccountResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
+	// acc, err := crud.Row(ctx, id)
+	// if err != nil {
+	// 	logger.Sugar().Errorw("DeleteAccount", "ID", in.GetID(), "error", err)
+	// 	return &proto.DeleteAccountResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	// }
 
-	err = mgr.WithWriteContract(ctx, true, func(ctx context.Context, txOpts *bind.TransactOpts, contract *data_fin.DataFin, cli *ethclient.Client) error {
-		addr := common.HexToAddress(acc.Address)
-		_, err = contract.SetEnableAdmin(txOpts, addr, false)
-		if err != nil {
-			return err
-		}
-		_, err = contract.DeleteAdmin(txOpts, addr)
-		return err
-	})
-	if err != nil {
-		logger.Sugar().Errorw("DeleteAccount", "ID", in.GetID(), "error", err)
-		return &proto.DeleteAccountResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
+	// err = mgr.WithWriteContract(ctx, true, func(ctx context.Context, txOpts *bind.TransactOpts, contract *data_fin.DataFin, cli *ethclient.Client) error {
+	// 	addr := common.HexToAddress(acc.Address)
+	// 	_, err = contract.SetEnableAdmin(txOpts, addr, false)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	_, err = contract.DeleteAdmin(txOpts, addr)
+	// 	return err
+	// })
+	// if err != nil {
+	// 	logger.Sugar().Errorw("DeleteAccount", "ID", in.GetID(), "error", err)
+	// 	return &proto.DeleteAccountResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	// }
 
 	info, err := crud.Delete(ctx, id)
 	if err != nil {

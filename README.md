@@ -237,3 +237,39 @@ docker load -i tmp_traefik.tar
 docker images
 docker tag $tmp_traefik_image_id bright/traefik-service:v2.5.3.6
 ```
+
+## 部署Traefik
+部署traefik时需要在暴露服务的node上打标签才能生效
+```Shell
+kubectl label nodes node_name key=val
+```
+
+## 暴露service
+
+```yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 31080
+      protocol: TCP
+  selector:
+    app: traefik
+```
+
+## 手动部署工程
+```Shell
+kubectl apply -k account/cmd/account/k8s/
+kubectl apply -k contract/cmd/contract/
+kubectl apply -k contract/cmd/contract/k8s/
+kubectl apply -k datafin/cmd/datafin/k8s/
+kubectl apply -k endpoint/cmd/endpoint/k8s/
+kubectl apply -k user/cmd/user/k8s/
+```
