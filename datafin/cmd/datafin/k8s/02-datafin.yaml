@@ -59,5 +59,8 @@ spec:
     - name: healthz
       port: 30142
       targetPort: 30142
+    - name: pprof
+      port: 6062
+      targetPort: 6062
   selector:
     app: datafin
