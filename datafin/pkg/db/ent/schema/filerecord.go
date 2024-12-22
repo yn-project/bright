@@ -37,5 +37,6 @@ func (FileRecord) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("file_name"),
 		index.Fields("topic_id"),
+		index.Fields("updated_at"),
 	}
 }

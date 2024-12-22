@@ -65,6 +65,11 @@ var (
 				Unique:  false,
 				Columns: []*schema.Column{FileRecordsColumns[5]},
 			},
+			{
+				Name:    "filerecord_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{FileRecordsColumns[2]},
+			},
 		},
 	}
 	// MqueuesColumns holds the columns for the "mqueues" table.

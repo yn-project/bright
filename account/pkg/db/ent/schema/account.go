@@ -5,6 +5,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
 
+	"github.com/google/uuid"
 	"yun.tea/block/bright/account/pkg/db/mixin"
 	"yun.tea/block/bright/proto/bright/basetype"
 )
@@ -21,6 +22,9 @@ func (Account) Mixin() []ent.Mixin {
 
 func (Account) Fields() []ent.Field {
 	return []ent.Field{
+		field.UUID("id", uuid.UUID{}).
+			Default(uuid.New).
+			Unique(),
 		field.String("address"),
 		field.String("pri_key"),
 		field.String("balance").Optional(),
