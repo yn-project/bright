@@ -52,7 +52,7 @@ func (aMGR *accountsMGR) GetRootAccount(ctx context.Context) (acc *AccountKey, u
 	acc = &AccountKey{}
 	for {
 		select {
-		case <-time.NewTicker(BlockTime).C:
+		case <-time.NewTimer(BlockTime).C:
 			err = ctredis.Get(rootAccountStoreKey, acc)
 			if err != nil {
 				return nil, nil, fmt.Errorf("have no available tree accounts,err: %v", err)
@@ -91,7 +91,7 @@ func (aMGR *accountsMGR) SetTreeAccounts(addresses []*AccountKey) error {
 func (aMGR *accountsMGR) GetTreeAccount(ctx context.Context) (address *AccountKey, unlock func(), err error) {
 	for {
 		select {
-		case <-time.NewTicker(BlockTime).C:
+		case <-time.NewTimer(BlockTime).C:
 			_addresses := &AccountKeyList{}
 			err = ctredis.Get(treeAccountsStoreKey, _addresses)
 			if err != nil {
@@ -132,7 +132,7 @@ func (aMGR *accountsMGR) GetAccount(ctx context.Context, address *AccountKey, re
 			}, nil
 		}
 		select {
-		case <-time.NewTicker(BlockTime).C:
+		case <-time.NewTimer(BlockTime).C:
 			continue
 		case <-ctx.Done():
 			return nil, fmt.Errorf("failed to get account timeout")

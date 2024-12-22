@@ -23,7 +23,7 @@ import (
 func ParseFileTask(ctx context.Context) {
 	for {
 		select {
-		case <-time.NewTicker(time.Second * 2).C:
+		case <-time.NewTimer(time.Second * 2).C:
 			parseFileTask(ctx)
 		case <-ctx.Done():
 			return

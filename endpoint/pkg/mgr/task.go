@@ -20,7 +20,7 @@ const (
 func Maintain(ctx context.Context) {
 	for {
 		select {
-		case <-time.NewTicker(RefreshTime).C:
+		case <-time.NewTimer(RefreshTime).C:
 			conds := &proto.Conds{}
 			infos, total, err := crud.Rows(ctx, conds, 0, MaxUseEndpoints)
 			if err != nil {

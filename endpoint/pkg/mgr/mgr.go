@@ -144,7 +144,7 @@ func WithClient(ctx context.Context, handle func(ctx context.Context, cli *ethcl
 	eIMGR := GetEndpintIntervalMGR()
 	for {
 		select {
-		case <-time.NewTicker(lockEndpointWaitTime).C:
+		case <-time.NewTimer(lockEndpointWaitTime).C:
 			endpoints, err := eIMGR.GetEndpoinsList()
 			if err != nil {
 				return err

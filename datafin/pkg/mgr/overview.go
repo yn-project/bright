@@ -127,6 +127,6 @@ func OverviewRun(ctx context.Context) {
 		}
 
 		overviewData = _overviewData
-		<-time.NewTicker(refreshInterval).C
+		<-time.NewTimer(refreshInterval).C
 	}
 }

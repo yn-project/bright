@@ -44,7 +44,7 @@ func Maintain(ctx context.Context) {
 			CheckAllAccountState(ctx)
 		}
 		select {
-		case <-time.NewTicker(RefreshTime).C:
+		case <-time.NewTimer(RefreshTime).C:
 			continue
 		case <-ctx.Done():
 			return

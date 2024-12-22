@@ -75,7 +75,7 @@ func Maintain(ctx context.Context) {
 
 	for {
 		select {
-		case <-time.NewTicker(maxTaskInterval).C:
+		case <-time.NewTimer(maxTaskInterval).C:
 			resp, err := topicclient.GetTopics(ctx, &topic.GetTopicsRequest{
 				Offset: 0,
 				Limit:  maxTopicNum,
@@ -114,7 +114,7 @@ func dataFinTask(ctx context.Context, topicID string, isIDTopic bool) error {
 	}()
 	for {
 		select {
-		case <-time.NewTicker(time.Second * 2).C:
+		case <-time.NewTimer(time.Second * 2).C:
 			locked, err := ctredis.TryPubLock(onProccessingLockKey, lockTimeout)
 			if err != nil {
 				logger.Sugar().Errorf("failed to lock on redis,err: %v", err)
@@ -251,7 +251,7 @@ func retry(ctx context.Context, retries uint32, minInterval time.Duration) {
 	}
 	for {
 		select {
-		case <-time.NewTicker(minInterval << time.Duration(retries)).C:
+		case <-time.NewTimer(minInterval << time.Duration(retries)).C:
 			locked := false
 			for i := 0; i < 3; i++ {
 				locked, _ = ctredis.TryPubLock(onQueueLockKey, lockTimeout)
