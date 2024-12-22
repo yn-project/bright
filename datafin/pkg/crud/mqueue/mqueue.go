@@ -133,9 +133,9 @@ func Rows(ctx context.Context, conds *proto.Conds, offset, limit int) ([]*ent.Mq
 			return err
 		}
 		rows, err = stm.
-			Order(ent.Desc(mqueue.FieldCreatedAt)).
 			Offset(offset).
 			Limit(limit).
+			Order(ent.Desc(mqueue.FieldCreatedAt)).
 			All(_ctx)
 		if err != nil {
 			return err
