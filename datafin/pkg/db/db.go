@@ -23,7 +23,7 @@ import (
 
 const (
 	maxLifeTime     = time.Minute
-	maxConns        = 200
+	maxConns        = 100
 	maxFailedConter = 3
 )
 
