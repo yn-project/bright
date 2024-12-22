@@ -37,5 +37,6 @@ func (Topic) Fields() []ent.Field {
 func (Topic) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("topic_id", "contract").Unique(),
+		index.Fields("updated_at"),
 	}
 }

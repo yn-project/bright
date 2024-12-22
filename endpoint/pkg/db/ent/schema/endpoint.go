@@ -3,6 +3,7 @@ package schema
 import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 
 	"github.com/google/uuid"
 	"yun.tea/block/bright/endpoint/pkg/db/mixin"
@@ -32,5 +33,7 @@ func (Endpoint) Fields() []ent.Field {
 }
 
 func (Endpoint) Indexes() []ent.Index {
-	return []ent.Index{}
+	return []ent.Index{
+		index.Fields("updated_at"),
+	}
 }

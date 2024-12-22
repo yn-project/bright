@@ -33,6 +33,11 @@ var (
 				Unique:  true,
 				Columns: []*schema.Column{AccountsColumns[3], AccountsColumns[5]},
 			},
+			{
+				Name:    "account_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{AccountsColumns[2]},
+			},
 		},
 	}
 	// BlockNumsColumns holds the columns for the "block_nums" table.
@@ -55,6 +60,11 @@ var (
 				Unique:  false,
 				Columns: []*schema.Column{BlockNumsColumns[4]},
 			},
+			{
+				Name:    "blocknum_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{BlockNumsColumns[2]},
+			},
 		},
 	}
 	// TxNumsColumns holds the columns for the "tx_nums" table.
@@ -76,6 +86,11 @@ var (
 				Name:    "txnum_time_at",
 				Unique:  false,
 				Columns: []*schema.Column{TxNumsColumns[4]},
+			},
+			{
+				Name:    "txnum_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{TxNumsColumns[2]},
 			},
 		},
 	}

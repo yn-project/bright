@@ -34,6 +34,11 @@ var (
 				Unique:  false,
 				Columns: []*schema.Column{DataFinsColumns[4], DataFinsColumns[5]},
 			},
+			{
+				Name:    "datafin_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{DataFinsColumns[2]},
+			},
 		},
 	}
 	// FileRecordsColumns holds the columns for the "file_records" table.
@@ -87,6 +92,13 @@ var (
 		Name:       "mqueues",
 		Columns:    MqueuesColumns,
 		PrimaryKey: []*schema.Column{MqueuesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "mqueue_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{MqueuesColumns[2]},
+			},
+		},
 	}
 	// TopicsColumns holds the columns for the "topics" table.
 	TopicsColumns = []*schema.Column{
@@ -112,6 +124,11 @@ var (
 				Name:    "topic_topic_id_contract",
 				Unique:  true,
 				Columns: []*schema.Column{TopicsColumns[4], TopicsColumns[6]},
+			},
+			{
+				Name:    "topic_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{TopicsColumns[2]},
 			},
 		},
 	}

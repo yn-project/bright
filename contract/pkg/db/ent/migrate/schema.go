@@ -24,6 +24,13 @@ var (
 		Name:       "contracts",
 		Columns:    ContractsColumns,
 		PrimaryKey: []*schema.Column{ContractsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "contract_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{ContractsColumns[2]},
+			},
+		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{

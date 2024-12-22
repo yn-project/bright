@@ -25,6 +25,13 @@ var (
 		Name:       "endpoints",
 		Columns:    EndpointsColumns,
 		PrimaryKey: []*schema.Column{EndpointsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "endpoint_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{EndpointsColumns[2]},
+			},
+		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
