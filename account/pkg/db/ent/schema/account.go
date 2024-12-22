@@ -38,6 +38,6 @@ func (Account) Fields() []ent.Field {
 func (Account) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("deleted_at", "pri_key").Unique(),
-		index.Fields("updated_at"),
+		index.Fields("created_at"),
 	}
 }

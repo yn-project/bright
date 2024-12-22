@@ -29,6 +29,6 @@ func (BlockNum) Fields() []ent.Field {
 func (BlockNum) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("time_at"),
-		index.Fields("updated_at"),
+		index.Fields("created_at"),
 	}
 }

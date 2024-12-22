@@ -33,6 +33,6 @@ func (User) Fields() []ent.Field {
 
 func (User) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("updated_at"),
+		index.Fields("created_at"),
 	}
 }

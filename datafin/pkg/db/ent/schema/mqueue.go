@@ -32,6 +32,6 @@ func (Mqueue) Fields() []ent.Field {
 
 func (Mqueue) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("updated_at"),
+		index.Fields("created_at"),
 	}
 }

@@ -188,7 +188,7 @@ func Rows(ctx context.Context, conds *proto.FileRecordConds, offset, limit int) 
 		}
 		rows, err = stm.
 			Offset(offset).
-			Order(ent.Desc(filerecord.FieldUpdatedAt)).
+			Order(ent.Desc(filerecord.FieldCreatedAt)).
 			Limit(limit).
 			All(_ctx)
 		if err != nil {

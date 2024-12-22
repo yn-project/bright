@@ -38,6 +38,6 @@ func (DataFin) Fields() []ent.Field {
 func (DataFin) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("topic_id", "data_id"),
-		index.Fields("updated_at"),
+		index.Fields("created_at"),
 	}
 }

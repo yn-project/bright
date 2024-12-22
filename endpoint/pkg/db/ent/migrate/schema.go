@@ -27,9 +27,9 @@ var (
 		PrimaryKey: []*schema.Column{EndpointsColumns[0]},
 		Indexes: []*schema.Index{
 			{
-				Name:    "endpoint_updated_at",
+				Name:    "endpoint_created_at",
 				Unique:  false,
-				Columns: []*schema.Column{EndpointsColumns[2]},
+				Columns: []*schema.Column{EndpointsColumns[1]},
 			},
 		},
 	}

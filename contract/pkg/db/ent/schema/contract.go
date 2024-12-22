@@ -33,6 +33,6 @@ func (Contract) Fields() []ent.Field {
 
 func (Contract) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("updated_at"),
+		index.Fields("created_at"),
 	}
 }

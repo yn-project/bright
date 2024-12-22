@@ -26,9 +26,9 @@ var (
 		PrimaryKey: []*schema.Column{ContractsColumns[0]},
 		Indexes: []*schema.Index{
 			{
-				Name:    "contract_updated_at",
+				Name:    "contract_created_at",
 				Unique:  false,
-				Columns: []*schema.Column{ContractsColumns[2]},
+				Columns: []*schema.Column{ContractsColumns[1]},
 			},
 		},
 	}

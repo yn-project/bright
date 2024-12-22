@@ -34,6 +34,6 @@ func (Endpoint) Fields() []ent.Field {
 
 func (Endpoint) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("updated_at"),
+		index.Fields("created_at"),
 	}
 }

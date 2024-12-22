@@ -26,9 +26,9 @@ var (
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
 		Indexes: []*schema.Index{
 			{
-				Name:    "user_updated_at",
+				Name:    "user_created_at",
 				Unique:  false,
-				Columns: []*schema.Column{UsersColumns[2]},
+				Columns: []*schema.Column{UsersColumns[1]},
 			},
 		},
 	}

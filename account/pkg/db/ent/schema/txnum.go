@@ -29,6 +29,6 @@ func (TxNum) Fields() []ent.Field {
 func (TxNum) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("time_at"),
-		index.Fields("updated_at"),
+		index.Fields("created_at"),
 	}
 }

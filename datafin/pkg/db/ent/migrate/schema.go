@@ -35,9 +35,9 @@ var (
 				Columns: []*schema.Column{DataFinsColumns[4], DataFinsColumns[5]},
 			},
 			{
-				Name:    "datafin_updated_at",
+				Name:    "datafin_created_at",
 				Unique:  false,
-				Columns: []*schema.Column{DataFinsColumns[2]},
+				Columns: []*schema.Column{DataFinsColumns[1]},
 			},
 		},
 	}
@@ -71,9 +71,9 @@ var (
 				Columns: []*schema.Column{FileRecordsColumns[5]},
 			},
 			{
-				Name:    "filerecord_updated_at",
+				Name:    "filerecord_created_at",
 				Unique:  false,
-				Columns: []*schema.Column{FileRecordsColumns[2]},
+				Columns: []*schema.Column{FileRecordsColumns[1]},
 			},
 		},
 	}
@@ -94,9 +94,9 @@ var (
 		PrimaryKey: []*schema.Column{MqueuesColumns[0]},
 		Indexes: []*schema.Index{
 			{
-				Name:    "mqueue_updated_at",
+				Name:    "mqueue_created_at",
 				Unique:  false,
-				Columns: []*schema.Column{MqueuesColumns[2]},
+				Columns: []*schema.Column{MqueuesColumns[1]},
 			},
 		},
 	}
@@ -126,9 +126,9 @@ var (
 				Columns: []*schema.Column{TopicsColumns[4], TopicsColumns[6]},
 			},
 			{
-				Name:    "topic_updated_at",
+				Name:    "topic_created_at",
 				Unique:  false,
-				Columns: []*schema.Column{TopicsColumns[2]},
+				Columns: []*schema.Column{TopicsColumns[1]},
 			},
 		},
 	}

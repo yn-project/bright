@@ -34,9 +34,9 @@ var (
 				Columns: []*schema.Column{AccountsColumns[3], AccountsColumns[5]},
 			},
 			{
-				Name:    "account_updated_at",
+				Name:    "account_created_at",
 				Unique:  false,
-				Columns: []*schema.Column{AccountsColumns[2]},
+				Columns: []*schema.Column{AccountsColumns[1]},
 			},
 		},
 	}
@@ -61,9 +61,9 @@ var (
 				Columns: []*schema.Column{BlockNumsColumns[4]},
 			},
 			{
-				Name:    "blocknum_updated_at",
+				Name:    "blocknum_created_at",
 				Unique:  false,
-				Columns: []*schema.Column{BlockNumsColumns[2]},
+				Columns: []*schema.Column{BlockNumsColumns[1]},
 			},
 		},
 	}
@@ -88,9 +88,9 @@ var (
 				Columns: []*schema.Column{TxNumsColumns[4]},
 			},
 			{
-				Name:    "txnum_updated_at",
+				Name:    "txnum_created_at",
 				Unique:  false,
-				Columns: []*schema.Column{TxNumsColumns[2]},
+				Columns: []*schema.Column{TxNumsColumns[1]},
 			},
 		},
 	}
