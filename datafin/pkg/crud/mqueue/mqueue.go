@@ -156,16 +156,15 @@ func AllRows(ctx context.Context, desc bool, offset, limit int) ([]*ent.Mqueue, 
 	var total int
 
 	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		dtm := cli.Mqueue.Query()
+		dtm := cli.Mqueue.Query().
+			Offset(offset).
+			Limit(limit)
 		if desc {
 			dtm.Order(ent.Desc(mqueue.FieldCreatedAt))
 		} else {
 			dtm.Order(ent.Asc(mqueue.FieldCreatedAt))
 		}
-		rows, err = dtm.
-			Offset(offset).
-			Limit(limit).
-			All(_ctx)
+		rows, err = dtm.All(_ctx)
 		if err != nil {
 			return err
 		}

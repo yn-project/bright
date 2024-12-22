@@ -203,9 +203,9 @@ func Rows(ctx context.Context, conds *proto.Conds, offset, limit int) ([]*ent.Ac
 			return err
 		}
 		rows, err = stm.
-			Order(ent.Desc(account.FieldCreatedAt)).
 			Offset(offset).
 			Limit(limit).
+			Order(ent.Desc(account.FieldCreatedAt)).
 			All(_ctx)
 		if err != nil {
 			return err

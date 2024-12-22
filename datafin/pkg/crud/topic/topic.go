@@ -86,8 +86,8 @@ func Rows(ctx context.Context, offset, limit int, contractAddr string) ([]*ent.T
 		}
 		rows, err = stm.
 			Offset(offset).
-			Order(ent.Desc(topic.FieldCreatedAt)).
 			Limit(limit).
+			Order(ent.Desc(topic.FieldCreatedAt)).
 			All(_ctx)
 		if err != nil {
 			return err

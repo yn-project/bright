@@ -199,8 +199,8 @@ func Rows(ctx context.Context, conds *proto.Conds, offset, limit int) ([]*ent.En
 		}
 		rows, err = stm.
 			Offset(offset).
-			Order(ent.Desc(endpoint.FieldCreatedAt)).
 			Limit(limit).
+			Order(ent.Desc(endpoint.FieldCreatedAt)).
 			All(_ctx)
 		if err != nil {
 			return err

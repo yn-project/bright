@@ -249,9 +249,9 @@ func Rows(ctx context.Context, conds *proto.Conds, offset, limit int) ([]*ent.Da
 			return err
 		}
 		rows, err = stm.
-			Order(ent.Desc(datafin.FieldCreatedAt)).
 			Offset(offset).
 			Limit(limit).
+			Order(ent.Desc(datafin.FieldCreatedAt)).
 			All(_ctx)
 		if err != nil {
 			return err
@@ -272,16 +272,16 @@ func AllRows(ctx context.Context, desc bool, offset, limit int) ([]*ent.DataFin,
 	var total int
 
 	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		dtm := cli.DataFin.Query()
+		dtm := cli.DataFin.Query().
+			Offset(offset).
+			Limit(limit)
+
 		if desc {
 			dtm.Order(ent.Desc(datafin.FieldCreatedAt))
 		} else {
 			dtm.Order(ent.Asc(datafin.FieldCreatedAt))
 		}
-		rows, err = dtm.
-			Offset(offset).
-			Limit(limit).
-			All(_ctx)
+		rows, err = dtm.All(_ctx)
 		if err != nil {
 			return err
 		}
