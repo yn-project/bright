@@ -116,6 +116,21 @@ func (s *Server) GetAccount(ctx context.Context, in *proto.GetAccountRequest) (*
 	}, nil
 }
 
+func (s *Server) GetAccountReport(ctx context.Context, in *proto.GetAccountReportRequest) (*proto.GetAccountReportResponse, error) {
+	ret, err := mgr.GetAccountReport(ctx, in.Address)
+	if err != nil {
+		logger.Sugar().Errorw("GetAccountReport", "Address", in.GetAddress(), "error", err)
+		return &proto.GetAccountReportResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	return &proto.GetAccountReportResponse{
+		Balance: ret.Balance,
+		Nonce:   ret.Nonce,
+		IsRoot:  ret.IsRoot,
+		State:   ret.State,
+		Remark:  ret.Remark,
+	}, nil
+}
+
 func (s *Server) GetAccountPriKey(ctx context.Context, in *proto.GetAccountPriKeyRequest) (*proto.GetAccountPriKeyResponse, error) {
 	var err error
 

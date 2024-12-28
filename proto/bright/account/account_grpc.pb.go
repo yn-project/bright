@@ -25,6 +25,7 @@ type ManagerClient interface {
 	CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*CreateAccountResponse, error)
 	ImportAccount(ctx context.Context, in *ImportAccountRequest, opts ...grpc.CallOption) (*ImportAccountResponse, error)
 	GetAccount(ctx context.Context, in *GetAccountRequest, opts ...grpc.CallOption) (*GetAccountResponse, error)
+	GetAccountReport(ctx context.Context, in *GetAccountReportRequest, opts ...grpc.CallOption) (*GetAccountReportResponse, error)
 	GetAccountPriKey(ctx context.Context, in *GetAccountPriKeyRequest, opts ...grpc.CallOption) (*GetAccountPriKeyResponse, error)
 	GetAccounts(ctx context.Context, in *GetAccountsRequest, opts ...grpc.CallOption) (*GetAccountsResponse, error)
 	SetRootAccount(ctx context.Context, in *SetRootAccountRequest, opts ...grpc.CallOption) (*SetRootAccountResponse, error)
@@ -61,6 +62,15 @@ func (c *managerClient) ImportAccount(ctx context.Context, in *ImportAccountRequ
 func (c *managerClient) GetAccount(ctx context.Context, in *GetAccountRequest, opts ...grpc.CallOption) (*GetAccountResponse, error) {
 	out := new(GetAccountResponse)
 	err := c.cc.Invoke(ctx, "/bright.account.Manager/GetAccount", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *managerClient) GetAccountReport(ctx context.Context, in *GetAccountReportRequest, opts ...grpc.CallOption) (*GetAccountReportResponse, error) {
+	out := new(GetAccountReportResponse)
+	err := c.cc.Invoke(ctx, "/bright.account.Manager/GetAccountReport", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -119,6 +129,7 @@ type ManagerServer interface {
 	CreateAccount(context.Context, *CreateAccountRequest) (*CreateAccountResponse, error)
 	ImportAccount(context.Context, *ImportAccountRequest) (*ImportAccountResponse, error)
 	GetAccount(context.Context, *GetAccountRequest) (*GetAccountResponse, error)
+	GetAccountReport(context.Context, *GetAccountReportRequest) (*GetAccountReportResponse, error)
 	GetAccountPriKey(context.Context, *GetAccountPriKeyRequest) (*GetAccountPriKeyResponse, error)
 	GetAccounts(context.Context, *GetAccountsRequest) (*GetAccountsResponse, error)
 	SetRootAccount(context.Context, *SetRootAccountRequest) (*SetRootAccountResponse, error)
@@ -139,6 +150,9 @@ func (UnimplementedManagerServer) ImportAccount(context.Context, *ImportAccountR
 }
 func (UnimplementedManagerServer) GetAccount(context.Context, *GetAccountRequest) (*GetAccountResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAccount not implemented")
+}
+func (UnimplementedManagerServer) GetAccountReport(context.Context, *GetAccountReportRequest) (*GetAccountReportResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAccountReport not implemented")
 }
 func (UnimplementedManagerServer) GetAccountPriKey(context.Context, *GetAccountPriKeyRequest) (*GetAccountPriKeyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAccountPriKey not implemented")
@@ -218,6 +232,24 @@ func _Manager_GetAccount_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ManagerServer).GetAccount(ctx, req.(*GetAccountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Manager_GetAccountReport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAccountReportRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagerServer).GetAccountReport(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/bright.account.Manager/GetAccountReport",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagerServer).GetAccountReport(ctx, req.(*GetAccountReportRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -330,6 +362,10 @@ var Manager_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAccount",
 			Handler:    _Manager_GetAccount_Handler,
+		},
+		{
+			MethodName: "GetAccountReport",
+			Handler:    _Manager_GetAccountReport_Handler,
 		},
 		{
 			MethodName: "GetAccountPriKey",

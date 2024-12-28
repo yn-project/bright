@@ -144,6 +144,38 @@
         ]
       }
     },
+    "/get/account/report": {
+      "post": {
+        "operationId": "Manager_GetAccountReport",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/accountGetAccountReportResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/accountGetAccountReportRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Manager"
+        ]
+      }
+    },
     "/get/accounts": {
       "post": {
         "operationId": "Manager_GetAccounts",
@@ -371,6 +403,35 @@
       "type": "object",
       "properties": {
         "PriKey": {
+          "type": "string"
+        }
+      }
+    },
+    "accountGetAccountReportRequest": {
+      "type": "object",
+      "properties": {
+        "Address": {
+          "type": "string"
+        }
+      }
+    },
+    "accountGetAccountReportResponse": {
+      "type": "object",
+      "properties": {
+        "Balance": {
+          "type": "string"
+        },
+        "Nonce": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "IsRoot": {
+          "type": "boolean"
+        },
+        "State": {
+          "$ref": "#/definitions/basetypeAccountState"
+        },
+        "Remark": {
           "type": "string"
         }
       }

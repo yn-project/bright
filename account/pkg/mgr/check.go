@@ -2,7 +2,6 @@ package mgr
 
 import (
 	"context"
-	"fmt"
 	"math/big"
 
 	"github.com/Vigo-Tea/go-ethereum-ant/accounts/abi/bind"
@@ -101,8 +100,7 @@ func GetAccountReport(ctx context.Context, address string) (acc AccountReport, e
 	if err != nil {
 		return
 	}
-	fmt.Println(rootAcc)
-	fmt.Println(utils.PrettyStruct(treeAccs))
+
 	if rootAcc == address {
 		acc.IsRoot = true
 	}
