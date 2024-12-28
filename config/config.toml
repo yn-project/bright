@@ -32,7 +32,7 @@ grpc-port=30151
 log-file="/var/log/account.log"
 
 [mysql]
-domain="mysql-headless"
+domain="mysql"
 port=3306
 user="root"
 password="123456"
